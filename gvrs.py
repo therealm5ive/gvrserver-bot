@@ -227,6 +227,11 @@ async def on_ready():
     bot.add_view(TicketPanelView())
     bot.add_view(ServerInfoView())
 
+    # Ticket Buttons nach Neustarts aktiv halten
+    bot.add_view(TicketView("General Assistance", 0, 0))
+    bot.add_view(TicketView("Civilian Report", 0, 0))
+    bot.add_view(TicketView("Staff Report", 0, 0))
+    bot.add_view(TicketView("Partnership", 0, 0))
 
     synced = await bot.tree.sync()
     print(f"{len(synced)} Commands synchronised")
@@ -1171,7 +1176,7 @@ class TicketView(discord.ui.View):
         self.open_timestamp = open_timestamp
         self.claimed_by = None
 
-    @discord.ui.button(label="Claim", style=discord.ButtonStyle.success)
+    @discord.ui.button(label="Claim", style=discord.ButtonStyle.success, custom_id="ticket_claim_button")
     async def claim_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
 
         if self.ticket_type == "Staff Report":
@@ -1216,7 +1221,7 @@ class TicketView(discord.ui.View):
         )
         await interaction.channel.send(embed=embed)
 
-    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger, custom_id="ticket_close_button")
     async def close_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
 
         allowed = (
