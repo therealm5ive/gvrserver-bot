@@ -1632,7 +1632,7 @@ class DeleteWarningSelect(discord.ui.Select):
             options.append(
                 discord.SelectOption(
                     label=warning["type"],
-                    description=warning["reason"][:90],
+                    description=f"{warning['reason'][:65]} • <t:{warning['timestamp']}:D>",
                     value=str(index)
                 )
             )
