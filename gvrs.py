@@ -1045,19 +1045,20 @@ async def staff_strike(interaction: discord.Interaction, user: discord.Member, r
         await interaction.response.defer(ephemeral=True)
         return
 
-    current_staff_infraction_roles = [
+    current = [
         role for role in user.roles
         if role.name in STAFF_INFRACTION_ROLES
     ]
 
-    if len(current_staff_infraction_roles) >= 3:
+    if len(current) >= 3:
         await interaction.response.send_message(
-            "This staff member already has 3 staff infractions.",
+            "This staff member already has 3 staff strikes.",
             ephemeral=True
         )
         return
 
-    next_role_name = STAFF_INFRACTION_ROLES[len(current_staff_infraction_roles)]
+    next_number = len(current) + 1
+    next_role_name = f"Staff Infraction {next_number}"
     next_role = discord.utils.get(interaction.guild.roles, name=next_role_name)
 
     if next_role is None:
@@ -1066,33 +1067,30 @@ async def staff_strike(interaction: discord.Interaction, user: discord.Member, r
 
     await user.add_roles(next_role)
 
-    strike_count = len(current_staff_infraction_roles) + 1
-
-    case = add_case(
-        user.id,
-        "Staff Strike",
-        interaction.user.id,
+    entry = make_entry(
+        f"Staff Strike {next_number}",
         reason,
+        interaction.user.id,
         appealable.value,
         time,
-        evidence,
-        active=True
+        evidence
     )
 
-    dm_embed = build_dm_embed(
+    add_mod_entry(user.id, entry)
+
+    await send_mod_dm(
+        user,
         "Staff Strike",
         (
             f"You have received **One** Staff Strike in **Greenville Roleplay Desire** for the following reason(s):\n\n"
             f"- {reason}\n\n"
-            f"This Strike is **{appealable.value}** in {time}, if you deem this strike to be false please open a ticket via {TICKET_APPEAL_LINK}.\n\n"
+            f"This Strike is **{appealable.value}** in {time}, if you deem this strike to be false please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
             f"Evidence: {evidence}"
         )
     )
 
-    await try_dm(user, dm_embed)
-
     await interaction.response.send_message(
-        f"{user.mention} has received staff strike `{strike_count}`. Case `{case['case_id']}`.",
+        f"{user.mention} has received **Staff Strike {next_number}**.",
         ephemeral=True
     )
 
@@ -1100,7 +1098,7 @@ async def staff_strike(interaction: discord.Interaction, user: discord.Member, r
         interaction.guild,
         interaction.user,
         "/staff strike",
-        f"User: {user.mention}\nCase: {case['case_id']}\nReason: {reason}"
+        f"User: {user.mention}\nStaff Strike: {next_number}\nReason: {reason}"
     )
 
 bot.tree.add_command(staff_group)
@@ -1454,23 +1452,13 @@ async def ticketpanel(interaction: discord.Interaction):
 # =====================================
 
 MODLOGS_FILE = "modlogs.json"
-TICKET_APPEAL_LINK = "https://discord.com/channels/1290705579953754163/1503269938624856156"
+APPEAL_TICKET_LINK = "https://discord.com/channels/1290705579953754163/1503269938624856156"
 
 STAFF_TEAM_ROLE = "Staff Team"
 HIGH_COMMAND_ROLES = ["High Command", "Senior High Command"]
 
-INFRACTION_ROLES = [
-    "Infraction I",
-    "Infraction II",
-    "Infraction III",
-    "Infraction IIII"
-]
-
-STAFF_INFRACTION_ROLES = [
-    "Staff Infraction I",
-    "Staff Infraction II",
-    "Staff Infraction III"
-]
+INFRACTION_ROLES = ["Infraction I", "Infraction II", "Infraction III", "Infraction IIII"]
+STAFF_INFRACTION_ROLES = ["Staff Infraction I", "Staff Infraction II", "Staff Infraction III"]
 
 STAFF_REMOVE_ROLES = [
     "Staff Team",
@@ -1509,62 +1497,65 @@ def load_modlogs():
 
 def save_modlogs(data):
     temp_file = MODLOGS_FILE + ".tmp"
-
-    try:
-        with open(temp_file, "w", encoding="utf-8") as file:
-            json.dump(data, file, indent=4)
-
-        os.replace(temp_file, MODLOGS_FILE)
-
-    except OSError as e:
-        print(f"Could not save modlogs: {e}")
+    with open(temp_file, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+    os.replace(temp_file, MODLOGS_FILE)
 
 def is_high_command(member):
     return any(role.name in HIGH_COMMAND_ROLES for role in member.roles)
 
-def has_staff_role(member):
+def is_staff_team(member):
     return any(role.name == STAFF_TEAM_ROLE for role in member.roles)
 
-async def get_member_or_user(guild, target: str):
-    target_id = int(re.sub(r"\D", "", target))
+async def get_target(guild, user_input: str):
+    user_id = re.sub(r"\D", "", user_input)
 
-    member = guild.get_member(target_id)
+    if not user_id:
+        return None
+
+    user_id = int(user_id)
+    member = guild.get_member(user_id)
 
     if member:
         return member
 
     try:
-        return await bot.fetch_user(target_id)
+        return await bot.fetch_user(user_id)
     except:
         return None
 
-def add_case(user_id, case_type, moderator_id, reason, appealable, appeal_time, evidence, active=True):
-    data = load_modlogs()
+def ensure_mod_user(data, user_id):
     user_id = str(user_id)
 
     if user_id not in data:
-        data[user_id] = []
+        data[user_id] = {
+            "warnings": [],
+            "modlogs": []
+        }
 
-    case_id = sum(len(cases) for cases in data.values()) + 1
+def add_mod_entry(user_id, entry):
+    data = load_modlogs()
+    user_id = str(user_id)
 
-    case = {
-        "case_id": case_id,
-        "type": case_type,
-        "moderator": moderator_id,
+    ensure_mod_user(data, user_id)
+
+    data[user_id]["warnings"].append(entry)
+    data[user_id]["modlogs"].append(entry.copy())
+
+    save_modlogs(data)
+
+def make_entry(entry_type, reason, moderator_id, appealable, appeal_time, evidence):
+    return {
+        "type": entry_type,
         "reason": reason,
+        "moderator": moderator_id,
         "appealable": appealable,
         "appeal_time": appeal_time,
         "evidence": evidence,
-        "timestamp": int(discord.utils.utcnow().timestamp()),
-        "active": active
+        "timestamp": int(discord.utils.utcnow().timestamp())
     }
 
-    data[user_id].append(case)
-    save_modlogs(data)
-
-    return case
-
-def build_dm_embed(title, description):
+async def send_mod_dm(user, title, description):
     embed = discord.Embed(
         title=title,
         description=description,
@@ -1576,35 +1567,46 @@ def build_dm_embed(title, description):
         icon_url=bot.user.display_avatar.url
     )
 
-    return embed
-
-async def try_dm(user, embed):
     try:
         await user.send(embed=embed)
     except:
         pass
 
-async def remove_roles_by_names(member, role_names):
-    roles_to_remove = [
-        role for role in member.roles
-        if role.name in role_names
-    ]
+async def remove_roles_by_name(member, role_names):
+    roles = [role for role in member.roles if role.name in role_names]
 
-    if roles_to_remove:
-        await member.remove_roles(*roles_to_remove)
+    if roles:
+        await member.remove_roles(*roles)
 
-class WarningDeleteSelect(discord.ui.Select):
-    def __init__(self, target_id: str, active_cases: list):
-        self.target_id = target_id
+async def remove_warning_role(member, warning_type):
+    role_name = None
+
+    if warning_type.startswith("Infraction "):
+        number = warning_type.replace("Infraction ", "")
+        role_name = f"Infraction {number}"
+
+    if warning_type.startswith("Staff Strike "):
+        number = warning_type.replace("Staff Strike ", "")
+        role_name = f"Staff Infraction {number}"
+
+    if role_name:
+        role = discord.utils.get(member.guild.roles, name=role_name)
+
+        if role and role in member.roles:
+            await member.remove_roles(role)
+
+class DeleteWarningSelect(discord.ui.Select):
+    def __init__(self, target: discord.Member, warnings: list):
+        self.target = target
 
         options = []
 
-        for case in active_cases[:25]:
+        for index, warning in enumerate(warnings[:25]):
             options.append(
                 discord.SelectOption(
-                    label=f"Remove Case {case['case_id']}",
-                    description=f"{case['type']} • {case['reason'][:70]}",
-                    value=str(case["case_id"])
+                    label=warning["type"],
+                    description=warning["reason"][:90],
+                    value=str(index)
                 )
             )
 
@@ -1619,38 +1621,47 @@ class WarningDeleteSelect(discord.ui.Select):
             return
 
         data = load_modlogs()
-        cases = data.get(self.target_id, [])
-        selected_case_id = int(self.values[0])
+        user_id = str(self.target.id)
 
-        for case in cases:
-            if case["case_id"] == selected_case_id:
-                case["active"] = False
-                break
+        warnings = data.get(user_id, {}).get("warnings", [])
+        index = int(self.values[0])
 
+        if index >= len(warnings):
+            await interaction.response.send_message(
+                "This warning no longer exists.",
+                ephemeral=True
+            )
+            return
+
+        removed_warning = warnings.pop(index)
+
+        data[user_id]["warnings"] = warnings
         save_modlogs(data)
 
+        await remove_warning_role(self.target, removed_warning["type"])
+
         await interaction.response.send_message(
-            f"Case `{selected_case_id}` has been removed from warnings. It will remain in modlogs.",
+            f"`{removed_warning['type']}` has been deleted from warnings.",
             ephemeral=True
         )
 
         await send_log(
             interaction.guild,
             interaction.user,
-            "Warning removed",
-            f"Target ID: {self.target_id}\nCase ID: {selected_case_id}"
+            "Warning deleted",
+            f"User: {self.target.mention}\nWarning: {removed_warning['type']}"
         )
 
-class WarningDeleteDropdownView(discord.ui.View):
-    def __init__(self, target_id: str, active_cases: list):
+class DeleteWarningDropdownView(discord.ui.View):
+    def __init__(self, target: discord.Member, warnings: list):
         super().__init__(timeout=120)
-        self.add_item(WarningDeleteSelect(target_id, active_cases))
+        self.add_item(DeleteWarningSelect(target, warnings))
 
-class WarningDeleteButtonView(discord.ui.View):
-    def __init__(self, target_user, active_cases: list):
+class DeleteWarningButtonView(discord.ui.View):
+    def __init__(self, target: discord.Member, warnings: list):
         super().__init__(timeout=120)
-        self.target_user = target_user
-        self.active_cases = active_cases
+        self.target = target
+        self.warnings = warnings
 
     @discord.ui.button(
         label="Delete a Warning",
@@ -1663,13 +1674,13 @@ class WarningDeleteButtonView(discord.ui.View):
 
         embed = discord.Embed(
             title="Delete a Warning",
-            description=f"{self.target_user.mention} has **{len(self.active_cases)}** active warning(s). Select one to delete.",
+            description=f"{self.target.mention} has **{len(self.warnings)}** warning(s). Select a warning to delete.",
             color=discord.Color.red()
         )
 
         await interaction.response.send_message(
             embed=embed,
-            view=WarningDeleteDropdownView(str(self.target_user.id), self.active_cases),
+            view=DeleteWarningDropdownView(self.target, self.warnings),
             ephemeral=True
         )
 
@@ -1688,36 +1699,34 @@ class WarningDeleteButtonView(discord.ui.View):
     ]
 )
 async def infract(interaction: discord.Interaction, user: str, reason: str, appealable: app_commands.Choice[str], time: str, evidence: str):
-    if not has_staff_role(interaction.user):
+    if not is_staff_team(interaction.user):
         await interaction.response.defer(ephemeral=True)
         return
 
-    target = await get_member_or_user(interaction.guild, user)
+    target = await get_target(interaction.guild, user)
 
     if target is None or not isinstance(target, discord.Member):
         await interaction.response.send_message("User was not found in this server.", ephemeral=True)
         return
 
-    if has_staff_role(target):
+    if is_staff_team(target):
         await interaction.response.send_message(
-            "Staff members cannot be infracted. Use `/staff strike` instead.",
+            "Staff Team members cannot be infracted. Use `/staff strike` instead.",
             ephemeral=True
         )
         return
 
-    current_infraction_roles = [
-        role for role in target.roles
-        if role.name in INFRACTION_ROLES
-    ]
+    current = [role for role in target.roles if role.name in INFRACTION_ROLES]
 
-    if len(current_infraction_roles) >= 4:
+    if len(current) >= 4:
         await interaction.response.send_message(
             "User has 4 infractions, roleplay restrict the user.",
             ephemeral=True
         )
         return
 
-    next_role_name = INFRACTION_ROLES[len(current_infraction_roles)]
+    next_number = len(current) + 1
+    next_role_name = f"Infraction {next_number}"
     next_role = discord.utils.get(interaction.guild.roles, name=next_role_name)
 
     if next_role is None:
@@ -1726,44 +1735,36 @@ async def infract(interaction: discord.Interaction, user: str, reason: str, appe
 
     await target.add_roles(next_role)
 
-    infraction_count = len(current_infraction_roles) + 1
-
-    case = add_case(
-        target.id,
-        "Infraction",
-        interaction.user.id,
+    entry = make_entry(
+        f"Infraction {next_number}",
         reason,
+        interaction.user.id,
         appealable.value,
         time,
-        evidence,
-        active=True
+        evidence
     )
 
-    dm_embed = build_dm_embed(
+    add_mod_entry(target.id, entry)
+
+    await send_mod_dm(
+        target,
         "Infraction",
         (
-            f"You have been **Infracted {infraction_count} Time** in **Greenville Roleplay Desire** for the following reason(s):\n\n"
+            f"You have been **Infracted {next_number} Time** in **Greenville Roleplay Desire** for the following reason(s):\n\n"
             f"- {reason}\n\n"
-            f"This infraction is **{appealable.value}** in {time}, if you deem this infraction to be false please open a ticket via {TICKET_APPEAL_LINK}.\n\n"
+            f"This infraction is **{appealable.value}** in {time}, if you deem this infraction to be false please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
             f"Evidence: {evidence}"
         )
     )
 
-    await try_dm(target, dm_embed)
+    msg = f"{target.mention} has received **Infraction {next_number}**."
 
-    message = f"{target.mention} has been infracted. Case `{case['case_id']}`."
+    if next_number == 4:
+        msg += "\nThis user has now reached 4 infractions. User needs to be roleplay restricted."
 
-    if infraction_count == 4:
-        message += "\nThis user has now reached 4 infractions. User needs to be roleplay restricted."
+    await interaction.response.send_message(msg, ephemeral=True)
 
-    await interaction.response.send_message(message, ephemeral=True)
-
-    await send_log(
-        interaction.guild,
-        interaction.user,
-        "/infract",
-        f"User: {target.mention}\nCase: {case['case_id']}\nReason: {reason}"
-    )
+    await send_log(interaction.guild, interaction.user, "/infract", f"User: {target.mention}\nInfraction: {next_number}\nReason: {reason}")
 
 @bot.tree.command(name="mute", description="Mute a user")
 @app_commands.describe(
@@ -1772,21 +1773,18 @@ async def infract(interaction: discord.Interaction, user: str, reason: str, appe
     hours="Hours"
 )
 async def mute(interaction: discord.Interaction, user: str, minutes: int = 0, hours: int = 0):
-    if not has_staff_role(interaction.user):
+    if not is_staff_team(interaction.user):
         await interaction.response.defer(ephemeral=True)
         return
 
-    target = await get_member_or_user(interaction.guild, user)
+    target = await get_target(interaction.guild, user)
 
     if target is None or not isinstance(target, discord.Member):
         await interaction.response.send_message("User was not found in this server.", ephemeral=True)
         return
 
-    if has_staff_role(target):
-        await interaction.response.send_message(
-            "Staff members cannot be muted with this command.",
-            ephemeral=True
-        )
+    if is_staff_team(target):
+        await interaction.response.send_message("Staff Team members cannot be muted.", ephemeral=True)
         return
 
     duration = timedelta(hours=hours, minutes=minutes)
@@ -1797,28 +1795,12 @@ async def mute(interaction: discord.Interaction, user: str, minutes: int = 0, ho
 
     await target.timeout(duration, reason=f"Muted by {interaction.user}")
 
-    case = add_case(
-        target.id,
-        "Mute",
-        interaction.user.id,
-        f"Muted for {hours}h {minutes}m",
-        "N/A",
-        "N/A",
-        "N/A",
-        active=True
-    )
-
     await interaction.response.send_message(
         f"{target.mention} has been muted for `{hours}h {minutes}m`.",
         ephemeral=True
     )
 
-    await send_log(
-        interaction.guild,
-        interaction.user,
-        "/mute",
-        f"User: {target.mention}\nDuration: {hours}h {minutes}m\nCase: {case['case_id']}"
-    )
+    await send_log(interaction.guild, interaction.user, "/mute", f"User: {target.mention}\nDuration: {hours}h {minutes}m")
 
 @bot.tree.command(name="ban", description="Ban a user")
 @app_commands.describe(
@@ -1831,13 +1813,14 @@ async def ban(interaction: discord.Interaction, user: str, reason: str, evidence
         await interaction.response.defer(ephemeral=True)
         return
 
-    target = await get_member_or_user(interaction.guild, user)
+    target = await get_target(interaction.guild, user)
 
     if target is None:
         await interaction.response.send_message("User was not found.", ephemeral=True)
         return
 
-    dm_embed = build_dm_embed(
+    await send_mod_dm(
+        target,
         "Ban",
         (
             f"You have been **Banned** from **Greenville Roleplay Desire** for the following reason(s):\n\n"
@@ -1848,32 +1831,13 @@ async def ban(interaction: discord.Interaction, user: str, reason: str, evidence
         )
     )
 
-    await try_dm(target, dm_embed)
-
     await interaction.guild.ban(target, reason=reason)
 
-    case = add_case(
-        target.id,
-        "Ban",
-        interaction.user.id,
-        reason,
-        "Soon",
-        "Soon",
-        evidence,
-        active=True
-    )
+    entry = make_entry("Ban", reason, interaction.user.id, "Soon", "Soon", evidence)
+    add_mod_entry(target.id, entry)
 
-    await interaction.response.send_message(
-        f"{target.mention if hasattr(target, 'mention') else target.id} has been banned. Case `{case['case_id']}`.",
-        ephemeral=True
-    )
-
-    await send_log(
-        interaction.guild,
-        interaction.user,
-        "/ban",
-        f"User ID: {target.id}\nCase: {case['case_id']}\nReason: {reason}"
-    )
+    await interaction.response.send_message(f"{target} has been banned.", ephemeral=True)
+    await send_log(interaction.guild, interaction.user, "/ban", f"User ID: {target.id}\nReason: {reason}")
 
 @bot.tree.command(name="suspend", description="Suspend a staff member")
 @app_commands.describe(
@@ -1894,48 +1858,30 @@ async def suspend(interaction: discord.Interaction, user: str, reason: str, appe
         await interaction.response.defer(ephemeral=True)
         return
 
-    target = await get_member_or_user(interaction.guild, user)
+    target = await get_target(interaction.guild, user)
 
     if target is None or not isinstance(target, discord.Member):
         await interaction.response.send_message("User was not found in this server.", ephemeral=True)
         return
 
-    await remove_roles_by_names(target, STAFF_REMOVE_ROLES)
+    await remove_roles_by_name(target, STAFF_REMOVE_ROLES)
 
-    case = add_case(
-        target.id,
-        "Suspension",
-        interaction.user.id,
-        reason,
-        appealable.value,
-        time,
-        evidence,
-        active=True
-    )
+    entry = make_entry("Suspension", reason, interaction.user.id, appealable.value, time, evidence)
+    add_mod_entry(target.id, entry)
 
-    dm_embed = build_dm_embed(
+    await send_mod_dm(
+        target,
         "Suspension",
         (
             f"You have been **Suspended** from the **Greenville Roleplay Desire** Staff Team for the following reason(s):\n\n"
             f"- {reason}\n\n"
-            f"This Suspension is **{appealable.value}** in {time}, if you deem this suspension to be false please open a ticket via {TICKET_APPEAL_LINK}\n\n"
+            f"This Suspension is **{appealable.value}** in {time}, if you deem this suspension to be false please open a ticket via {APPEAL_TICKET_LINK}\n\n"
             f"Evidence: {evidence}"
         )
     )
 
-    await try_dm(target, dm_embed)
-
-    await interaction.response.send_message(
-        f"{target.mention} has been suspended. Case `{case['case_id']}`.",
-        ephemeral=True
-    )
-
-    await send_log(
-        interaction.guild,
-        interaction.user,
-        "/suspend",
-        f"User: {target.mention}\nCase: {case['case_id']}\nReason: {reason}"
-    )
+    await interaction.response.send_message(f"{target.mention} has been suspended.", ephemeral=True)
+    await send_log(interaction.guild, interaction.user, "/suspend", f"User: {target.mention}\nReason: {reason}")
 
 @bot.tree.command(name="terminate", description="Terminate a staff member")
 @app_commands.describe(
@@ -1956,26 +1902,19 @@ async def terminate(interaction: discord.Interaction, user: str, reason: str, ap
         await interaction.response.defer(ephemeral=True)
         return
 
-    target = await get_member_or_user(interaction.guild, user)
+    target = await get_target(interaction.guild, user)
 
     if target is None or not isinstance(target, discord.Member):
         await interaction.response.send_message("User was not found in this server.", ephemeral=True)
         return
 
-    await remove_roles_by_names(target, STAFF_REMOVE_ROLES)
+    await remove_roles_by_name(target, STAFF_REMOVE_ROLES)
 
-    case = add_case(
-        target.id,
-        "Termination",
-        interaction.user.id,
-        reason,
-        appealable.value,
-        time,
-        evidence,
-        active=True
-    )
+    entry = make_entry("Termination", reason, interaction.user.id, appealable.value, time, evidence)
+    add_mod_entry(target.id, entry)
 
-    dm_embed = build_dm_embed(
+    await send_mod_dm(
+        target,
         "Termination",
         (
             f"You have been **Terminated** from the **Greenville Roleplay Desire** Staff Team for the following reason(s):\n\n"
@@ -1985,124 +1924,88 @@ async def terminate(interaction: discord.Interaction, user: str, reason: str, ap
         )
     )
 
-    await try_dm(target, dm_embed)
-
-    await interaction.response.send_message(
-        f"{target.mention} has been terminated. Case `{case['case_id']}`.",
-        ephemeral=True
-    )
-
-    await send_log(
-        interaction.guild,
-        interaction.user,
-        "/terminate",
-        f"User: {target.mention}\nCase: {case['case_id']}\nReason: {reason}"
-    )
+    await interaction.response.send_message(f"{target.mention} has been terminated.", ephemeral=True)
+    await send_log(interaction.guild, interaction.user, "/terminate", f"User: {target.mention}\nReason: {reason}")
 
 @bot.tree.command(name="warnings", description="View active warnings for a user")
 @app_commands.describe(user="Mention or user ID")
 async def warnings(interaction: discord.Interaction, user: str):
-    if not has_staff_role(interaction.user):
+    if not is_staff_team(interaction.user):
         await interaction.response.defer(ephemeral=True)
         return
 
-    target = await get_member_or_user(interaction.guild, user)
+    target = await get_target(interaction.guild, user)
 
-    if target is None:
-        await interaction.response.send_message("User was not found.", ephemeral=True)
+    if target is None or not isinstance(target, discord.Member):
+        await interaction.response.send_message("User was not found in this server.", ephemeral=True)
         return
 
     data = load_modlogs()
-    cases = data.get(str(target.id), [])
+    warnings_list = data.get(str(target.id), {}).get("warnings", [])
 
-    active_cases = [
-        case for case in cases
-        if case.get("active", True)
-    ]
-
-    if not active_cases:
-        await interaction.response.send_message("This user has no active warnings.", ephemeral=True)
+    if not warnings_list:
+        await interaction.response.send_message("This user has no warnings.", ephemeral=True)
         return
 
     text = ""
 
-    for case in active_cases:
+    for warning in warnings_list:
         text += (
-            f"**Case {case['case_id']} — {case['type']}**\n"
-            f"Reason: {case['reason']}\n"
-            f"Moderator: <@{case['moderator']}>\n"
-            f"Date: <t:{case['timestamp']}:F>\n"
-            f"Evidence: {case['evidence']}\n\n"
+            f"**{warning['type']}**\n"
+            f"Reason: {warning['reason']}\n"
+            f"Moderator: <@{warning['moderator']}>\n"
+            f"Date: <t:{warning['timestamp']}:F>\n"
+            f"Evidence: {warning['evidence']}\n\n"
         )
 
     embed = discord.Embed(
-        title=f"{target} — Active Warnings",
+        title=f"Warnings for {target}",
         description=text[:4000],
         color=discord.Color.from_str("#fef1b3")
     )
 
-    view = WarningDeleteButtonView(target, active_cases) if is_high_command(interaction.user) else None
+    view = DeleteWarningButtonView(target, warnings_list) if is_high_command(interaction.user) else None
 
-    await interaction.response.send_message(
-        embed=embed,
-        view=view,
-        ephemeral=False
-    )
-
-    await send_log(
-        interaction.guild,
-        interaction.user,
-        "/warnings",
-        f"User: {target.mention if hasattr(target, 'mention') else target.id}"
-    )
+    await interaction.response.send_message(embed=embed, view=view)
 
 @bot.tree.command(name="modlogs", description="View all moderation logs for a user")
 @app_commands.describe(user="Mention or user ID")
 async def modlogs(interaction: discord.Interaction, user: str):
-    if not has_staff_role(interaction.user):
+    if not is_staff_team(interaction.user):
         await interaction.response.defer(ephemeral=True)
         return
 
-    target = await get_member_or_user(interaction.guild, user)
+    target = await get_target(interaction.guild, user)
 
     if target is None:
         await interaction.response.send_message("User was not found.", ephemeral=True)
         return
 
     data = load_modlogs()
-    cases = data.get(str(target.id), [])
+    logs = data.get(str(target.id), {}).get("modlogs", [])
 
-    if not cases:
+    if not logs:
         await interaction.response.send_message("This user has no modlogs.", ephemeral=True)
         return
 
     text = ""
 
-    for case in cases:
-        status = "Active" if case.get("active", True) else "Removed from warnings"
-
+    for log in logs:
         text += (
-            f"**Case {case['case_id']} — {case['type']}** `{status}`\n"
-            f"Reason: {case['reason']}\n"
-            f"Moderator: <@{case['moderator']}>\n"
-            f"Date: <t:{case['timestamp']}:F>\n"
-            f"Evidence: {case['evidence']}\n\n"
+            f"**{log['type']}**\n"
+            f"Reason: {log['reason']}\n"
+            f"Moderator: <@{log['moderator']}>\n"
+            f"Date: <t:{log['timestamp']}:F>\n"
+            f"Evidence: {log['evidence']}\n\n"
         )
 
     embed = discord.Embed(
-        title=f"{target} — Modlogs",
+        title=f"Modlogs for {target}",
         description=text[:4000],
         color=discord.Color.from_str("#fef1b3")
     )
 
     await interaction.response.send_message(embed=embed, ephemeral=True)
-
-    await send_log(
-        interaction.guild,
-        interaction.user,
-        "/modlogs",
-        f"User: {target.mention if hasattr(target, 'mention') else target.id}"
-    )
 
     # =====================================
 # /serverinfo
