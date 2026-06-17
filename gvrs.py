@@ -216,6 +216,11 @@ class StaffProfileView(discord.ui.View):
 
 @bot.event
 async def on_ready():
+    print(f"Logged in as {bot.user}")
+
+    bot.add_view(TicketPanelView())
+    bot.add_view(PersistentTicketView())
+    bot.add_view(ServerInfoView())
 
     await bot.change_presence(
         activity=discord.Activity(
@@ -223,14 +228,6 @@ async def on_ready():
             name="🌸 discord.gg/gvsociety"
         )
     )
-
-    bot.add_view(TicketPanelView())
-    bot.add_view(ServerInfoView())
-
-    # Ticket Buttons nach Neustarts aktiv halten
-    bot.add_view(TicketPanelView())
-    bot.add_view(PersistentTicketView())
-    bot.add_view(ServerInfoView())
 
     synced = await bot.tree.sync()
     print(f"{len(synced)} Commands synchronised")
@@ -1122,60 +1119,104 @@ SERVER_OVERSEER_ROLE_NAME = "Bot Developer"
 STAFF_ROLE_NAME = "Staff Team"
 HIGH_COMMAND_ROLE_NAMES = ["High Command"]
 
+
+def get_ticket_info(channel):
+    ticket_type = "General Assistance"
+    opener_id = None
+    open_timestamp = int(discord.utils.utcnow().timestamp())
+    claimed_by = None
+
+    if channel.topic:
+        for part in channel.topic.split("|"):
+            if part.startswith("type="):
+                ticket_type = part.replace("type=", "")
+            elif part.startswith("opener="):
+                try:
+                    opener_id = int(part.replace("opener=", ""))
+                except:
+                    opener_id = None
+            elif part.startswith("opened="):
+                try:
+                    open_timestamp = int(part.replace("opened=", ""))
+                except:
+                    pass
+            elif part.startswith("claimed="):
+                try:
+                    claimed_by = int(part.replace("claimed=", ""))
+                except:
+                    claimed_by = None
+
+    return ticket_type, opener_id, open_timestamp, claimed_by
+
+
+async def update_ticket_topic(channel, ticket_type, opener_id, open_timestamp, claimed_by=None):
+    claimed_text = claimed_by if claimed_by else "none"
+
+    await channel.edit(
+        topic=f"type={ticket_type}|opener={opener_id}|opened={open_timestamp}|claimed={claimed_text}"
+    )
+
+
 class TicketCloseConfirmView(discord.ui.View):
-    def __init__(self, opener_id: int, open_timestamp: int):
+    def __init__(self):
         super().__init__(timeout=60)
-        self.opener_id = opener_id
-        self.open_timestamp = open_timestamp
 
     @discord.ui.button(label="Confirm Close", style=discord.ButtonStyle.danger)
     async def confirm_close(self, interaction: discord.Interaction, button: discord.ui.Button):
+        ticket_type, opener_id, open_timestamp, claimed_by = get_ticket_info(interaction.channel)
         close_timestamp = int(discord.utils.utcnow().timestamp())
 
-        try:
-            opener = await bot.fetch_user(self.opener_id)
+        if opener_id:
+            try:
+                opener = await bot.fetch_user(opener_id)
 
-            dm_embed = discord.Embed(
-                title="Ticket Closed",
-                description=(
-                    f"Hello {opener.mention}, your ticket has been successfully closed by "
-                    f"{interaction.user.mention}. We hope our team was able to resolve your issue.\n\n"
-                    f"**Closed by**\n{interaction.user.mention}\n\n"
-                    f"**Ticket ID**\n{interaction.channel.id}\n\n"
-                    f"**Open Date**\n<t:{self.open_timestamp}:F>\n\n"
-                    f"**Close Date**\n<t:{close_timestamp}:F>"
-                ),
-                color=discord.Color.from_str("#fef1b3")
-            )
+                dm_embed = discord.Embed(
+                    title="Ticket Closed",
+                    description=(
+                        f"Hello {opener.mention}, your ticket has been successfully closed by "
+                        f"{interaction.user.mention}. We hope our team was able to resolve your issue.\n\n"
+                        f"**Closed by**\n{interaction.user.mention}\n\n"
+                        f"**Ticket ID**\n{interaction.channel.id}\n\n"
+                        f"**Open Date**\n<t:{open_timestamp}:F>\n\n"
+                        f"**Close Date**\n<t:{close_timestamp}:F>"
+                    ),
+                    color=discord.Color.from_str("#fef1b3")
+                )
 
-            dm_embed.set_footer(
-                text="Greenville Roleplay Society™",
-                icon_url=bot.user.display_avatar.url
-            )
+                dm_embed.set_footer(
+                    text="Greenville Roleplay Society™",
+                    icon_url=bot.user.display_avatar.url
+                )
 
-            await opener.send(embed=dm_embed)
-        except:
-            pass
+                await opener.send(embed=dm_embed)
+            except:
+                pass
 
         await interaction.response.send_message("Ticket closed.", ephemeral=True)
+
         await send_log(
-    interaction.guild,
-    interaction.user,
-    "Ticket closed",
-    f"Ticket channel: {interaction.channel.name}\nTicket ID: {interaction.channel.id}"
-)
+            interaction.guild,
+            interaction.user,
+            "Ticket closed",
+            f"Ticket channel: {interaction.channel.name}\nTicket ID: {interaction.channel.id}"
+        )
+
         await interaction.channel.delete()
 
 
 class PersistentTicketView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-        self.claimed_by = None
 
-    @discord.ui.button(label="Claim", style=discord.ButtonStyle.success, custom_id="ticket_claim_button")
+    @discord.ui.button(
+        label="Claim",
+        style=discord.ButtonStyle.success,
+        custom_id="ticket_claim_button"
+    )
     async def claim_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+        ticket_type, opener_id, open_timestamp, claimed_by = get_ticket_info(interaction.channel)
 
-        if self.ticket_type == "Staff Report":
+        if ticket_type == "Staff Report":
             allowed = any(role.name in HIGH_COMMAND_ROLE_NAMES for role in interaction.user.roles)
         else:
             allowed = any(role.name == STAFF_ROLE_NAME for role in interaction.user.roles)
@@ -1184,8 +1225,15 @@ class PersistentTicketView(discord.ui.View):
             await interaction.response.defer(ephemeral=True)
             return
 
-        if self.claimed_by is None:
-            self.claimed_by = interaction.user.id
+        if claimed_by is None:
+            await update_ticket_topic(
+                interaction.channel,
+                ticket_type,
+                opener_id,
+                open_timestamp,
+                interaction.user.id
+            )
+
             button.label = "Unclaim"
             button.style = discord.ButtonStyle.danger
 
@@ -1195,17 +1243,25 @@ class PersistentTicketView(discord.ui.View):
                 description=f"{interaction.user.mention} claimed this ticket.",
                 color=discord.Color.from_str("#fef1b3")
             )
+
             await interaction.channel.send(embed=embed)
             return
 
-        if self.claimed_by != interaction.user.id:
+        if claimed_by != interaction.user.id:
             await interaction.response.send_message(
                 "Only the user who claimed this ticket can unclaim it.",
                 ephemeral=True
             )
             return
 
-        self.claimed_by = None
+        await update_ticket_topic(
+            interaction.channel,
+            ticket_type,
+            opener_id,
+            open_timestamp,
+            None
+        )
+
         button.label = "Claim"
         button.style = discord.ButtonStyle.success
 
@@ -1215,11 +1271,15 @@ class PersistentTicketView(discord.ui.View):
             description=f"{interaction.user.mention} unclaimed this ticket.",
             color=discord.Color.from_str("#fef1b3")
         )
+
         await interaction.channel.send(embed=embed)
 
-    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger, custom_id="ticket_close_button")
+    @discord.ui.button(
+        label="Close",
+        style=discord.ButtonStyle.danger,
+        custom_id="ticket_close_button"
+    )
     async def close_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
-
         allowed = (
             any(role.name == STAFF_ROLE_NAME for role in interaction.user.roles)
             or any(role.name in HIGH_COMMAND_ROLE_NAMES for role in interaction.user.roles)
@@ -1237,7 +1297,7 @@ class PersistentTicketView(discord.ui.View):
 
         await interaction.response.send_message(
             embed=embed,
-            view=TicketCloseConfirmView(self.opener_id, self.open_timestamp),
+            view=TicketCloseConfirmView(),
             ephemeral=True
         )
 
@@ -1268,6 +1328,7 @@ class TicketModal(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         guild = interaction.guild
         opener = interaction.user
+        open_timestamp = int(discord.utils.utcnow().timestamp())
 
         staff_role = discord.utils.get(guild.roles, name=STAFF_ROLE_NAME)
         high_command_roles = [
@@ -1315,6 +1376,7 @@ class TicketModal(discord.ui.Modal):
             name=f"support-{opener.name}".lower().replace(" ", "-"),
             category=category,
             overwrites=overwrites,
+            topic=f"type={self.ticket_type}|opener={opener.id}|opened={open_timestamp}|claimed=none",
             reason=f"{self.ticket_type} ticket opened by {opener}"
         )
 
@@ -1346,11 +1408,11 @@ class TicketModal(discord.ui.Modal):
         )
 
         await send_log(
-    interaction.guild,
-    interaction.user,
-    "Ticket opened",
-    f"Ticket type: {self.ticket_type}\nTicket channel: {ticket_channel.mention}"
-)
+            interaction.guild,
+            interaction.user,
+            "Ticket opened",
+            f"Ticket type: {self.ticket_type}\nTicket channel: {ticket_channel.mention}"
+        )
 
         await interaction.response.send_message(
             f"Your ticket has been created: {ticket_channel.mention}",
@@ -1390,7 +1452,6 @@ class TicketSelect(discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
-
         if not any(role.id == CIVILIANS_ROLE_ID for role in interaction.user.roles):
             await interaction.response.send_message(
                 "You do not have permission to open a ticket.",
@@ -1412,7 +1473,6 @@ class TicketPanelView(discord.ui.View):
     description="Sends the assistance ticket panel"
 )
 async def ticketpanel(interaction: discord.Interaction):
-
     if not any(role.name == SERVER_OVERSEER_ROLE_NAME for role in interaction.user.roles):
         await interaction.response.defer(ephemeral=True)
         return
