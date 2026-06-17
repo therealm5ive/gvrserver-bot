@@ -1597,13 +1597,24 @@ async def remove_roles_by_name(member, role_names):
 async def remove_warning_role(member, warning_type):
     role_name = None
 
-    if warning_type.startswith("Infraction "):
-        number = warning_type.replace("Infraction ", "")
-        role_name = f"Infraction {number}"
+    infraction_roles = {
+        "Infraction 1": "Infraction I",
+        "Infraction 2": "Infraction II",
+        "Infraction 3": "Infraction III",
+        "Infraction 4": "Infraction IIII",
+    }
 
-    if warning_type.startswith("Staff Strike "):
-        number = warning_type.replace("Staff Strike ", "")
-        role_name = f"Staff Infraction {number}"
+    staff_strike_roles = {
+        "Staff Strike 1": "Staff Infraction I",
+        "Staff Strike 2": "Staff Infraction II",
+        "Staff Strike 3": "Staff Infraction III",
+    }
+
+    if warning_type in infraction_roles:
+        role_name = infraction_roles[warning_type]
+
+    elif warning_type in staff_strike_roles:
+        role_name = staff_strike_roles[warning_type]
 
     if role_name:
         role = discord.utils.get(member.guild.roles, name=role_name)
