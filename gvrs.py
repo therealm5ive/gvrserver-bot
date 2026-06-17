@@ -228,10 +228,9 @@ async def on_ready():
     bot.add_view(ServerInfoView())
 
     # Ticket Buttons nach Neustarts aktiv halten
-    bot.add_view(TicketView("General Assistance", 0, 0))
-    bot.add_view(TicketView("Civilian Report", 0, 0))
-    bot.add_view(TicketView("Staff Report", 0, 0))
-    bot.add_view(TicketView("Partnership", 0, 0))
+    bot.add_view(TicketPanelView())
+    bot.add_view(PersistentTicketView())
+    bot.add_view(ServerInfoView())
 
     synced = await bot.tree.sync()
     print(f"{len(synced)} Commands synchronised")
@@ -1168,12 +1167,9 @@ class TicketCloseConfirmView(discord.ui.View):
         await interaction.channel.delete()
 
 
-class TicketView(discord.ui.View):
-    def __init__(self, ticket_type: str, opener_id: int, open_timestamp: int):
+class PersistentTicketView(discord.ui.View):
+    def __init__(self):
         super().__init__(timeout=None)
-        self.ticket_type = ticket_type
-        self.opener_id = opener_id
-        self.open_timestamp = open_timestamp
         self.claimed_by = None
 
     @discord.ui.button(label="Claim", style=discord.ButtonStyle.success, custom_id="ticket_claim_button")
@@ -1346,11 +1342,7 @@ class TicketModal(discord.ui.Modal):
         await ticket_channel.send(
             content=f"{opener.mention} {support_mentions}",
             embeds=[banner_embed, embed],
-            view=TicketView(
-                self.ticket_type,
-                opener.id,
-                int(discord.utils.utcnow().timestamp())
-            )
+            view=PersistentTicketView()
         )
 
         await send_log(
