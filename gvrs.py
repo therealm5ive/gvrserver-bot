@@ -9,7 +9,7 @@ from PIL import Image
 from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -1629,10 +1629,14 @@ class DeleteWarningSelect(discord.ui.Select):
         options = []
 
         for index, warning in enumerate(warnings[:25]):
+            date_text = datetime.fromtimestamp(
+                warning["timestamp"]
+            ).strftime("%d.%m.%Y")
+
             options.append(
                 discord.SelectOption(
                     label=warning["type"],
-                    description=f"{warning['reason'][:65]} • <t:{warning['timestamp']}:D>",
+                    description=f"{warning['reason'][:40]} • {date_text}",
                     value=str(index)
                 )
             )
