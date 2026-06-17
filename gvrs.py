@@ -1064,6 +1064,7 @@ async def staff_strike(interaction: discord.Interaction, user: discord.Member, r
         3: "III"
     }
 
+    roman = {1: "I", 2: "II", 3: "III"}
     next_role_name = f"Staff Infraction {roman[next_number]}"
     next_role = discord.utils.get(interaction.guild.roles, name=next_role_name)
 
@@ -1533,6 +1534,15 @@ async def get_target(guild, user_input: str):
 def ensure_mod_user(data, user_id):
     user_id = str(user_id)
 
+    if user_id not in data or isinstance(data[user_id], list):
+        old_logs = data[user_id] if user_id in data and isinstance(data[user_id], list) else []
+
+        data[user_id] = {
+            "warnings": [],
+            "modlogs": old_logs
+        }
+    user_id = str(user_id)
+
     if user_id not in data:
         data[user_id] = {
             "warnings": [],
@@ -1739,6 +1749,7 @@ async def infract(interaction: discord.Interaction, user: str, reason: str, appe
         4: "IIII"
     }
 
+    roman = {1: "I", 2: "II", 3: "III", 4: "IIII"}
     next_role_name = f"Infraction {roman[next_number]}"
     next_role = discord.utils.get(interaction.guild.roles, name=next_role_name)
 
