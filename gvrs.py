@@ -1986,61 +1986,54 @@ async def warnings(interaction: discord.Interaction, user: str):
 
     for warning in warnings_list:
         if warning["type"].startswith("Infraction"):
-            dm_text = (
-                f"You have been **Infracted {warning['type'].replace('Infraction ', '')} Time** in **Greenville Roleplay Society** for the following reason(s):\n\n"
+            number = warning["type"].replace("Infraction ", "")
+            text += (
+                f"**Moderator:** <@{warning['moderator']}>\n"
+                f"You have been **Infracted {number} Time** in **Greenville Roleplay Society** for the following reason(s):\n\n"
                 f"- {warning['reason']}\n\n"
                 f"This infraction is **{warning['appealable']}** in {warning['appeal_time']}, if you deem this infraction to be false "
                 f"please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
-                f"Evidence: {warning['evidence']}"
+                f"Evidence: {warning['evidence']} - <t:{warning['timestamp']}:R>\n\n"
             )
 
         elif warning["type"].startswith("Staff Strike"):
-            dm_text = (
+            text += (
+                f"**Moderator:** <@{warning['moderator']}>\n"
                 f"You have received **One** Staff Strike in **Greenville Roleplay Society** for the following reason(s):\n\n"
                 f"- {warning['reason']}\n\n"
                 f"This Strike is **{warning['appealable']}** in {warning['appeal_time']}, if you deem this strike to be false "
                 f"please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
-                f"Evidence: {warning['evidence']}"
+                f"Evidence: {warning['evidence']} - <t:{warning['timestamp']}:R>\n\n"
             )
 
         elif warning["type"] == "Suspension":
-            dm_text = (
+            text += (
+                f"**Moderator:** <@{warning['moderator']}>\n"
                 f"You have been **Suspended** from the **Greenville Roleplay Society** Staff Team for the following reason(s):\n\n"
                 f"- {warning['reason']}\n\n"
                 f"This Suspension is **{warning['appealable']}** in {warning['appeal_time']}, if you deem this suspension to be false "
-                f"please open a ticket via {APPEAL_TICKET_LINK}\n\n"
-                f"Evidence: {warning['evidence']}"
+                f"please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
+                f"Evidence: {warning['evidence']} - <t:{warning['timestamp']}:R>\n\n"
             )
 
         elif warning["type"] == "Termination":
-            dm_text = (
+            text += (
+                f"**Moderator:** <@{warning['moderator']}>\n"
                 f"You have been **Terminated** from the **Greenville Roleplay Society** Staff Team for the following reason(s):\n\n"
                 f"- {warning['reason']}\n\n"
                 f"This Termination is **{warning['appealable']}** in {warning['appeal_time']}.\n\n"
-                f"Evidence: {warning['evidence']}"
+                f"Evidence: {warning['evidence']} - <t:{warning['timestamp']}:R>\n\n"
             )
 
         elif warning["type"] == "Ban":
-            dm_text = (
+            text += (
+                f"**Moderator:** <@{warning['moderator']}>\n"
                 f"You have been **Banned** from **Greenville Roleplay Society** for the following reason(s):\n\n"
                 f"- {warning['reason']}\n\n"
                 f"If you deem this ban to be false, feel free to appeal it with the appeal listed below.\n"
                 f"Appeal: Soon.\n\n"
-                f"Evidence: {warning['evidence']}"
+                f"Evidence: {warning['evidence']} - <t:{warning['timestamp']}:R>\n\n"
             )
-
-    else:
-        dm_text = (
-            f"Reason: {warning['reason']}\n"
-            f"Evidence: {warning['evidence']}"
-        )
-
-    text += (
-        f"**{warning['type']} for {target} ({target.id})**\n\n"
-        f"**Moderator:** <@{warning['moderator']}>\n"
-        f"{dm_text}\n\n"
-        f"Date: <t:{warning['timestamp']}:R>\n\n"
-    )
 
     embed = discord.Embed(
         title=f"{len(warnings_list)} Warning{'s' if len(warnings_list) != 1 else ''} for {target} ({target.id})",
