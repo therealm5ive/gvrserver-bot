@@ -225,7 +225,7 @@ async def on_ready():
     await bot.change_presence(
         activity=discord.Activity(
             type=discord.ActivityType.watching,
-            name="🌸 discord.gg/gvsociety"
+            name="⭐ discord.gg/gvsociety"
         )
     )
 
@@ -1090,7 +1090,7 @@ async def staff_strike(interaction: discord.Interaction, user: discord.Member, r
         user,
         "Staff Strike",
         (
-            f"You have received **One** Staff Strike in **Greenville Roleplay Desire** for the following reason(s):\n\n"
+            f"You have received **One** Staff Strike in **Greenville Roleplay Society** for the following reason(s):\n\n"
             f"- {reason}\n\n"
             f"This Strike is **{appealable.value}** in {time}, if you deem this strike to be false please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
             f"Evidence: {evidence}"
@@ -1636,7 +1636,7 @@ async def send_mod_dm(user, title, description):
     )
 
     embed.set_footer(
-        text="Greenville Roleplay Desire",
+        text="Greenville Roleplay Society",
         icon_url=bot.user.display_avatar.url
     )
 
@@ -1846,7 +1846,7 @@ async def infract(interaction: discord.Interaction, user: str, reason: str, appe
         target,
         "Infraction",
         (
-            f"You have been **Infracted {next_number} Time** in **Greenville Roleplay Desire** for the following reason(s):\n\n"
+            f"You have been **Infracted {next_number} Time** in **Greenville Roleplay Society** for the following reason(s):\n\n"
             f"- {reason}\n\n"
             f"This infraction is **{appealable.value}** in {time}, if you deem this infraction to be false please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
             f"Evidence: {evidence}"
@@ -1919,7 +1919,7 @@ async def ban(interaction: discord.Interaction, user: str, reason: str, evidence
         target,
         "Ban",
         (
-            f"You have been **Banned** from **Greenville Roleplay Desire** for the following reason(s):\n\n"
+            f"You have been **Banned** from **Greenville Roleplay Society** for the following reason(s):\n\n"
             f"- {reason}\n\n"
             f"If you deem this ban to be false, feel free to appeal it with the appeal listed below.\n"
             f"Appeal: Soon.\n\n"
@@ -1969,7 +1969,7 @@ async def suspend(interaction: discord.Interaction, user: str, reason: str, appe
         target,
         "Suspension",
         (
-            f"You have been **Suspended** from the **Greenville Roleplay Desire** Staff Team for the following reason(s):\n\n"
+            f"You have been **Suspended** from the **Greenville Roleplay Society** Staff Team for the following reason(s):\n\n"
             f"- {reason}\n\n"
             f"This Suspension is **{appealable.value}** in {time}, if you deem this suspension to be false please open a ticket via {APPEAL_TICKET_LINK}\n\n"
             f"Evidence: {evidence}"
@@ -2013,7 +2013,7 @@ async def terminate(interaction: discord.Interaction, user: str, reason: str, ap
         target,
         "Termination",
         (
-            f"You have been **Terminated** from the **Greenville Roleplay Desire** Staff Team for the following reason(s):\n\n"
+            f"You have been **Terminated** from the **Greenville Roleplay Society** Staff Team for the following reason(s):\n\n"
             f"- {reason}\n\n"
             f"This Termination is **{appealable.value}** in {time}.\n\n"
             f"Evidence: {evidence}"
