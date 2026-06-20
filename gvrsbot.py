@@ -5,6 +5,8 @@ import json
 import re
 import io
 import aiohttp
+import colorsys
+import sqlite3
 from PIL import Image
 from discord.ext import commands
 from discord import app_commands
@@ -28,58 +30,86 @@ EARLYACCESS_ROLE_ID = 1290705580046024725
 CIVILIANS_ROLE_ID = 1290705580025184277
 TICKET_CATEGORY_ID = 1506043336987906231
 
-STAFF_DATA_FILE = "staff_sessions.json"
+DB_FILE = "bot_data.db"
+
 SESSION_START_TIMES = {}
 ACTIVE_COHOSTS = {}
 ACTIVE_SUPERVISIONS = {}
 ACTIVE_STARTUPS = {}
 
-def load_staff_data():
-    try:
-        with open(STAFF_DATA_FILE, "r", encoding="utf-8") as file:
-            content = file.read().strip()
-            if not content:
-                return {}
-            return json.loads(content)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
 
-def save_staff_data(data):
-    temp_file = STAFF_DATA_FILE + ".tmp"
+def get_db():
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    return conn
 
-    try:
-        with open(temp_file, "w", encoding="utf-8") as file:
-            json.dump(data, file, indent=4)
 
-        os.replace(temp_file, STAFF_DATA_FILE)
+def init_db():
+    conn = get_db()
+    cur = conn.cursor()
 
-    except OSError as e:
-        print(f"Could not save staff data: {e}")
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS staff_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            session_type TEXT NOT NULL,
+            note TEXT,
+            start_timestamp INTEGER NOT NULL,
+            end_timestamp INTEGER NOT NULL,
+            duration_minutes INTEGER NOT NULL
+        )
+    """)
 
-def ensure_user(data, user_id):
-    user_id = str(user_id)
-    if user_id not in data:
-        data[user_id] = {
-            "hosted": [],
-            "cohosted": [],
-            "supervised": []
-        }
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS warnings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            type TEXT NOT NULL,
+            reason TEXT NOT NULL,
+            moderator_id TEXT NOT NULL,
+            appealable TEXT,
+            appeal_time TEXT,
+            evidence TEXT,
+            timestamp INTEGER NOT NULL,
+            active INTEGER NOT NULL DEFAULT 1
+        )
+    """)
+
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_staff_sessions_user
+        ON staff_sessions(user_id)
+    """)
+
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_warnings_user_active
+        ON warnings(user_id, active)
+    """)
+
+    conn.commit()
+    conn.close()
+
 
 def add_staff_session(user_id, session_type, note, start_timestamp, end_timestamp):
-    data = load_staff_data()
-    user_id = str(user_id)
-    ensure_user(data, user_id)
-
     duration_minutes = round((end_timestamp - start_timestamp) / 60)
 
-    data[user_id][session_type].append({
-        "note": note,
-        "start": start_timestamp,
-        "end": end_timestamp,
-        "duration": duration_minutes
-    })
+    conn = get_db()
+    cur = conn.cursor()
 
-    save_staff_data(data)
+    cur.execute("""
+        INSERT INTO staff_sessions
+        (user_id, session_type, note, start_timestamp, end_timestamp, duration_minutes)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        str(user_id),
+        session_type,
+        note,
+        start_timestamp,
+        end_timestamp,
+        duration_minutes
+    ))
+
+    conn.commit()
+    conn.close()
 
 def is_staff(member):
     return any(role.name == "Staff Team" for role in member.roles)
@@ -174,8 +204,18 @@ class StaffProfileView(discord.ui.View):
         self.user_id = str(user_id)
 
     async def send_sessions(self, interaction: discord.Interaction, session_type: str, title: str):
-        data = load_staff_data()
-        sessions = data.get(self.user_id, {}).get(session_type, [])
+        conn = get_db()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT * FROM staff_sessions
+            WHERE user_id = ? AND session_type = ?
+            ORDER BY end_timestamp DESC
+        """, (self.user_id, session_type))
+
+        sessions = cur.fetchall()
+        conn.close()
+
 
         if not sessions:
             await interaction.response.send_message(
@@ -189,8 +229,8 @@ class StaffProfileView(discord.ui.View):
         for index, session in enumerate(sessions, start=1):
             text += (
                 f"**{index}.**\n"
-                f"Date: <t:{session['end']}:D>\n"
-                f"Duration: {session['duration']} minutes\n"
+                f"Date: <t:{session['end_timestamp']}:D>\n"
+                f"Duration: {session['duration_minutes']} minutes\n"
                 f"Note: {session['note']}\n\n"
             )
 
@@ -216,6 +256,7 @@ class StaffProfileView(discord.ui.View):
 
 @bot.event
 async def on_ready():
+    init_db()
     print(f"Logged in as {bot.user}")
 
     bot.add_view(TicketPanelView())
@@ -982,19 +1023,34 @@ async def staff_profile(interaction: discord.Interaction, user: discord.Member =
     if user is None:
         user = interaction.user
 
-    data = load_staff_data()
-    ensure_user(data, user.id)
-    save_staff_data(data)
+    conn = get_db()
+    cur = conn.cursor()
 
-    user_data = data[str(user.id)]
+    cur.execute("""
+        SELECT session_type, COUNT(*) as count
+        FROM staff_sessions
+        WHERE user_id = ?
+        GROUP BY session_type
+    """, (str(user.id),))
+
+    counts = {
+    "hosted": 0,
+    "cohosted": 0,
+    "supervised": 0
+    }
+
+    for row in cur.fetchall():
+        counts[row["session_type"]] = row["count"]
+
+    conn.close()
 
     embed = discord.Embed(
         title="Staff Profile",
         description=(
             f"**User:** {user.mention}\n\n"
-            f"**Hosted Sessions:** {len(user_data['hosted'])}\n"
-            f"**Co-Hosted Sessions:** {len(user_data['cohosted'])}\n"
-            f"**Supervised Sessions:** {len(user_data['supervised'])}\n\n"
+            f"**Hosted Sessions:** {counts['hosted']}\n"
+            f"**Co-Hosted Sessions:** {counts['cohosted']}\n"
+            f"**Supervised Sessions:** {counts['supervised']}\n\n"
             f"Use the buttons below to view saved sessions."
         ),
         color=discord.Color.from_str("#fef1b3")
@@ -1018,7 +1074,11 @@ async def staff_clear(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         return
 
-    save_staff_data({})
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM staff_sessions")
+    conn.commit()
+    conn.close()
 
     await interaction.response.send_message(
         "All staff profiles have been cleared.",
@@ -1515,7 +1575,6 @@ async def ticketpanel(interaction: discord.Interaction):
 # /infract /mute /modlogs /warnings /ban /suspend /terminate
 # =====================================
 
-MODLOGS_FILE = "modlogs.json"
 APPEAL_TICKET_LINK = "https://discord.com/channels/1290705579953754163/1503269938624856156"
 
 STAFF_TEAM_ROLE = "Staff Team"
@@ -1549,22 +1608,6 @@ STAFF_REMOVE_ROLES = [
     "Bot Developer"
 ]
 
-def load_modlogs():
-    try:
-        with open(MODLOGS_FILE, "r", encoding="utf-8") as file:
-            content = file.read().strip()
-            if not content:
-                return {}
-            return json.loads(content)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
-
-def save_modlogs(data):
-    temp_file = MODLOGS_FILE + ".tmp"
-    with open(temp_file, "w", encoding="utf-8") as file:
-        json.dump(data, file, indent=4)
-    os.replace(temp_file, MODLOGS_FILE)
-
 def is_high_command(member):
     return any(role.name in HIGH_COMMAND_ROLES for role in member.roles)
 
@@ -1588,45 +1631,49 @@ async def get_target(guild, user_input: str):
     except:
         return None
 
-def ensure_mod_user(data, user_id):
-    user_id = str(user_id)
-
-    if user_id not in data or isinstance(data[user_id], list):
-        old_logs = data[user_id] if user_id in data and isinstance(data[user_id], list) else []
-
-        data[user_id] = {
-            "warnings": [],
-            "modlogs": old_logs
-        }
-    user_id = str(user_id)
-
-    if user_id not in data:
-        data[user_id] = {
-            "warnings": [],
-            "modlogs": []
-        }
-
-def add_mod_entry(user_id, entry):
-    data = load_modlogs()
-    user_id = str(user_id)
-
-    ensure_mod_user(data, user_id)
-
-    data[user_id]["warnings"].append(entry)
-    data[user_id]["modlogs"].append(entry.copy())
-
-    save_modlogs(data)
-
 def make_entry(entry_type, reason, moderator_id, appealable, appeal_time, evidence):
     return {
         "type": entry_type,
         "reason": reason,
-        "moderator": moderator_id,
+        "moderator": str(moderator_id),
         "appealable": appealable,
         "appeal_time": appeal_time,
         "evidence": evidence,
         "timestamp": int(discord.utils.utcnow().timestamp())
     }
+
+
+def add_mod_entry(user_id, entry):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO warnings
+        (
+            user_id,
+            type,
+            reason,
+            moderator_id,
+            appealable,
+            appeal_time,
+            evidence,
+            timestamp,
+            active
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+    """, (
+        str(user_id),
+        entry["type"],
+        entry["reason"],
+        str(entry["moderator"]),
+        entry["appealable"],
+        entry["appeal_time"],
+        entry["evidence"],
+        entry["timestamp"]
+    ))
+
+    conn.commit()
+    conn.close()
 
 async def send_mod_dm(user, title, description):
     embed = discord.Embed(
@@ -1694,7 +1741,7 @@ class DeleteWarningSelect(discord.ui.Select):
                 discord.SelectOption(
                     label=warning["type"],
                     description=f"{warning['reason'][:40]} • {date_text}",
-                    value=str(index)
+                    value=str(warning["id"])
                 )
             )
 
@@ -1708,23 +1755,34 @@ class DeleteWarningSelect(discord.ui.Select):
             await interaction.response.defer(ephemeral=True)
             return
 
-        data = load_modlogs()
-        user_id = str(self.target.id)
+        warning_id = int(self.values[0])
 
-        warnings = data.get(user_id, {}).get("warnings", [])
-        index = int(self.values[0])
+        conn = get_db()
+        cur = conn.cursor()
 
-        if index >= len(warnings):
+        cur.execute("""
+            SELECT * FROM warnings
+            WHERE id = ? AND user_id = ? AND active = 1
+        """, (warning_id, str(self.target.id)))
+
+        removed_warning = cur.fetchone()
+
+        if removed_warning is None:
+            conn.close()
             await interaction.response.send_message(
                 "This warning no longer exists.",
                 ephemeral=True
             )
             return
 
-        removed_warning = warnings.pop(index)
+        cur.execute("""
+            UPDATE warnings
+            SET active = 0
+            WHERE id = ?
+        """, (warning_id,))
 
-        data[user_id]["warnings"] = warnings
-        save_modlogs(data)
+        conn.commit()
+        conn.close()
 
         await remove_warning_role(self.target, removed_warning["type"])
 
@@ -2036,8 +2094,18 @@ async def warnings(interaction: discord.Interaction, user: str):
         await interaction.response.send_message("User was not found in this server.", ephemeral=True)
         return
 
-    data = load_modlogs()
-    warnings_list = data.get(str(target.id), {}).get("warnings", [])
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM warnings
+        WHERE user_id = ? AND active = 1
+        ORDER BY timestamp ASC
+    """, (str(target.id),))
+
+    warnings_list = cur.fetchall()
+    conn.close()
 
     if not warnings_list:
         await interaction.response.send_message("This user has no warnings.", ephemeral=True)
@@ -2049,7 +2117,7 @@ async def warnings(interaction: discord.Interaction, user: str):
         if warning["type"].startswith("Infraction"):
             number = warning["type"].replace("Infraction ", "")
             text += (
-                f"**Moderator:** <@{warning['moderator']}>\n"
+                f"**Moderator:** <@{warning['moderator_id']}>\n"
                 f"You have been **Infracted {number} Time** in **Greenville Roleplay Society** for the following reason(s):\n\n"
                 f"- {warning['reason']}\n\n"
                 f"This infraction is **{warning['appealable']}** in {warning['appeal_time']}, if you deem this infraction to be false "
@@ -2059,7 +2127,7 @@ async def warnings(interaction: discord.Interaction, user: str):
 
         elif warning["type"].startswith("Staff Strike"):
             text += (
-                f"**Moderator:** <@{warning['moderator']}>\n"
+                f"**Moderator:** <@{warning['moderator_id']}>\n"
                 f"You have received **One** Staff Strike in **Greenville Roleplay Society** for the following reason(s):\n\n"
                 f"- {warning['reason']}\n\n"
                 f"This Strike is **{warning['appealable']}** in {warning['appeal_time']}, if you deem this strike to be false "
@@ -2069,7 +2137,7 @@ async def warnings(interaction: discord.Interaction, user: str):
 
         elif warning["type"] == "Suspension":
             text += (
-                f"**Moderator:** <@{warning['moderator']}>\n"
+                f"**Moderator:** <@{warning['moderator_id']}>\n"
                 f"You have been **Suspended** from the **Greenville Roleplay Society** Staff Team for the following reason(s):\n\n"
                 f"- {warning['reason']}\n\n"
                 f"This Suspension is **{warning['appealable']}** in {warning['appeal_time']}, if you deem this suspension to be false "
@@ -2079,7 +2147,7 @@ async def warnings(interaction: discord.Interaction, user: str):
 
         elif warning["type"] == "Termination":
             text += (
-                f"**Moderator:** <@{warning['moderator']}>\n"
+                f"**Moderator:** <@{warning['moderator_id']}>\n"
                 f"You have been **Terminated** from the **Greenville Roleplay Society** Staff Team for the following reason(s):\n\n"
                 f"- {warning['reason']}\n\n"
                 f"This Termination is **{warning['appealable']}** in {warning['appeal_time']}.\n\n"
@@ -2088,7 +2156,7 @@ async def warnings(interaction: discord.Interaction, user: str):
 
         elif warning["type"] == "Ban":
             text += (
-                f"**Moderator:** <@{warning['moderator']}>\n"
+                f"**Moderator:** <@{warning['moderator_id']}>\n"
                 f"You have been **Banned** from **Greenville Roleplay Society** for the following reason(s):\n\n"
                 f"- {warning['reason']}\n\n"
                 f"If you deem this ban to be false, feel free to appeal it with the appeal listed below.\n"
@@ -2119,8 +2187,18 @@ async def modlogs(interaction: discord.Interaction, user: str):
         await interaction.response.send_message("User was not found.", ephemeral=True)
         return
 
-    data = load_modlogs()
-    logs = data.get(str(target.id), {}).get("modlogs", [])
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM warnings
+        WHERE user_id = ?
+        ORDER BY timestamp ASC
+    """, (str(target.id),))
+
+    logs = cur.fetchall()
+    conn.close()
 
     if not logs:
         await interaction.response.send_message("This user has no modlogs.", ephemeral=True)
@@ -2132,7 +2210,7 @@ async def modlogs(interaction: discord.Interaction, user: str):
         text += (
             f"**{log['type']}**\n"
             f"Reason: {log['reason']}\n"
-            f"Moderator: <@{log['moderator']}>\n"
+            f"Moderator: <@{log['moderator_id']}>\n"
             f"Date: <t:{log['timestamp']}:F>\n"
             f"Evidence: {log['evidence']}\n\n"
         )
@@ -2353,47 +2431,87 @@ async def role(interaction: discord.Interaction, user: discord.Member, role: dis
 )
 async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
 
-    if not any(role.name == "Bot Developer" for role in interaction.user.roles):
-        await interaction.response.defer(ephemeral=True)
+    if not any(role.name == "Server Bot Developer" for role in interaction.user.roles):
+        await interaction.response.send_message(
+            "You do not have permission to use this command.",
+            ephemeral=True
+        )
         return
 
     await interaction.response.defer(ephemeral=True)
 
-    if not hex_color.startswith("#") or len(hex_color) != 7:
+    try:
         await interaction.followup.send(
-            "Please use a valid HEX color, example: `#ffb7c5`.",
+            "Repainting emoji, please wait...",
             ephemeral=True
         )
+    except:
+        pass
+
+    async def safe_reply(message: str):
+        try:
+            await interaction.followup.send(message, ephemeral=True)
+        except:
+            try:
+                await interaction.user.send(message)
+            except:
+                pass
+
+    if not re.fullmatch(r"#[0-9a-fA-F]{6}", hex_color):
+        await safe_reply("Please use a valid HEX color, example: `#ffb7c5`.")
         return
 
     match = re.match(r"<(a?):(\w+):(\d+)>", emoji)
 
     if not match:
-        await interaction.followup.send(
-            "Please paste a valid custom emoji.",
-            ephemeral=True
-        )
+        await safe_reply("Please paste a valid custom emoji.")
         return
 
     is_animated = match.group(1) == "a"
     emoji_name = match.group(2)
     emoji_id = int(match.group(3))
 
-    r = int(hex_color[1:3], 16)
-    g = int(hex_color[3:5], 16)
-    b = int(hex_color[5:7], 16)
+    target_r = int(hex_color[1:3], 16)
+    target_g = int(hex_color[3:5], 16)
+    target_b = int(hex_color[5:7], 16)
+
+    target_h, target_l, target_s = colorsys.rgb_to_hls(
+        target_r / 255,
+        target_g / 255,
+        target_b / 255
+    )
+
+    def repaint_pixel(old_r, old_g, old_b, alpha):
+        if alpha == 0:
+            return old_r, old_g, old_b, alpha
+
+        old_h, old_l, old_s = colorsys.rgb_to_hls(
+            old_r / 255,
+            old_g / 255,
+            old_b / 255
+        )
+
+        nr, ng, nb = colorsys.hls_to_rgb(
+            target_h,
+            old_l,
+            max(old_s, 0.20)
+        )
+
+        return (
+            int(nr * 255),
+            int(ng * 255),
+            int(nb * 255),
+            alpha
+        )
 
     file_extension = "gif" if is_animated else "png"
-    emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.{file_extension}"
+    emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.{file_extension}?quality=lossless"
 
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(emoji_url) as response:
                 if response.status != 200:
-                    await interaction.followup.send(
-                        "Could not download this emoji.",
-                        ephemeral=True
-                    )
+                    await safe_reply("Could not download this emoji.")
                     return
 
                 image_bytes = await response.read()
@@ -2406,18 +2524,22 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
             frames = []
             durations = []
 
-            for frame_index in range(getattr(image, "n_frames", 1)):
+            frame_count = getattr(image, "n_frames", 1)
+
+            for frame_index in range(frame_count):
                 image.seek(frame_index)
 
                 frame = image.convert("RGBA")
+
+                if frame.width > 128 or frame.height > 128:
+                    frame.thumbnail((128, 128), Image.LANCZOS)
+
                 pixels = frame.load()
 
                 for y in range(frame.height):
                     for x in range(frame.width):
                         old_r, old_g, old_b, alpha = pixels[x, y]
-
-                        if alpha > 0:
-                            pixels[x, y] = (r, g, b, alpha)
+                        pixels[x, y] = repaint_pixel(old_r, old_g, old_b, alpha)
 
                 frames.append(frame.copy())
                 durations.append(image.info.get("duration", 100))
@@ -2429,24 +2551,33 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
                 append_images=frames[1:],
                 duration=durations,
                 loop=0,
-                disposal=2
+                disposal=2,
+                optimize=True
             )
 
         else:
             image = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
+
+            if image.width > 128 or image.height > 128:
+                image.thumbnail((128, 128), Image.LANCZOS)
+
             pixels = image.load()
 
             for y in range(image.height):
                 for x in range(image.width):
                     old_r, old_g, old_b, alpha = pixels[x, y]
+                    pixels[x, y] = repaint_pixel(old_r, old_g, old_b, alpha)
 
-                    if alpha > 0:
-                        pixels[x, y] = (r, g, b, alpha)
-
-            image.save(output, format="PNG")
+            image.save(output, format="PNG", optimize=True)
 
         output.seek(0)
         new_image_bytes = output.read()
+
+        if len(new_image_bytes) > 256000:
+            await safe_reply(
+                "The repainted emoji is too large for Discord. Try a smaller emoji/GIF."
+            )
+            return
 
         old_emoji = discord.utils.get(interaction.guild.emojis, id=emoji_id)
 
@@ -2464,18 +2595,17 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
             reason=f"Emoji repainted by {interaction.user}"
         )
 
-        await interaction.followup.send(
-            f"Emoji repainted successfully: {new_emoji}",
-            ephemeral=True
-        )
+        await safe_reply(f"Emoji repainted successfully: {new_emoji}")
 
-        await send_log(interaction.guild, interaction.user, "/repaint", f"Emoji: {emoji}\nColor: {hex_color}")
+        await send_log(
+            interaction.guild,
+            interaction.user,
+            "/repaint",
+            f"Emoji: {emoji}\nColor: {hex_color}"
+        )
 
     except Exception as e:
-        await interaction.followup.send(
-            f"Something went wrong: `{e}`",
-            ephemeral=True
-        )
+        await safe_reply(f"Something went wrong: `{e}`")
 
 # =====================================
 # .purge
