@@ -1119,13 +1119,8 @@ async def staff_strike(interaction: discord.Interaction, user: discord.Member, r
         return
 
     next_number = len(current) + 1
-    roman = {
-        1: "I",
-        2: "II",
-        3: "III"
-    }
 
-    next_role_name = f"Staff Infraction {next_number}/4"
+    next_role_name = f"Staff Strike {next_number}/3"
     next_role = discord.utils.get(interaction.guild.roles, name=next_role_name)
 
     if next_role is None:
