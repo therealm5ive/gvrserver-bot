@@ -1103,8 +1103,13 @@ async def staff_clear(interaction: discord.Interaction):
 )
 async def staff_strike(interaction: discord.Interaction, user: discord.Member, reason: str, appealable: app_commands.Choice[str], time: str, evidence: str):
     if not is_high_command(interaction.user):
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.send_message(
+            "You do not have permission to use this command.",
+            ephemeral=True
+        )
         return
+
+    await interaction.response.defer(ephemeral=True)
 
     current = [
         role for role in user.roles
@@ -1112,7 +1117,7 @@ async def staff_strike(interaction: discord.Interaction, user: discord.Member, r
     ]
 
     if len(current) >= 3:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             "This staff member already has 3 staff strikes.",
             ephemeral=True
         )
@@ -1124,7 +1129,7 @@ async def staff_strike(interaction: discord.Interaction, user: discord.Member, r
     next_role = discord.utils.get(interaction.guild.roles, name=next_role_name)
 
     if next_role is None:
-        await interaction.response.send_message(f"Role `{next_role_name}` was not found.", ephemeral=True)
+        await interaction.followup.send(f"Role `{next_role_name}` was not found.", ephemeral=True)
         return
 
     await user.add_roles(next_role)
@@ -1151,7 +1156,7 @@ async def staff_strike(interaction: discord.Interaction, user: discord.Member, r
         )
     )
 
-    await interaction.response.send_message(
+    await interaction.followup.send(
         f"{user.mention} has received **Staff Strike {next_number}**.",
         ephemeral=True
     )
@@ -1870,7 +1875,7 @@ async def infract(interaction: discord.Interaction, user: str, reason: str, appe
     next_role = discord.utils.get(interaction.guild.roles, name=next_role_name)
 
     if next_role is None:
-        await interaction.response.send_message(f"Role `{next_role_name}` was not found.", ephemeral=True)
+        await interaction.followup.send(f"Role `{next_role_name}` was not found.", ephemeral=True)
         return
 
     await target.add_roles(next_role)
@@ -1902,7 +1907,7 @@ async def infract(interaction: discord.Interaction, user: str, reason: str, appe
     if next_number == 4:
         msg += "\nThis user has now reached 4 infractions. User needs to be roleplay restricted."
 
-    await interaction.response.send_message(msg, ephemeral=True)
+    await interaction.followup.send(msg, ephemeral=True)
 
     await send_log(interaction.guild, interaction.user, "/infract", f"User: {target.mention}\nInfraction: {next_number}\nReason: {reason}")
 
