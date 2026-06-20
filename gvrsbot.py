@@ -1125,8 +1125,7 @@ async def staff_strike(interaction: discord.Interaction, user: discord.Member, r
         3: "III"
     }
 
-    roman = {1: "I", 2: "II", 3: "III"}
-    next_role_name = f"Staff Infraction {roman[next_number]}"
+    next_role_name = f"Staff Infraction {next_number}/4"
     next_role = discord.utils.get(interaction.guild.roles, name=next_role_name)
 
     if next_role is None:
@@ -1580,8 +1579,8 @@ APPEAL_TICKET_LINK = "https://discord.com/channels/1290705579953754163/150326993
 STAFF_TEAM_ROLE = "Staff Team"
 HIGH_COMMAND_ROLES = ["High Command", "Senior High Command"]
 
-INFRACTION_ROLES = ["Infraction I", "Infraction II", "Infraction III", "Infraction IIII"]
-STAFF_INFRACTION_ROLES = ["Staff Infraction I", "Staff Infraction II", "Staff Infraction III"]
+INFRACTION_ROLES = ["Infraction 1/4", "Infraction 2/4", "Infraction 3/4", "Infraction 4/4"]
+STAFF_INFRACTION_ROLES = ["Staff Strike 1/3", "Staff Strike 2/3", "Staff Strike 3/3"]
 
 STAFF_REMOVE_ROLES = [
     "Staff Team",
@@ -1702,16 +1701,16 @@ async def remove_warning_role(member, warning_type):
     role_name = None
 
     infraction_roles = {
-        "Infraction 1": "Infraction I",
-        "Infraction 2": "Infraction II",
-        "Infraction 3": "Infraction III",
-        "Infraction 4": "Infraction IIII",
+        "Infraction 1": "Infraction 1/4",
+        "Infraction 2": "Infraction 2/4",
+        "Infraction 3": "Infraction 3/4",
+        "Infraction 4": "Infraction 4/4",
     }
 
     staff_strike_roles = {
-        "Staff Strike 1": "Staff Infraction I",
-        "Staff Strike 2": "Staff Infraction II",
-        "Staff Strike 3": "Staff Infraction III",
+        "Staff Strike 1": "Staff Strike 1/3",
+        "Staff Strike 2": "Staff Strike 2/3",
+        "Staff Strike 3": "Staff Strike 3/3",
     }
 
     if warning_type in infraction_roles:
