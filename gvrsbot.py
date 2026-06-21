@@ -288,7 +288,7 @@ async def on_ready():
 async def say(interaction: discord.Interaction, text: str):
 
     if not any(
-        role.name in ["Senior High Command", "High Command"]
+        role.name in ["Senior High Ranking Staff", "High Ranking Staff"]
         for role in interaction.user.roles
     ):
         await interaction.response.defer(ephemeral=True)
@@ -333,7 +333,7 @@ async def startup(
         return
 
     if not any(
-        role.name in ["Staff Team", "High Command"]
+        role.name in ["Staff Team", "High Ranking Staff"]
         for role in interaction.user.roles
     ):
         await interaction.response.defer(ephemeral=True)
@@ -1176,7 +1176,7 @@ bot.tree.add_command(staff_group)
 
 SERVER_OVERSEER_ROLE_NAME = "Bot Developer"
 STAFF_ROLE_NAME = "Staff Team"
-HIGH_COMMAND_ROLE_NAMES = ["High Command"]
+HIGH_COMMAND_ROLE_NAMES = ["High Ranking Staff"]
 
 
 def get_ticket_info(channel):
@@ -1577,7 +1577,7 @@ async def ticketpanel(interaction: discord.Interaction):
 APPEAL_TICKET_LINK = "https://discord.com/channels/1290705579953754163/1503269938624856156"
 
 STAFF_TEAM_ROLE = "Staff Team"
-HIGH_COMMAND_ROLES = ["High Command", "Senior High Command"]
+HIGH_COMMAND_ROLES = ["High Ranking Staff", "Senior High Ranking Staff"]
 
 INFRACTION_ROLES = ["Infraction 1/4", "Infraction 2/4", "Infraction 3/4", "Infraction 4/4"]
 STAFF_INFRACTION_ROLES = ["Staff Strike 1/3", "Staff Strike 2/3", "Staff Strike 3/3"]
@@ -1596,8 +1596,8 @@ STAFF_REMOVE_ROLES = [
     "Senior Administration",
     "High Ranking Intern",
     "Trial Management",
-    "High Command",
-    "Senior High Command",
+    "High Ranking Staff",
+    "Senior High Ranking Staff",
     "Staffing Management",
     "Community Management",
     "Executive Management",
