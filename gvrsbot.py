@@ -2422,7 +2422,12 @@ async def role(interaction: discord.Interaction, user: discord.Member, role: dis
 )
 async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
 
-    if not any(role.name == "Server Bot Developer" for role in interaction.user.roles):
+    ALLOWED_REPAINT_ROLES = [
+        "Bot Developer",
+        "Ownership Team"
+    ]
+
+    if not any(role.name in ALLOWED_REPAINT_ROLES for role in interaction.user.roles):
         await interaction.response.send_message(
             "You do not have permission to use this command.",
             ephemeral=True
