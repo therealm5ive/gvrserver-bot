@@ -26,6 +26,7 @@ REINVITES_IMAGE = "https://media.discordapp.net/attachments/1479130697800089622/
 TICKET_PANEL_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1513567380910116955/Society_-_Embed_-_Assistance.png?ex=6a2832f8&is=6a26e178&hm=9c577084fd141441a642443b308194b5cb91feda42c41e4bbb4cbb73d69698a2&"
 TICKET_OPEN_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1513567380910116955/Society_-_Embed_-_Assistance.png?ex=6a2832f8&is=6a26e178&hm=9c577084fd141441a642443b308194b5cb91feda42c41e4bbb4cbb73d69698a2&"
 WELCOME_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1519100047961362463/image.png?ex=6a3c53aa&is=6a3b022a&hm=20dcd9ee3256031229c4245a4eb7ac879aa7f4dd56bc5adc9c948c8ccb4d3fb6&"
+WELCOME_THUMBNAIL = "https://cdn.discordapp.com/attachments/1479130697800089622/1519101482203615323/image.png?ex=6a3c5500&is=6a3b0380&hm=efea340a34ed87dc6bec1a9e6c29cfdd545c6103712621e7046220045ade683e&"
 
 EARLYACCESS_ROLE_ID = 1290705580046024725
 CIVILIANS_ROLE_ID = 1290705580025184277
@@ -531,7 +532,7 @@ async def on_member_join(member: discord.Member):
         color=discord.Color.from_str("#fef1b3")
     )
 
-    embed.set_thumbnail(url=member.guild.icon.url if member.guild.icon else bot.user.display_avatar.url)
+    embed.set_thumbnail(url=WELCOME_THUMBNAIL)
     embed.set_image(url=WELCOME_IMAGE)
 
     await channel.send(
