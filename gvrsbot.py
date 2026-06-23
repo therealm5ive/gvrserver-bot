@@ -429,9 +429,14 @@ class LOARequestView(discord.ui.View):
             allowed_mentions=discord.AllowedMentions(users=True)
         )
 
-    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
+    @discord.ui.button(
+        label="Accept",
+        style=discord.ButtonStyle.success,
+        custom_id="loa_accept_button"
+    )
     async def accept_loa(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not self.can_handle_loa(interaction.user):
+            await interaction.response.defer()
             return
 
         await self.send_loa_reply(
@@ -439,9 +444,14 @@ class LOARequestView(discord.ui.View):
             f"{interaction.user.mention} accepted your LOA!"
         )
 
-    @discord.ui.button(label="Deny", style=discord.ButtonStyle.danger)
+    @discord.ui.button(
+        label="Deny",
+        style=discord.ButtonStyle.danger,
+        custom_id="loa_deny_button"
+    )
     async def deny_loa(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not self.can_handle_loa(interaction.user):
+            await interaction.response.defer()
             return
 
         await self.send_loa_reply(
@@ -459,6 +469,7 @@ async def on_ready():
     bot.add_view(TicketPanelView())
     bot.add_view(PersistentTicketView())
     bot.add_view(ServerInfoView())
+    bot.add_view(LOARequestView())
 
     await bot.change_presence(
         activity=discord.Activity(
@@ -468,7 +479,13 @@ async def on_ready():
     )
 
     synced = await bot.tree.sync()
-    print(f"{len(synced)} Commands synchronised")
+    print(f"{len(synced)} global commands synchronised")
+
+    for guild in bot.guilds:
+        bot.tree.copy_global_to(guild=guild)
+        guild_synced = await bot.tree.sync(guild=guild)
+        print(f"{len(guild_synced)} commands synchronised for {guild.name}")
+
     print(f"{bot.user} is online!")
 
 # =====================================
