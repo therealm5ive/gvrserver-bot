@@ -25,11 +25,15 @@ OVER_IMAGE = "https://media.discordapp.net/attachments/1479130697800089622/15134
 REINVITES_IMAGE = "https://media.discordapp.net/attachments/1479130697800089622/1513461960455356526/Society_-_Embed_-_Session_Reinvites.png?ex=6a27d0ca&is=6a267f4a&hm=eaeca4b95415c2dcd907222657cecd95b77b650619da1e2997eb29169ae1801d&=&format=webp&quality=lossless"
 TICKET_PANEL_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1513567380910116955/Society_-_Embed_-_Assistance.png?ex=6a2832f8&is=6a26e178&hm=9c577084fd141441a642443b308194b5cb91feda42c41e4bbb4cbb73d69698a2&"
 TICKET_OPEN_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1513567380910116955/Society_-_Embed_-_Assistance.png?ex=6a2832f8&is=6a26e178&hm=9c577084fd141441a642443b308194b5cb91feda42c41e4bbb4cbb73d69698a2&"
+WELCOME_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1519100047961362463/image.png?ex=6a3c53aa&is=6a3b022a&hm=20dcd9ee3256031229c4245a4eb7ac879aa7f4dd56bc5adc9c948c8ccb4d3fb6&"
 
 EARLYACCESS_ROLE_ID = 1290705580046024725
 CIVILIANS_ROLE_ID = 1290705580025184277
 TICKET_CATEGORY_ID = 1506043336987906231
 ROLEPLAY_RESTRICTED_ROLE_ID = 1290705580025184282
+WELCOME_CHANNEL_ID = 1290705580905861223
+BOOK_EMOJI = "<:GVRSbook:1515852761948749874>"
+SUN_EMOJI = "☀️"
 
 DB_FILE = "bot_data.db"
 
@@ -500,6 +504,41 @@ async def on_ready():
     print(f"{len(synced)} global commands synchronised")
 
     print(f"{bot.user} is online!")
+
+
+@bot.event
+async def on_member_join(member: discord.Member):
+    channel = member.guild.get_channel(WELCOME_CHANNEL_ID)
+
+    if channel is None:
+        return
+
+    embed = discord.Embed(
+        description=(
+            "Welcome to **Greenville Roleplay Society** — a community built on professionalism, realism, and "
+            "an engaging Greenville roleplay experience! We’re excited to have you here.\n\n"
+            "Whether you're joining to patrol, roleplay as a civilian, participate in events, or connect with new people, "
+            "GVRS is committed to providing a safe, organized, and enjoyable environment for everyone.\n\n"
+            f"{BOOK_EMOJI} **Getting Started**\n"
+            "• Make sure to read all server rules and in-game regulations\n"
+            "• Claim your roles in the designated channels\n"
+            "• Introduce yourself and meet the community\n"
+            "• Watch for upcoming sessions, events, and announcements\n\n"
+            "**Meet the Team**\n"
+            "Our staff team is here to support you and maintain a smooth experience. If you need help, guidance, "
+            "or have questions, feel free to contact any GVRS staff member."
+        ),
+        color=discord.Color.from_str("#fef1b3")
+    )
+
+    embed.set_thumbnail(url=member.guild.icon.url if member.guild.icon else bot.user.display_avatar.url)
+    embed.set_image(url=WELCOME_IMAGE)
+
+    await channel.send(
+        content=f"{SUN_EMOJI} Welcome to Greenville Roleplay Society {member.mention}!",
+        embed=embed,
+        allowed_mentions=discord.AllowedMentions(users=True)
+    )
 
 # =====================================
 # /say
