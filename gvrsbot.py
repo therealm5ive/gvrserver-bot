@@ -1205,6 +1205,17 @@ async def roleplay_restrict(
         reason=f"Roleplay restricted by {interaction.user}"
     )
 
+    entry = make_entry(
+        "Roleplay Restriction",
+        reason,
+        interaction.user.id,
+        "Appealable",
+        time,
+        evidence
+    )
+
+    add_mod_entry(user.id, entry)
+
     dm_embed = discord.Embed(
         description=(
             "You have been **roleplay restricted** in **Greenville Roleplay Society** for the following reason(s):\n\n"
@@ -2625,6 +2636,16 @@ async def warnings(interaction: discord.Interaction, user: str):
                 f"- {warning['reason']}\n\n"
                 f"If you deem this ban to be false, feel free to appeal it with the appeal listed below.\n"
                 f"Appeal: Soon.\n\n"
+                f"Evidence: {warning['evidence']} - <t:{warning['timestamp']}:R>\n\n"
+            )
+
+        elif warning["type"] == "Roleplay Restriction":
+            text += (
+                f"**Moderator:** <@{warning['moderator_id']}>\n"
+                f"You have been **roleplay restricted** in **Greenville Roleplay Society** for the following reason(s):\n\n"
+                f"- {warning['reason']}\n\n"
+                f"This roleplay restriction is guilty for **{warning['appeal_time']}**. If you deem this restriction to be false "
+                f"please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
                 f"Evidence: {warning['evidence']} - <t:{warning['timestamp']}:R>\n\n"
             )
 
