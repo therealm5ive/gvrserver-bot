@@ -490,13 +490,14 @@ async def on_ready():
         )
     )
 
-    synced = await bot.tree.sync()
-    print(f"{len(synced)} global commands synchronised")
-
     for guild in bot.guilds:
-        bot.tree.clear_commands(guild=guild)
+        bot.tree.copy_global_to(guild=guild)
         guild_synced = await bot.tree.sync(guild=guild)
         print(f"{len(guild_synced)} guild commands synchronised for {guild.name}")
+
+    bot.tree.clear_commands(guild=None)
+    synced = await bot.tree.sync()
+    print(f"{len(synced)} global commands synchronised")
 
     print(f"{bot.user} is online!")
 
@@ -1207,10 +1208,10 @@ async def roleplay_restrict(
     dm_embed = discord.Embed(
         description=(
             "You have been **roleplay restricted** in **Greenville Roleplay Society** for the following reason(s):\n\n"
-            f"**Reason(s):**\n{reason}\n\n"
-            f"**Time:**\n{time}\n\n"
-            f"If you deem this restriction to be false please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
-            f"**Evidence:**\n{evidence}"
+            f"- {reason}\n\n"
+            f"This roleplay restriction is guilty for **{time}**. If you deem this restriction to be false "
+            f"please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
+            f"Evidence: {evidence}"
         ),
         color=discord.Color.from_str("#fef1b3")
     )
