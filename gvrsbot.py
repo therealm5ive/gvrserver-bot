@@ -421,8 +421,17 @@ class LOARequestView(discord.ui.View):
     def can_handle_loa(self, member):
         return any(role.name == "High Ranking Staff" for role in member.roles)
 
-    async def send_loa_reply(self, interaction: discord.Interaction, message: str):
-        await interaction.response.defer()
+    async def finish_loa_request(self, interaction: discord.Interaction, message: str, accepted: bool):
+        for item in self.children:
+            item.disabled = True
+            item.style = discord.ButtonStyle.secondary
+
+            if accepted and item.custom_id == "loa_accept_button":
+                item.label = "Accepted"
+            elif not accepted and item.custom_id == "loa_deny_button":
+                item.label = "Denied"
+
+        await interaction.response.edit_message(view=self)
         await interaction.channel.send(
             message,
             reference=interaction.message,
@@ -439,9 +448,10 @@ class LOARequestView(discord.ui.View):
             await interaction.response.defer()
             return
 
-        await self.send_loa_reply(
+        await self.finish_loa_request(
             interaction,
-            f"{interaction.user.mention} accepted your LOA!"
+            f"{interaction.user.mention} accepted your LOA!",
+            True
         )
 
     @discord.ui.button(
@@ -454,9 +464,10 @@ class LOARequestView(discord.ui.View):
             await interaction.response.defer()
             return
 
-        await self.send_loa_reply(
+        await self.finish_loa_request(
             interaction,
-            f"{interaction.user.mention} denied your LOA!"
+            f"{interaction.user.mention} denied your LOA!",
+            False
         )
 
 
@@ -482,9 +493,9 @@ async def on_ready():
     print(f"{len(synced)} global commands synchronised")
 
     for guild in bot.guilds:
-        bot.tree.copy_global_to(guild=guild)
+        bot.tree.clear_commands(guild=guild)
         guild_synced = await bot.tree.sync(guild=guild)
-        print(f"{len(guild_synced)} commands synchronised for {guild.name}")
+        print(f"{len(guild_synced)} guild commands synchronised for {guild.name}")
 
     print(f"{bot.user} is online!")
 
