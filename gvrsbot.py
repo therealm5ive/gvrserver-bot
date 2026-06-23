@@ -1,7 +1,6 @@
 import os
 import asyncio
 import discord
-import json
 import re
 import io
 import aiohttp
@@ -12,6 +11,7 @@ from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+from urllib.parse import urlparse
 
 load_dotenv()
 
@@ -36,6 +36,34 @@ SESSION_START_TIMES = {}
 ACTIVE_COHOSTS = {}
 ACTIVE_SUPERVISIONS = {}
 ACTIVE_STARTUPS = {}
+
+ALLOWED_ROLEPLAY_CHANNELS = ["roleplay-1", "roleplay-2", "bot-testing-dont-remove"]
+MAX_TIMEOUT_DURATION = timedelta(days=28)
+MAX_EMOJI_DOWNLOAD_BYTES = 2 * 1024 * 1024
+MAX_GIF_FRAMES = 80
+
+
+def session_key(interaction):
+    guild_id = interaction.guild.id if interaction.guild else 0
+    return guild_id, interaction.channel.id
+
+
+def user_session_key(interaction):
+    guild_id, channel_id = session_key(interaction)
+    return guild_id, channel_id, interaction.user.id
+
+
+def is_allowed_url(value: str, allowed_hosts=None):
+    parsed = urlparse(value.strip())
+
+    if parsed.scheme != "https" or not parsed.netloc:
+        return False
+
+    if allowed_hosts is None:
+        return True
+
+    hostname = parsed.hostname or ""
+    return any(hostname == host or hostname.endswith(f".{host}") for host in allowed_hosts)
 
 
 def get_db():
@@ -76,6 +104,27 @@ def init_db():
     """)
 
     cur.execute("""
+        CREATE TABLE IF NOT EXISTS active_sessions (
+            guild_id TEXT NOT NULL,
+            channel_id TEXT NOT NULL,
+            message_id TEXT NOT NULL,
+            start_timestamp INTEGER NOT NULL,
+            PRIMARY KEY (guild_id, channel_id)
+        )
+    """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS active_staff_timers (
+            guild_id TEXT NOT NULL,
+            channel_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            timer_type TEXT NOT NULL,
+            start_timestamp INTEGER NOT NULL,
+            PRIMARY KEY (guild_id, channel_id, user_id, timer_type)
+        )
+    """)
+
+    cur.execute("""
         CREATE INDEX IF NOT EXISTS idx_staff_sessions_user
         ON staff_sessions(user_id)
     """)
@@ -84,6 +133,116 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_warnings_user_active
         ON warnings(user_id, active)
     """)
+
+    conn.commit()
+    conn.close()
+
+
+def load_active_state():
+    ACTIVE_STARTUPS.clear()
+    SESSION_START_TIMES.clear()
+    ACTIVE_COHOSTS.clear()
+    ACTIVE_SUPERVISIONS.clear()
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM active_sessions")
+    for row in cur.fetchall():
+        key = (int(row["guild_id"]), int(row["channel_id"]))
+        ACTIVE_STARTUPS[key] = int(row["message_id"])
+        SESSION_START_TIMES[key] = row["start_timestamp"]
+
+    cur.execute("SELECT * FROM active_staff_timers")
+    for row in cur.fetchall():
+        key = (int(row["guild_id"]), int(row["channel_id"]), int(row["user_id"]))
+
+        if row["timer_type"] == "cohost":
+            ACTIVE_COHOSTS[key] = row["start_timestamp"]
+        elif row["timer_type"] == "supervise":
+            ACTIVE_SUPERVISIONS[key] = row["start_timestamp"]
+
+    conn.close()
+
+
+def save_active_session(active_key, message_id, start_timestamp):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO active_sessions
+        (guild_id, channel_id, message_id, start_timestamp)
+        VALUES (?, ?, ?, ?)
+    """, (
+        str(active_key[0]),
+        str(active_key[1]),
+        str(message_id),
+        start_timestamp
+    ))
+
+    conn.commit()
+    conn.close()
+
+
+def clear_active_session(active_key):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        DELETE FROM active_sessions
+        WHERE guild_id = ? AND channel_id = ?
+    """, (str(active_key[0]), str(active_key[1])))
+
+    conn.commit()
+    conn.close()
+
+
+def save_staff_timer(active_key, timer_type, start_timestamp):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO active_staff_timers
+        (guild_id, channel_id, user_id, timer_type, start_timestamp)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        str(active_key[0]),
+        str(active_key[1]),
+        str(active_key[2]),
+        timer_type,
+        start_timestamp
+    ))
+
+    conn.commit()
+    conn.close()
+
+
+def clear_staff_timer(active_key, timer_type):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        DELETE FROM active_staff_timers
+        WHERE guild_id = ? AND channel_id = ? AND user_id = ? AND timer_type = ?
+    """, (
+        str(active_key[0]),
+        str(active_key[1]),
+        str(active_key[2]),
+        timer_type
+    ))
+
+    conn.commit()
+    conn.close()
+
+
+def clear_staff_timers_for_session(active_key):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        DELETE FROM active_staff_timers
+        WHERE guild_id = ? AND channel_id = ?
+    """, (str(active_key[0]), str(active_key[1])))
 
     conn.commit()
     conn.close()
@@ -257,6 +416,7 @@ class StaffProfileView(discord.ui.View):
 @bot.event
 async def on_ready():
     init_db()
+    load_active_state()
     print(f"Logged in as {bot.user}")
 
     bot.add_view(TicketPanelView())
@@ -301,7 +461,10 @@ async def say(interaction: discord.Interaction, text: str):
 
     await send_log(interaction.guild, interaction.user, "/say", f"Text: {text}")
 
-    await interaction.channel.send(text)
+    await interaction.channel.send(
+        text,
+        allowed_mentions=discord.AllowedMentions.none()
+    )
 
 # =====================================
 # /startup
@@ -319,13 +482,21 @@ async def startup(
     reactions: int
 ):
 
-    allowed_channels = ["roleplay-1", "roleplay-2", "bot-testing-dont-remove"]
+    allowed_channels = ALLOWED_ROLEPLAY_CHANNELS
+    active_key = session_key(interaction)
 
     if interaction.channel.name not in allowed_channels:
         await interaction.response.defer(ephemeral=True)
         return
 
-    if interaction.channel.id in ACTIVE_STARTUPS:
+    if reactions <= 0:
+        await interaction.response.send_message(
+            "Reaction amount must be at least 1.",
+            ephemeral=True
+        )
+        return
+
+    if active_key in ACTIVE_STARTUPS:
         await interaction.response.send_message(
             "There is already an active startup message in this channel.",
             ephemeral=True
@@ -370,8 +541,10 @@ async def startup(
         embed=embed
     )
 
-    SESSION_START_TIMES[interaction.channel.id] = int(message.created_at.timestamp())
-    ACTIVE_STARTUPS[interaction.channel.id] = message.id
+    start_timestamp = int(message.created_at.timestamp())
+    SESSION_START_TIMES[active_key] = start_timestamp
+    ACTIVE_STARTUPS[active_key] = message.id
+    save_active_session(active_key, message.id, start_timestamp)
 
     await message.add_reaction("<:yellowcheck:1513524676180054107>")
     await interaction.response.send_message("Startup message executed!", ephemeral=True)
@@ -384,6 +557,9 @@ async def startup(
     async def wait_for_reactions():
         while True:
             await asyncio.sleep(5)
+
+            if ACTIVE_STARTUPS.get(active_key) != message.id:
+                return
 
             try:
                 updated_message = await interaction.channel.fetch_message(message.id)
@@ -442,13 +618,14 @@ async def startup(
 @bot.tree.command(name="earlyaccess", description="Sends an early access message")
 @app_commands.describe(link="Enter the early access link here")
 async def earlyaccess(interaction: discord.Interaction, link: str):
-    allowed_channels = ["roleplay-1", "roleplay-2", "bot-testing-dont-remove"]
+    allowed_channels = ALLOWED_ROLEPLAY_CHANNELS
+    active_key = session_key(interaction)
 
     if interaction.channel.name not in allowed_channels:
         await interaction.response.defer(ephemeral=True)
         return
 
-    if interaction.channel.id not in ACTIVE_STARTUPS:
+    if active_key not in ACTIVE_STARTUPS:
         await interaction.response.send_message(
         "There is no active startup in this channel.",
         ephemeral=True
@@ -459,7 +636,7 @@ async def earlyaccess(interaction: discord.Interaction, link: str):
         await interaction.response.defer(ephemeral=True)
         return
 
-    if "https" not in link:
+    if not is_allowed_url(link):
         await interaction.response.send_message("This is not a valid URL.", ephemeral=True)
         return
 
@@ -516,13 +693,14 @@ async def release(
     frp_speeds: str,
     leo_status: str
 ):
-    allowed_channels = ["roleplay-1", "roleplay-2", "bot-testing-dont-remove"]
+    allowed_channels = ALLOWED_ROLEPLAY_CHANNELS
+    active_key = session_key(interaction)
 
     if interaction.channel.name not in allowed_channels:
         await interaction.response.defer(ephemeral=True)
         return
 
-    if interaction.channel.id not in ACTIVE_STARTUPS:
+    if active_key not in ACTIVE_STARTUPS:
         await interaction.response.send_message(
         "There is no active startup in this channel.",
         ephemeral=True
@@ -533,7 +711,7 @@ async def release(
         await interaction.response.defer(ephemeral=True)
         return
 
-    if "https" not in session_link:
+    if not is_allowed_url(session_link):
         await interaction.response.send_message("This is not a valid URL.", ephemeral=True)
         return
 
@@ -601,13 +779,14 @@ async def reinvites(
     leo_status: str
 ):
 
-    allowed_channels = ["roleplay-1", "roleplay-2", "bot-testing-dont-remove"]
+    allowed_channels = ALLOWED_ROLEPLAY_CHANNELS
+    active_key = session_key(interaction)
 
     if interaction.channel.name not in allowed_channels:
         await interaction.response.defer(ephemeral=True)
         return
 
-    if interaction.channel.id not in ACTIVE_STARTUPS:
+    if active_key not in ACTIVE_STARTUPS:
         await interaction.response.send_message(
         "There is no active startup in this channel.",
         ephemeral=True
@@ -618,7 +797,7 @@ async def reinvites(
         await interaction.response.defer(ephemeral=True)
         return
 
-    if "https" not in session_link:
+    if not is_allowed_url(session_link):
         await interaction.response.send_message(
             "This is not a valid URL.",
             ephemeral=True
@@ -677,13 +856,14 @@ async def reinvites(
 
 @bot.tree.command(name="linkregen", description="Sends a link regeneration message")
 async def linkregen(interaction: discord.Interaction):
-    allowed_channels = ["roleplay-1", "roleplay-2", "bot-testing-dont-remove"]
+    allowed_channels = ALLOWED_ROLEPLAY_CHANNELS
+    active_key = session_key(interaction)
 
     if interaction.channel.name not in allowed_channels:
         await interaction.response.defer(ephemeral=True)
         return
 
-    if interaction.channel.id not in ACTIVE_STARTUPS:
+    if active_key not in ACTIVE_STARTUPS:
         await interaction.response.send_message(
         "There is no active startup in this channel.",
         ephemeral=True
@@ -719,7 +899,7 @@ async def linkregen(interaction: discord.Interaction):
 )
 async def sessionclear(interaction: discord.Interaction):
 
-    allowed_channels = ["roleplay-1", "roleplay-2", "bot-testing-dont-remove"]
+    allowed_channels = ALLOWED_ROLEPLAY_CHANNELS
 
     if interaction.channel.name not in allowed_channels:
         await interaction.response.defer(ephemeral=True)
@@ -729,8 +909,10 @@ async def sessionclear(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         return
 
-    ACTIVE_STARTUPS.pop(interaction.channel.id, None)
-    SESSION_START_TIMES.pop(interaction.channel.id, None)
+    active_key = session_key(interaction)
+    ACTIVE_STARTUPS.pop(active_key, None)
+    SESSION_START_TIMES.pop(active_key, None)
+    clear_active_session(active_key)
 
     await interaction.response.send_message(
         "The active session has been cleared.",
@@ -746,12 +928,13 @@ async def sessionclear(interaction: discord.Interaction):
 @bot.tree.command(name="over", description="Sends a roleplay concluded message")
 @app_commands.describe(additional_notes="Additional notes")
 async def over(interaction: discord.Interaction, additional_notes: str):
-    allowed_channels = ["roleplay-1", "roleplay-2", "bot-testing-dont-remove"]
+    allowed_channels = ALLOWED_ROLEPLAY_CHANNELS
+    active_key = session_key(interaction)
     if interaction.channel.name not in allowed_channels:
         await interaction.response.defer(ephemeral=True)
         return
 
-    if interaction.channel.id not in ACTIVE_STARTUPS:
+    if active_key not in ACTIVE_STARTUPS:
         await interaction.response.send_message(
             "There is no active startup in this channel.",
             ephemeral=True
@@ -763,7 +946,7 @@ async def over(interaction: discord.Interaction, additional_notes: str):
         return
 
     host = interaction.user.mention
-    start_timestamp = SESSION_START_TIMES.get(interaction.channel.id)
+    start_timestamp = SESSION_START_TIMES.get(active_key)
 
     if start_timestamp:
         end_timestamp = int(discord.utils.utcnow().timestamp())
@@ -817,7 +1000,11 @@ async def over(interaction: discord.Interaction, additional_notes: str):
         check=not_pinned
     )
 
-    for user_id, cohost_start_timestamp in list(ACTIVE_COHOSTS.items()):
+    for cohost_key, cohost_start_timestamp in list(ACTIVE_COHOSTS.items()):
+        if cohost_key[:2] != active_key:
+            continue
+
+        user_id = cohost_key[2]
         add_staff_session(
             user_id,
             "cohosted",
@@ -826,9 +1013,13 @@ async def over(interaction: discord.Interaction, additional_notes: str):
             end_timestamp
         )
 
-    ACTIVE_COHOSTS.clear()
+        ACTIVE_COHOSTS.pop(cohost_key, None)
 
-    for user_id, supervise_start_timestamp in list(ACTIVE_SUPERVISIONS.items()):
+    for supervise_key, supervise_start_timestamp in list(ACTIVE_SUPERVISIONS.items()):
+        if supervise_key[:2] != active_key:
+            continue
+
+        user_id = supervise_key[2]
         add_staff_session(
             user_id,
             "supervised",
@@ -837,10 +1028,12 @@ async def over(interaction: discord.Interaction, additional_notes: str):
             end_timestamp
         )
 
-    ACTIVE_SUPERVISIONS.clear()
+        ACTIVE_SUPERVISIONS.pop(supervise_key, None)
 
-    ACTIVE_STARTUPS.pop(interaction.channel.id, None)
-    SESSION_START_TIMES.pop(interaction.channel.id, None)
+    ACTIVE_STARTUPS.pop(active_key, None)
+    SESSION_START_TIMES.pop(active_key, None)
+    clear_active_session(active_key)
+    clear_staff_timers_for_session(active_key)
 
     await interaction.channel.send(embed=embed)
 
@@ -859,7 +1052,10 @@ async def cohost_start(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         return
 
-    ACTIVE_COHOSTS[interaction.user.id] = int(discord.utils.utcnow().timestamp())
+    active_key = user_session_key(interaction)
+    start_timestamp = int(discord.utils.utcnow().timestamp())
+    ACTIVE_COHOSTS[active_key] = start_timestamp
+    save_staff_timer(active_key, "cohost", start_timestamp)
 
     embed = discord.Embed(
         description=f"{interaction.user.mention} is **co-hosting** the current session.",
@@ -884,14 +1080,17 @@ async def cohost_end(interaction: discord.Interaction, note: str):
         await interaction.response.defer(ephemeral=True)
         return
 
-    if interaction.user.id not in ACTIVE_COHOSTS:
+    active_key = user_session_key(interaction)
+
+    if active_key not in ACTIVE_COHOSTS:
         await interaction.response.send_message(
             "You have not started a cohost session.",
             ephemeral=True
         )
         return
 
-    start_timestamp = ACTIVE_COHOSTS.pop(interaction.user.id)
+    start_timestamp = ACTIVE_COHOSTS.pop(active_key)
+    clear_staff_timer(active_key, "cohost")
     end_timestamp = int(discord.utils.utcnow().timestamp())
     duration_minutes = round((end_timestamp - start_timestamp) / 60)
 
@@ -939,7 +1138,10 @@ async def supervise_start(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         return
 
-    ACTIVE_SUPERVISIONS[interaction.user.id] = int(discord.utils.utcnow().timestamp())
+    active_key = user_session_key(interaction)
+    start_timestamp = int(discord.utils.utcnow().timestamp())
+    ACTIVE_SUPERVISIONS[active_key] = start_timestamp
+    save_staff_timer(active_key, "supervise", start_timestamp)
 
     embed = discord.Embed(
         description=f"{interaction.user.mention} is **supervising** the current session.",
@@ -964,14 +1166,17 @@ async def supervise_end(interaction: discord.Interaction, note: str):
         await interaction.response.defer(ephemeral=True)
         return
 
-    if interaction.user.id not in ACTIVE_SUPERVISIONS:
+    active_key = user_session_key(interaction)
+
+    if active_key not in ACTIVE_SUPERVISIONS:
         await interaction.response.send_message(
             "You have not started a supervision.",
             ephemeral=True
         )
         return
 
-    start_timestamp = ACTIVE_SUPERVISIONS.pop(interaction.user.id)
+    start_timestamp = ACTIVE_SUPERVISIONS.pop(active_key)
+    clear_staff_timer(active_key, "supervise")
     end_timestamp = int(discord.utils.utcnow().timestamp())
     duration_minutes = round((end_timestamp - start_timestamp) / 60)
 
@@ -1848,14 +2053,16 @@ async def infract(interaction: discord.Interaction, user: str, reason: str, appe
         await interaction.response.defer(ephemeral=True)
         return
 
+    await interaction.response.defer(ephemeral=True)
+
     target = await get_target(interaction.guild, user)
 
     if target is None or not isinstance(target, discord.Member):
-        await interaction.response.send_message("User was not found in this server.", ephemeral=True)
+        await interaction.followup.send("User was not found in this server.", ephemeral=True)
         return
 
     if is_staff_team(target):
-        await interaction.response.send_message(
+        await interaction.followup.send(
             "Staff Team members cannot be infracted. Use `/staff strike` instead.",
             ephemeral=True
         )
@@ -1864,7 +2071,7 @@ async def infract(interaction: discord.Interaction, user: str, reason: str, appe
     current = [role for role in target.roles if role.name in INFRACTION_ROLES]
 
     if len(current) >= 4:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             "User has 4 infractions, roleplay restrict the user.",
             ephemeral=True
         )
@@ -1922,6 +2129,10 @@ async def mute(interaction: discord.Interaction, user: str, minutes: int = 0, ho
         await interaction.response.defer(ephemeral=True)
         return
 
+    if minutes < 0 or hours < 0:
+        await interaction.response.send_message("Duration cannot be negative.", ephemeral=True)
+        return
+
     target = await get_target(interaction.guild, user)
 
     if target is None or not isinstance(target, discord.Member):
@@ -1936,6 +2147,10 @@ async def mute(interaction: discord.Interaction, user: str, minutes: int = 0, ho
 
     if duration.total_seconds() <= 0:
         await interaction.response.send_message("Please provide minutes or hours.", ephemeral=True)
+        return
+
+    if duration > MAX_TIMEOUT_DURATION:
+        await interaction.response.send_message("Discord timeouts cannot be longer than 28 days.", ephemeral=True)
         return
 
     await target.timeout(duration, reason=f"Muted by {interaction.user}")
@@ -2393,12 +2608,28 @@ async def role(interaction: discord.Interaction, user: discord.Member, role: dis
         await interaction.response.defer(ephemeral=True)
         return
 
+    if role >= interaction.guild.me.top_role:
+        await interaction.response.send_message(
+            "I cannot manage a role that is higher than or equal to my highest role.",
+            ephemeral=True
+        )
+        return
+
+    if interaction.user != interaction.guild.owner and role >= interaction.user.top_role:
+        await interaction.response.send_message(
+            "You cannot manage a role that is higher than or equal to your highest role.",
+            ephemeral=True
+        )
+        return
+
     if role in user.roles:
         await user.remove_roles(role)
         await interaction.response.send_message(
             f"{role.mention} has been removed from {user.mention}.",
             ephemeral=True
         )
+
+        await send_log(interaction.guild, interaction.user, "/role", f"Removed\nUser: {user.mention}\nRole: {role.mention}")
     else:
         await user.add_roles(role)
         await interaction.response.send_message(
@@ -2406,7 +2637,7 @@ async def role(interaction: discord.Interaction, user: discord.Member, role: dis
             ephemeral=True
         )
 
-        await send_log(interaction.guild, interaction.user, "/role", f"User: {user.mention}\nRole: {role.mention}")
+        await send_log(interaction.guild, interaction.user, "/role", f"Added\nUser: {user.mention}\nRole: {role.mention}")
 
         # =====================================
 # /repaint
@@ -2471,7 +2702,7 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
     target_g = int(hex_color[3:5], 16)
     target_b = int(hex_color[5:7], 16)
 
-    target_h, target_l, target_s = colorsys.rgb_to_hls(
+    target_h, _, _ = colorsys.rgb_to_hls(
         target_r / 255,
         target_g / 255,
         target_b / 255
@@ -2481,7 +2712,7 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
         if alpha == 0:
             return old_r, old_g, old_b, alpha
 
-        old_h, old_l, old_s = colorsys.rgb_to_hls(
+        _, old_l, old_s = colorsys.rgb_to_hls(
             old_r / 255,
             old_g / 255,
             old_b / 255
@@ -2503,24 +2734,18 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
     file_extension = "gif" if is_animated else "png"
     emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.{file_extension}?quality=lossless"
 
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(emoji_url) as response:
-                if response.status != 200:
-                    await safe_reply("Could not download this emoji.")
-                    return
-
-                image_bytes = await response.read()
-
+    def process_emoji_image(image_bytes):
         output = io.BytesIO()
 
         if is_animated:
             image = Image.open(io.BytesIO(image_bytes))
+            frame_count = getattr(image, "n_frames", 1)
+
+            if frame_count > MAX_GIF_FRAMES:
+                raise ValueError(f"Animated emojis are limited to {MAX_GIF_FRAMES} frames.")
 
             frames = []
             durations = []
-
-            frame_count = getattr(image, "n_frames", 1)
 
             for frame_index in range(frame_count):
                 image.seek(frame_index)
@@ -2567,7 +2792,30 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
             image.save(output, format="PNG", optimize=True)
 
         output.seek(0)
-        new_image_bytes = output.read()
+        return output.read()
+
+    try:
+        timeout = aiohttp.ClientTimeout(total=15)
+
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            async with session.get(emoji_url) as response:
+                if response.status != 200:
+                    await safe_reply("Could not download this emoji.")
+                    return
+
+                content_length = response.headers.get("Content-Length")
+
+                if content_length and int(content_length) > MAX_EMOJI_DOWNLOAD_BYTES:
+                    await safe_reply("This emoji is too large to repaint.")
+                    return
+
+                image_bytes = await response.read()
+
+        if len(image_bytes) > MAX_EMOJI_DOWNLOAD_BYTES:
+            await safe_reply("This emoji is too large to repaint.")
+            return
+
+        new_image_bytes = await asyncio.to_thread(process_emoji_image, image_bytes)
 
         if len(new_image_bytes) > 256000:
             await safe_reply(
