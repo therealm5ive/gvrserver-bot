@@ -413,6 +413,43 @@ class StaffProfileView(discord.ui.View):
     async def supervised_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.send_sessions(interaction, "supervised", "Supervised Sessions")
 
+
+class LOARequestView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    def can_handle_loa(self, member):
+        return any(role.name == "High Ranking Staff" for role in member.roles)
+
+    async def send_loa_reply(self, interaction: discord.Interaction, message: str):
+        await interaction.response.defer()
+        await interaction.channel.send(
+            message,
+            reference=interaction.message,
+            allowed_mentions=discord.AllowedMentions(users=True)
+        )
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
+    async def accept_loa(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not self.can_handle_loa(interaction.user):
+            return
+
+        await self.send_loa_reply(
+            interaction,
+            f"{interaction.user.mention} accepted your LOA!"
+        )
+
+    @discord.ui.button(label="Deny", style=discord.ButtonStyle.danger)
+    async def deny_loa(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not self.can_handle_loa(interaction.user):
+            return
+
+        await self.send_loa_reply(
+            interaction,
+            f"{interaction.user.mention} denied your LOA!"
+        )
+
+
 @bot.event
 async def on_ready():
     init_db()
@@ -1036,6 +1073,65 @@ async def over(interaction: discord.Interaction, additional_notes: str):
     clear_staff_timers_for_session(active_key)
 
     await interaction.channel.send(embed=embed)
+
+# =====================================
+# /loa
+# =====================================
+
+loa_group = app_commands.Group(
+    name="loa",
+    description="LOA commands"
+)
+
+
+@loa_group.command(name="request", description="Submit an LOA request")
+@app_commands.describe(
+    reason="Reason for your LOA",
+    end_of_loa="End of LOA"
+)
+async def loa_request(interaction: discord.Interaction, reason: str, end_of_loa: str):
+    embed = discord.Embed(
+        title="LOA Request",
+        color=discord.Color.from_str("#fef1b3")
+    )
+
+    embed.add_field(
+        name="User:",
+        value=interaction.user.mention,
+        inline=False
+    )
+
+    embed.add_field(
+        name="Reason:",
+        value=reason,
+        inline=False
+    )
+
+    embed.add_field(
+        name="End of LOA:",
+        value=end_of_loa,
+        inline=False
+    )
+
+    embed.set_footer(
+        text="Greenville Roleplay Society™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    await interaction.response.send_message(
+        embed=embed,
+        view=LOARequestView()
+    )
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/loa request",
+        f"Reason: {reason}\nEnd of LOA: {end_of_loa}"
+    )
+
+
+bot.tree.add_command(loa_group)
 
 # =====================================
 # /cohost
