@@ -29,6 +29,7 @@ TICKET_OPEN_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/
 EARLYACCESS_ROLE_ID = 1290705580046024725
 CIVILIANS_ROLE_ID = 1290705580025184277
 TICKET_CATEGORY_ID = 1506043336987906231
+ROLEPLAY_RESTRICTED_ROLE_ID = 1290705580025184282
 
 DB_FILE = "bot_data.db"
 
@@ -1160,6 +1161,138 @@ async def loa_request(interaction: discord.Interaction, reason: str, end_of_loa:
 
 
 bot.tree.add_command(loa_group)
+
+# =====================================
+# /roleplay
+# =====================================
+
+roleplay_group = app_commands.Group(
+    name="roleplay",
+    description="Roleplay moderation commands"
+)
+
+
+@roleplay_group.command(name="restrict", description="Roleplay restrict a user")
+@app_commands.describe(
+    user="Select the user",
+    time="Restriction duration",
+    reason="Reason(s)",
+    evidence="Evidence"
+)
+async def roleplay_restrict(
+    interaction: discord.Interaction,
+    user: discord.Member,
+    time: str,
+    reason: str,
+    evidence: str
+):
+    if not is_high_command(interaction.user):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    restricted_role = interaction.guild.get_role(ROLEPLAY_RESTRICTED_ROLE_ID)
+
+    if restricted_role is None:
+        await interaction.response.send_message(
+            "Roleplay Restricted role was not found.",
+            ephemeral=True
+        )
+        return
+
+    await user.add_roles(
+        restricted_role,
+        reason=f"Roleplay restricted by {interaction.user}"
+    )
+
+    dm_embed = discord.Embed(
+        description=(
+            "You have been **roleplay restricted** in **Greenville Roleplay Society** for the following reason(s):\n\n"
+            f"**Reason(s):**\n{reason}\n\n"
+            f"**Time:**\n{time}\n\n"
+            f"If you deem this restriction to be false please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
+            f"**Evidence:**\n{evidence}"
+        ),
+        color=discord.Color.from_str("#fef1b3")
+    )
+
+    dm_embed.set_footer(
+        text="Greenville Roleplay Society™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    try:
+        await user.send(embed=dm_embed)
+    except:
+        pass
+
+    await interaction.response.send_message(
+        f"{user.mention} has been roleplay restricted.",
+        ephemeral=True
+    )
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/roleplay restrict",
+        f"User: {user.mention}\nTime: {time}\nReason: {reason}\nEvidence: {evidence}"
+    )
+
+
+@roleplay_group.command(name="unrestrict", description="Roleplay unrestrict a user")
+@app_commands.describe(user="Select the user")
+async def roleplay_unrestrict(interaction: discord.Interaction, user: discord.Member):
+    if not is_high_command(interaction.user):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    restricted_role = interaction.guild.get_role(ROLEPLAY_RESTRICTED_ROLE_ID)
+
+    if restricted_role is None:
+        await interaction.response.send_message(
+            "Roleplay Restricted role was not found.",
+            ephemeral=True
+        )
+        return
+
+    if restricted_role in user.roles:
+        await user.remove_roles(
+            restricted_role,
+            reason=f"Roleplay unrestricted by {interaction.user}"
+        )
+
+    dm_embed = discord.Embed(
+        description=(
+            "You have been **roleplay unrestricted** in **Greenville Roleplay Society**.\n\n"
+            "Feel free to join our sessions again as usually. You may get roleplay restricted in future "
+            "if you break our guidelines again."
+        ),
+        color=discord.Color.from_str("#fef1b3")
+    )
+
+    dm_embed.set_footer(
+        text="Greenville Roleplay Society™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    try:
+        await user.send(embed=dm_embed)
+    except:
+        pass
+
+    await interaction.response.send_message(
+        f"{user.mention} has been roleplay unrestricted.",
+        ephemeral=True
+    )
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/roleplay unrestrict",
+        f"User: {user.mention}"
+    )
+
+
+bot.tree.add_command(roleplay_group)
 
 # =====================================
 # /cohost
