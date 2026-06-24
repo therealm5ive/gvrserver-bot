@@ -3036,7 +3036,7 @@ async def membercount(interaction: discord.Interaction):
     timestamp = int(discord.utils.utcnow().timestamp())
 
     embed = discord.Embed(
-        title=f"Members {interaction.guild.member_count}",
+        title=f"{interaction.guild.member_count} Members",
         description=f"<t:{timestamp}:f>",
         color=discord.Color.from_str("#fef1b3")
     )
