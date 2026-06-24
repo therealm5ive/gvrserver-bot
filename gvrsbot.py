@@ -27,6 +27,7 @@ TICKET_PANEL_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622
 TICKET_OPEN_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1513567380910116955/Society_-_Embed_-_Assistance.png?ex=6a2832f8&is=6a26e178&hm=9c577084fd141441a642443b308194b5cb91feda42c41e4bbb4cbb73d69698a2&"
 WELCOME_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1519100047961362463/image.png?ex=6a3c53aa&is=6a3b022a&hm=20dcd9ee3256031229c4245a4eb7ac879aa7f4dd56bc5adc9c948c8ccb4d3fb6&"
 WELCOME_THUMBNAIL = "https://cdn.discordapp.com/attachments/1479130697800089622/1519101482203615323/image.png?ex=6a3c5500&is=6a3b0380&hm=efea340a34ed87dc6bec1a9e6c29cfdd545c6103712621e7046220045ade683e&"
+STAFF_INFORMATION_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1519309639471075468/Society_-_Embed_-_Staff_Information.webp?ex=6a3d16dd&is=6a3bc55d&hm=4dec9cec71bd426376ae543e24e310ca57595d585d114ec10f519e2e4d096fa8&"
 
 EARLYACCESS_ROLE_ID = 1290705580046024725
 CIVILIANS_ROLE_ID = 1290705580025184277
@@ -481,6 +482,7 @@ async def on_ready():
     bot.add_view(PersistentTicketView())
     bot.add_view(ServerInfoView())
     bot.add_view(LOARequestView())
+    bot.add_view(StaffInformationView())
 
     await bot.change_presence(
         activity=discord.Activity(
@@ -1165,7 +1167,7 @@ async def loa_request(
     end_of_loa: str
 ):
     embed = discord.Embed(
-        title="LOA Request",
+        title="__LOA Request__",
         color=discord.Color.from_str("#fef1b3")
     )
 
@@ -1536,6 +1538,274 @@ staff_group = app_commands.Group(
     name="staff",
     description="Staff profile commands"
 )
+
+STAFF_INFORMATION_TEXT = """
+<a:blue_flower:1518783617160052909> **Welcome to the Greenville Roleplay Society Staff Team** <a:blue_flower:1518783617160052909>
+<a:blue_flower:1518783617160052909> Your commitment, professionalism, and leadership are essential to maintaining a safe, organized, and immersive roleplay environment for our community. As a member of the GVRS Staff Team, you represent the standard of conduct and structure that allows our server to operate at a high level. We sincerely appreciate the time and effort you dedicate to supporting GVRS and its members.
+
+<:GVRSarrow2:1515852723713474611> **Notes**
+Being a member of the GVRS Staff Team is both a responsibility and a privilege. Your dedication allows Greenville Roleplay Society to continue growing as a structured, professional, and enjoyable community for everyone involved.
+
+Thank you for your continued hard work, leadership, and commitment to excellence.
+"""
+
+STAFF_REGULATIONS_TEXT = """
+<:GVRSarrow2:1515852723713474611> **Community Safety & Moderation**
+Staff members are entrusted with maintaining order and fairness throughout the server. This includes:
+
+<:yellowarrow:1517392101678121040> Enforcing all server and roleplay rules consistently and fairly.
+<:yellowarrow:1517392101678121040> Monitoring Discord channels and in-game activity for compliance.
+<:yellowarrow:1517392101678121040> Addressing reports, concerns, and rule violations promptly.
+<:yellowarrow:1517392101678121040> Ensuring sessions operate smoothly, safely, and without disruption.
+
+
+<:GVRSarrow2:1515852723713474611> **Support & Communication**
+Staff presence plays a key role in preventing issues before they escalate and maintaining a welcoming environment for all members. A critical part of being staff is providing assistance and clear communication to the community. Staff are expected to:
+
+<:yellowarrow:1517392101678121040> Assist members with questions, concerns, or technical issues.
+<:yellowarrow:1517392101678121040> Respond to support tickets in a timely and professional manner.
+<:yellowarrow:1517392101678121040> Foster a welcoming and respectful atmosphere for new and existing members.
+<:yellowarrow:1517392101678121040> Communicate clearly and effectively during roleplay sessions and events.
+
+
+<:GVRSarrow2:1515852723713474611> **Professional Conduct**
+Professional communication reflects the overall quality and structure of GVRS. Staff members must uphold the highest standards of professionalism at all times. This includes:
+
+<:yellowarrow:1517392101678121040> Using staff permissions responsibly and appropriately.
+<:yellowarrow:1517392101678121040> Treating all members fairly, equally, and without bias.
+<:yellowarrow:1517392101678121040> Following all staff policies, procedures, and internal guidelines.
+<:yellowarrow:1517392101678121040> Serving as a positive role model within the community.
+"""
+
+STAFF_QUOTA_TEXT = """
+<:GVRSarrow2:1515852723713474611> **Staff Quota Requirements**
+Your behavior sets the example for how members should conduct themselves. To remain active and in good standing, staff members are required to meet weekly activity quotas based on their rank.
+
+**Low Ranking Staff**
+<:yellowarrow:1517392101678121040> 4 sessions per week OR 8 moderation/activity logs per week
+
+**Middle Ranking Staff**
+<:yellowarrow:1517392101678121040> 3 sessions per week OR 6 moderation/activity logs per week
+<:yellowarrow:1517392101678121040> Assist and guide lower-ranking staff
+<:yellowarrow:1517392101678121040> Participate in staff discussions and internal communication
+
+**High-Ranking Staff <:GVRSarrow2:1515852723713474611> Senior High Ranking**
+<:yellowarrow:1517392101678121040> 2 hosted sessions per week
+<:yellowarrow:1517392101678121040> 4 moderation/activity logs per week
+<:yellowarrow:1517392101678121040> Oversee staff performance and address escalated situations
+<:yellowarrow:1517392101678121040> Provide support and coordination with Ownership
+
+**Executive Team**
+<:yellowarrow:1517392101678121040> Quota exempt
+<:yellowarrow:1517392101678121040> Expected to lead by example and ensure overall server stability
+
+<:GVRSarrow2:1515852723713474611> **Missed Quota Policy**
+Meeting quota demonstrates reliability, activity, and commitment to the server. Failure to meet quota without an approved Leave of Absence (LOA) may result in:
+
+<:yellowarrow:1517392101678121040> Verbal or written warnings
+<:yellowarrow:1517392101678121040> Staff strikes
+<:yellowarrow:1517392101678121040> Temporary suspension
+<:yellowarrow:1517392101678121040> Demotion for repeated noncompliance
+
+If real-life responsibilities arise, staff are encouraged to submit an LOA in advance. Communication is key, and we understand that availability can change.
+"""
+
+SESSION_FORMATS_TEXT_1 = """
+**Session Formats** <a:GVRDdesolvingheart:1515852981205991627>
+
+# Greenville Roleplay Society Session Format
+
+**(Use in this order)**
+
+**Early Entry:** <a:yellowanimatedstar:1509793309713764432>
+```
+:A Greetings Early Entry, If you require to be brought, Say !host and assistance will be provided shortly.
+```
+```
+:HA Failure to park up will result in a removal from the session and you will be required to join through Main Release.
+```
+```
+:A Allow me to release the session to all participants else.
+```
+--------------------------------------------------------------------------------
+**Main Release:** <a:yellowretrohearts:1509751711387095172>
+```
+:A Greetings all, If you require to be brought, Say !host and assistance will be provided shortly.
+```
+```
+:Ha Failure to park up will result in a removal from the session and you may face moderation.
+```
+```
+:A Once Parked, Please wait patiently and attentive while session regulations are being explained.
+```
+--------------------------------------------------------------------------------
+**Roleplay Regulations:** <:GVRSmegaphone:1509751663764705360>
+```
+:HA Peacetime: Strict/Normal/Peacetime Off. FRP is 65/80/100. HC is (On/Off) Brookmere, Horton and Highway are all closed until further notice.
+```
+```
+:A Law enforcement will be (Active/Inactive) this session.
+```
+```
+:A GVFD will be (Active/Inactive) This session.
+```
+```
+:A DOT Will be (Active/Inactive) This session.
+```
+"""
+
+SESSION_FORMATS_TEXT_2 = """
+```
+:HA Fail-Roleplay will NOT be tolerated into GVRS sessions, Watch rotations will commence at random, it is your responsibility as a civilian to stay informed of the session Regulations.
+```
+```
+:M Ensure to refer to roleplay-1 to gather more information about the current session.
+```
+```
+:HA To avoid moderation, Ensure to check the vehicle list to ensure your desired vehicle is permitted into the session.
+```
+```
+:M Allow me to set up the checkpoint.
+```
+--------------------------------------------------------------------------------
+**Checkpoint:** <a:GVRDdesolvingheart:1515852981205991627>
+```
+:A Staff (On-Duty And Off-Duty) May Come forward as well as Law enforcement and Public services.
+```
+```
+:A Early Entry may come forward, Once approached, ensure to ping [USER].
+```
+```
+:A All remaining participants may come forward, Once approached, ensure to ping [USER].
+```
+```
+:A Checkpoint has been concluded, Enjoy the session. Roadmap/Brookmere autos/Ron's Rivers will be open shortly.
+```
+**Other** <a:GVRDdesolvingheart:1515852981205991627>
+```
+:HA Watch Rotations are now in effect, any fail-roleplay that is seen will be dealt with accordingly.
+```
+```
+:HA Vehicle Role-checks are now in effect, If you are caught using a vehicle without the correct roles, you may expect moderation.
+```
+```
+:A Open up some businesses to enhance the roleplay interaction and experience.
+```
+```
+:A Shall we do Daytime, Nighttime or cycle, Input your vote into the roblox chat!
+```
+```
+:A Shall we do Sunny, Overcast, Rainy, Cloudy Or weather lock, Cast your vote into the roblox chat!
+```
+"""
+
+
+class StaffInformationSelect(discord.ui.Select):
+    def __init__(self):
+        options = [
+            discord.SelectOption(
+                label="Staff Regulations",
+                description="View staff regulations."
+            ),
+            discord.SelectOption(
+                label="Staff Quota Requirements",
+                description="View staff quota requirements."
+            ),
+            discord.SelectOption(
+                label="Session Formats",
+                description="View session formats."
+            )
+        ]
+
+        super().__init__(
+            placeholder="Select a option",
+            options=options,
+            custom_id="staff_information_select"
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+        if self.values[0] == "Staff Regulations":
+            embeds = [
+                discord.Embed(
+                    description=STAFF_REGULATIONS_TEXT,
+                    color=discord.Color.from_str("#fef1b3")
+                )
+            ]
+        elif self.values[0] == "Staff Quota Requirements":
+            embeds = [
+                discord.Embed(
+                    description=STAFF_QUOTA_TEXT,
+                    color=discord.Color.from_str("#fef1b3")
+                )
+            ]
+        else:
+            embeds = [
+                discord.Embed(
+                    description=SESSION_FORMATS_TEXT_1,
+                    color=discord.Color.from_str("#fef1b3")
+                ),
+                discord.Embed(
+                    description=SESSION_FORMATS_TEXT_2,
+                    color=discord.Color.from_str("#fef1b3")
+                )
+            ]
+
+        for embed in embeds:
+            embed.set_footer(
+                text="Greenville Roleplay Society™",
+                icon_url=bot.user.display_avatar.url
+            )
+
+        await interaction.response.send_message(embeds=embeds, ephemeral=True)
+
+
+class StaffInformationView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.add_item(StaffInformationSelect())
+
+
+staff_information_group = app_commands.Group(
+    name="information",
+    description="Staff information commands"
+)
+
+
+@staff_information_group.command(name="panel", description="Sends the staff information panel")
+async def staff_information_panel(interaction: discord.Interaction):
+    if not any(role.name in ["Ownership Team", "Bot Developer"] for role in interaction.user.roles):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    banner_embed = discord.Embed(color=discord.Color.from_str("#fef1b3"))
+    banner_embed.set_image(url=STAFF_INFORMATION_IMAGE)
+    banner_embed.set_footer(
+        text="Greenville Roleplay Society™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    info_embed = discord.Embed(
+        description=STAFF_INFORMATION_TEXT,
+        color=discord.Color.from_str("#fef1b3")
+    )
+
+    info_embed.set_footer(
+        text="Greenville Roleplay Society™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    await interaction.channel.send(embed=banner_embed)
+    await interaction.channel.send(embed=info_embed, view=StaffInformationView())
+
+    await interaction.response.send_message(
+        "Staff information panel sent!",
+        ephemeral=True
+    )
+
+    await send_log(interaction.guild, interaction.user, "/staff information panel")
+
+
+staff_group.add_command(staff_information_group)
 
 @staff_group.command(name="profile", description="Displays a staff profile")
 @app_commands.describe(user="Select a staff member")
