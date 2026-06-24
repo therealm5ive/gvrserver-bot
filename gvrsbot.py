@@ -3030,7 +3030,7 @@ async def modlogs(interaction: discord.Interaction, user: str):
 # /serverinfo
 # =====================================
 
-SERVER_INFO_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1513908128557695098/Society_-_Embed_-_Regulations.webp?ex=6a297050&is=6a281ed0&hm=dd0de229f889c0563f37d4de6c27e82277c597431990d53879e63dfef9b7079d&"
+SERVER_INFO_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1513908128557695098/Society_-_Embed_-_Regulations.webp?ex=6a3d36d0&is=6a3be550&hm=2b34b49689c50a78db9ad5d5372699bec636df5f9b8dd8243cdfc5f8085646b4&"
 
 ROBLOX_GROUP_LINK = "https://www.roblox.com/communities/650527738/Official-Greenville-Roleplay-Society#!/about"
 RESTRICTED_VEHICLES_LINK = "https://docs.google.com/spreadsheets/d/1ahcV0bVi62XDg6rRYaEpGgFQV3_85_BPcwqXO-EVoVs/edit?gid=16420916#gid=16420916"
@@ -3147,7 +3147,7 @@ class ServerInfoView(discord.ui.View):
 )
 async def serverinfo(interaction: discord.Interaction):
 
-    if not any(role.name == "Community Overseer" for role in interaction.user.roles):
+    if not any(role.name == "Ownership Team" for role in interaction.user.roles):
         await interaction.response.defer(ephemeral=True)
         return
 
