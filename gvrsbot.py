@@ -3106,7 +3106,7 @@ class ServerInfoSelect(discord.ui.Select):
         if choice == "Server Guidelines":
             embed = discord.Embed(
                 description=(
-                    "> <a:GVRSbutterfly:1515852789266518056> **__Greenville Roleplay Society, Server Guidelines__** <a:GVRSbutterfly:1515852789266518056>\n\n"
+                    "> ## <a:GVRSbutterfly:1515852789266518056> __Greenville Roleplay Society, Server Guidelines__ <a:GVRSbutterfly:1515852789266518056>\n\n"
                     f"{SERVER_GUIDELINES_TEXT}"
                 ),
                 color=discord.Color.from_str("#fef1b3")
@@ -3156,7 +3156,7 @@ async def serverinfo(interaction: discord.Interaction):
 
     info_embed = discord.Embed(
         description=(
-            "> <a:GVRSbutterfly:1515852789266518056> **__Welcome to Greenville Roleplay Society__** <a:GVRSbutterfly:1515852789266518056>\n\n"
+            "> ## <a:GVRSbutterfly:1515852789266518056> __Welcome to Greenville Roleplay Society__ <a:GVRSbutterfly:1515852789266518056>\n\n"
             "On behalf of the entire team, we are delighted to welcome you to Greenville Roleplay Society. "
             "Founded in April 2026 through the strategic acquisition of the Roblox Roleplay Server, our community has scaled significantly while maintaining the core values that define us.\n\n"
             "Our mission is to set the standard for immersive and authentic Greenville roleplay. "
