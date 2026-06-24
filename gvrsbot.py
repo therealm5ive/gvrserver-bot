@@ -1541,7 +1541,7 @@ staff_group = app_commands.Group(
 
 STAFF_INFORMATION_TEXT = """
 <a:blue_flower:1518783617160052909> **Welcome to the Greenville Roleplay Society Staff Team** <a:blue_flower:1518783617160052909>
-<a:blue_flower:1518783617160052909> Your commitment, professionalism, and leadership are essential to maintaining a safe, organized, and immersive roleplay environment for our community. As a member of the GVRS Staff Team, you represent the standard of conduct and structure that allows our server to operate at a high level. We sincerely appreciate the time and effort you dedicate to supporting GVRS and its members.
+Your commitment, professionalism, and leadership are essential to maintaining a safe, organized, and immersive roleplay environment for our community. As a member of the GVRS Staff Team, you represent the standard of conduct and structure that allows our server to operate at a high level. We sincerely appreciate the time and effort you dedicate to supporting GVRS and its members.
 
 <:GVRSarrow2:1515852723713474611> **Notes**
 Being a member of the GVRS Staff Team is both a responsibility and a privilege. Your dedication allows Greenville Roleplay Society to continue growing as a structured, professional, and enjoyable community for everyone involved.
@@ -1705,15 +1705,18 @@ class StaffInformationSelect(discord.ui.Select):
         options = [
             discord.SelectOption(
                 label="Staff Regulations",
-                description="View staff regulations."
+                description="View staff regulations.",
+                emoji=discord.PartialEmoji(name="GVRSarrow", id=1513646972106702919)
             ),
             discord.SelectOption(
                 label="Staff Quota Requirements",
-                description="View staff quota requirements."
+                description="View staff quota requirements.",
+                emoji=discord.PartialEmoji(name="GVRSarrow", id=1513646972106702919)
             ),
             discord.SelectOption(
                 label="Session Formats",
-                description="View session formats."
+                description="View session formats.",
+                emoji=discord.PartialEmoji(name="GVRSarrow", id=1513646972106702919)
             )
         ]
 
@@ -1779,10 +1782,6 @@ async def staff_information_panel(interaction: discord.Interaction):
 
     banner_embed = discord.Embed(color=discord.Color.from_str("#fef1b3"))
     banner_embed.set_image(url=STAFF_INFORMATION_IMAGE)
-    banner_embed.set_footer(
-        text="Greenville Roleplay Society™",
-        icon_url=bot.user.display_avatar.url
-    )
 
     info_embed = discord.Embed(
         description=STAFF_INFORMATION_TEXT,
