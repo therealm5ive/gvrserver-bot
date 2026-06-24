@@ -3082,17 +3082,17 @@ class ServerInfoSelect(discord.ui.Select):
             discord.SelectOption(
                 label="Server Guidelines",
                 description="View the server guidelines.",
-                emoji=discord.PartialEmoji(name="yellowarrow", id=1509767080004681839)
+                emoji=discord.PartialEmoji(name="GVRSarrow", id=1513646972106702919)
             ),
             discord.SelectOption(
                 label="Roblox Group",
                 description="Get the official Roblox group link.",
-                emoji=discord.PartialEmoji(name="yellowarrow", id=1509767080004681839)
+                emoji=discord.PartialEmoji(name="GVRSarrow", id=1513646972106702919)
             ),
             discord.SelectOption(
                 label="Restricted Vehicles List",
                 description="View the restricted vehicles list.",
-                emoji=discord.PartialEmoji(name="yellowarrow", id=1509767080004681839)
+                emoji=discord.PartialEmoji(name="GVRSarrow", id=1513646972106702919)
             )
         ]
 
@@ -3114,15 +3114,13 @@ class ServerInfoSelect(discord.ui.Select):
 
         elif choice == "Roblox Group":
             embed = discord.Embed(
-                title="Greenville Roleplay Society, Roblox Group",
-                description=f"<:yellowarrow:1509767080004681839> Join our Roblox group here:\n{ROBLOX_GROUP_LINK}",
+                description=f"Klick [here]({ROBLOX_GROUP_LINK}) to join our roblox group.",
                 color=discord.Color.from_str("#fef1b3")
             )
 
         else:
             embed = discord.Embed(
-                title="Greenville Roleplay Society, Restricted Vehicles List",
-                description=f"<:yellowarrow:1509767080004681839> View the Restricted Vehicles List here:\n{RESTRICTED_VEHICLES_LINK}",
+                description=f"Klick [here]({RESTRICTED_VEHICLES_LINK}) to view our Restricted Vehicles list.",
                 color=discord.Color.from_str("#fef1b3")
             )
 
@@ -3158,7 +3156,7 @@ async def serverinfo(interaction: discord.Interaction):
 
     info_embed = discord.Embed(
         description=(
-            "<:yellowwave:1509751772154171563> Welcome to **Greenville Roleplay Society**\n\n"
+            "> <a:GVRSbutterfly:1515852789266518056> __Welcome to Greenville Roleplay Society__\n\n"
             "On behalf of the entire team, we are delighted to welcome you to Greenville Roleplay Society. "
             "Founded in April 2026 through the strategic acquisition of the Roblox Roleplay Server, our community has scaled significantly while maintaining the core values that define us.\n\n"
             "Our mission is to set the standard for immersive and authentic Greenville roleplay. "
