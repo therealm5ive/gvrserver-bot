@@ -3023,6 +3023,31 @@ async def modlogs(interaction: discord.Interaction, user: str):
 
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
+# =====================================
+# /membercount
+# =====================================
+
+@bot.tree.command(name="membercount", description="Shows the current member count")
+async def membercount(interaction: discord.Interaction):
+    if not any(role.name == "Ownership Team" for role in interaction.user.roles):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    timestamp = int(discord.utils.utcnow().timestamp())
+
+    embed = discord.Embed(
+        title="Members",
+        description=(
+            f"{interaction.guild.member_count}\n"
+            f"<t:{timestamp}:f>"
+        ),
+        color=discord.Color.blue()
+    )
+
+    await interaction.response.send_message(embed=embed)
+
+    await send_log(interaction.guild, interaction.user, "/membercount")
+
     # =====================================
 # /serverinfo
 # =====================================
