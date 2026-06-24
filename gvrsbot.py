@@ -1540,7 +1540,7 @@ staff_group = app_commands.Group(
 )
 
 STAFF_INFORMATION_TEXT = """
-<a:blue_flower:1518783617160052909> **Welcome to the Greenville Roleplay Society Staff Team** <a:blue_flower:1518783617160052909>
+> ### <a:blue_flower:1518783617160052909> __Welcome to the Greenville Roleplay Society Staff Team__ <a:blue_flower:1518783617160052909>
 Your commitment, professionalism, and leadership are essential to maintaining a safe, organized, and immersive roleplay environment for our community. As a member of the GVRS Staff Team, you represent the standard of conduct and structure that allows our server to operate at a high level. We sincerely appreciate the time and effort you dedicate to supporting GVRS and its members.
 
 <:GVRSarrow2:1515852723713474611> **Notes**
