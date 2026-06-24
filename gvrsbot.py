@@ -1612,7 +1612,6 @@ If real-life responsibilities arise, staff are encouraged to submit an LOA in ad
 
 SESSION_FORMATS_TEXT_1 = """
 > ### <a:GVRDdesolvingheart:1515852981205991627> __Greenville Roleplay Society Session Format__ <a:GVRDdesolvingheart:1515852981205991627>
-
 **(Use in this order)**
 
 **Early Entry:** <a:yellowanimatedstar:1509793309713764432>
