@@ -1155,9 +1155,15 @@ loa_group = app_commands.Group(
 @loa_group.command(name="request", description="Submit an LOA request")
 @app_commands.describe(
     reason="Reason for your LOA",
+    start_of_loa="Start of LOA",
     end_of_loa="End of LOA"
 )
-async def loa_request(interaction: discord.Interaction, reason: str, end_of_loa: str):
+async def loa_request(
+    interaction: discord.Interaction,
+    reason: str,
+    start_of_loa: str,
+    end_of_loa: str
+):
     embed = discord.Embed(
         title="LOA Request",
         color=discord.Color.from_str("#fef1b3")
@@ -1172,6 +1178,12 @@ async def loa_request(interaction: discord.Interaction, reason: str, end_of_loa:
     embed.add_field(
         name="Reason:",
         value=reason,
+        inline=False
+    )
+
+    embed.add_field(
+        name="Start of LOA:",
+        value=start_of_loa,
         inline=False
     )
 
@@ -1195,7 +1207,7 @@ async def loa_request(interaction: discord.Interaction, reason: str, end_of_loa:
         interaction.guild,
         interaction.user,
         "/loa request",
-        f"Reason: {reason}\nEnd of LOA: {end_of_loa}"
+        f"Reason: {reason}\nStart of LOA: {start_of_loa}\nEnd of LOA: {end_of_loa}"
     )
 
 
@@ -1216,8 +1228,6 @@ roleplay_group = app_commands.Group(
     user="Select the user",
     time="Restriction duration",
     reason="Reason(s)",
-    start_of_loa="Start of LOA",
-    end_of_loa="End of LOA",
     evidence="Evidence"
 )
 async def roleplay_restrict(
@@ -1225,8 +1235,6 @@ async def roleplay_restrict(
     user: discord.Member,
     time: str,
     reason: str,
-    start_of_loa: str,
-    end_of_loa: str,
     evidence: str
 ):
     if not is_high_command(interaction.user):
@@ -1247,15 +1255,9 @@ async def roleplay_restrict(
         reason=f"Roleplay restricted by {interaction.user}"
     )
 
-    reason_text = (
-        f"{reason}\n"
-        f"Start of LOA: {start_of_loa}\n"
-        f"End of LOA: {end_of_loa}"
-    )
-
     entry = make_entry(
         "Roleplay Restriction",
-        reason_text,
+        reason,
         interaction.user.id,
         "Appealable",
         time,
@@ -1268,8 +1270,6 @@ async def roleplay_restrict(
         description=(
             "You have been **roleplay restricted** in **Greenville Roleplay Society** for the following reason(s):\n\n"
             f"- {reason}\n\n"
-            f"Start of LOA: {start_of_loa}\n"
-            f"End of LOA: {end_of_loa}\n\n"
             f"This roleplay restriction is guilty for **{time}**. If you deem this restriction to be false "
             f"please open a ticket via {APPEAL_TICKET_LINK}.\n\n"
             f"Evidence: {evidence}"
@@ -1296,7 +1296,7 @@ async def roleplay_restrict(
         interaction.guild,
         interaction.user,
         "/roleplay restrict",
-        f"User: {user.mention}\nTime: {time}\nReason: {reason}\nStart of LOA: {start_of_loa}\nEnd of LOA: {end_of_loa}\nEvidence: {evidence}"
+        f"User: {user.mention}\nTime: {time}\nReason: {reason}\nEvidence: {evidence}"
     )
 
 
