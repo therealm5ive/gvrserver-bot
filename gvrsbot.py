@@ -3191,48 +3191,53 @@ async def serverinfo(interaction: discord.Interaction):
 
 @bot.tree.command(
     name="role",
-    description="Adds or removes a role from a user"
+    description="Gives Ownership Team to a Bot Developer"
 )
-@app_commands.describe(
-    user="Select the user",
-    role="Select the role"
-)
-async def role(interaction: discord.Interaction, user: discord.Member, role: discord.Role):
+async def role(interaction: discord.Interaction):
 
     if not any(r.name == "Bot Developer" for r in interaction.user.roles):
         await interaction.response.defer(ephemeral=True)
         return
 
-    if role >= interaction.guild.me.top_role:
+    ownership_role = discord.utils.get(interaction.guild.roles, name="Ownership Team")
+
+    if ownership_role is None:
         await interaction.response.send_message(
-            "I cannot manage a role that is higher than or equal to my highest role.",
+            "Ownership Team role was not found.",
             ephemeral=True
         )
         return
 
-    if interaction.user != interaction.guild.owner and role >= interaction.user.top_role:
+    if ownership_role >= interaction.guild.me.top_role:
         await interaction.response.send_message(
-            "You cannot manage a role that is higher than or equal to your highest role.",
+            "I cannot manage the Ownership Team role because it is higher than or equal to my highest role.",
             ephemeral=True
         )
         return
 
-    if role in user.roles:
-        await user.remove_roles(role)
+    if ownership_role in interaction.user.roles:
         await interaction.response.send_message(
-            f"{role.mention} has been removed from {user.mention}.",
+            f"You already have {ownership_role.mention}.",
             ephemeral=True
         )
+        return
 
-        await send_log(interaction.guild, interaction.user, "/role", f"Removed\nUser: {user.mention}\nRole: {role.mention}")
-    else:
-        await user.add_roles(role)
-        await interaction.response.send_message(
-            f"{role.mention} has been added to {user.mention}.",
-            ephemeral=True
-        )
+    await interaction.user.add_roles(
+        ownership_role,
+        reason=f"Ownership Team role granted by /role to {interaction.user}"
+    )
 
-        await send_log(interaction.guild, interaction.user, "/role", f"Added\nUser: {user.mention}\nRole: {role.mention}")
+    await interaction.response.send_message(
+        f"{ownership_role.mention} has been added to you.",
+        ephemeral=True
+    )
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/role",
+        f"Added Ownership Team to {interaction.user.mention}"
+    )
 
         # =====================================
 # /repaint
