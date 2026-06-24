@@ -3036,43 +3036,41 @@ ROBLOX_GROUP_LINK = "https://www.roblox.com/communities/650527738/Official-Green
 RESTRICTED_VEHICLES_LINK = "https://docs.google.com/spreadsheets/d/1ahcV0bVi62XDg6rRYaEpGgFQV3_85_BPcwqXO-EVoVs/edit?gid=16420916#gid=16420916"
 
 SERVER_GUIDELINES_TEXT = """
-**▰ Discord Rules & Regulations**
-
-**1. <:yellowarrow:1509767080004681839> Read the Regulations**
+**1. <:GVRSarrow:1513646972106702919> Read the Regulations**
 All Greenville Roleplay Society members must read and acknowledge the regulations listed in our information channels. Failure to comply may result in serious consequences.
 
-**2. <:yellowarrow:1509767080004681839> Follow All Staff Instructions**
+**2. <:GVRSarrow:1513646972106702919> Follow All Staff Instructions**
 Members are required to follow directions given by staff. For example, if instructed to leave a session, you must comply immediately.
 
 
-**3. <:yellowarrow:1509767080004681839> Exercise Common Sense**
+**3. <:GVRSarrow:1513646972106702919> Exercise Common Sense**
 Use sound judgment when determining whether actions violate the rules. If it would be unacceptable in another community, it is not acceptable here.
 
-**4. <:yellowarrow:1509767080004681839> Age Requirement (13+)**
+**4. <:GVRSarrow:1513646972106702919> Age Requirement (13+)**
 In accordance with Discord's Terms of Service, all members must be at least 13 years old. Anyone found under this age will be removed until they meet the requirement.
 
-**5. <:yellowarrow:1509767080004681839> No Harassment or Personal Attacks**
+**5. <:GVRSarrow:1513646972106702919> No Harassment or Personal Attacks**
 Any form of harassment or targeting of other members is prohibited. Violations may result in timeouts, strikes, or removal from the community.
 
-**6. <:yellowarrow:1509767080004681839> No Slurs or Offensive Remarks**
+**6. <:GVRSarrow:1513646972106702919> No Slurs or Offensive Remarks**
 Use of discriminatory language or offensive comments based on race, gender identity, weight, ethnicity, or similar factors is strictly forbidden.
 
-**7. <:yellowarrow:1509767080004681839> No Advertising**
+**7. <:GVRSarrow:1513646972106702919> No Advertising**
 Advertising of any kind is prohibited, including direct messages and public channels. Any server found recruiting Greenville Roleplay Society members or staff will be blacklisted, and involved members will be removed.
 
-**8. <:yellowarrow:1509767080004681839> No Resource Theft**
+**8. <:GVRSarrow:1513646972106702919> No Resource Theft**
 Stealing any Greenville Roleplay Society resources, such as announcements, documentation or any other assets will lead to an immediate ban from Greenville Roleplay Society and all affiliated servers.
 
-**9. <:yellowarrow:1509767080004681839> No Sharing of Personal Information**
+**9. <:GVRSarrow:1513646972106702919> No Sharing of Personal Information**
 Leaking, doxxing, or otherwise sharing personal information about any member will result in an immediate and permanent ban.
 
-**10. <:yellowarrow:1509767080004681839> No NSFW Content**
+**10. <:GVRSarrow:1513646972106702919> No NSFW Content**
 Posting or distributing not safe for work material, including pornography, gore, or violent imagery, is strictly prohibited. First offense results in a warning, although the second offense results in an immediate ban.
 
-**11. <:yellowarrow:1509767080004681839> Maintain Respect**
+**11. <:GVRSarrow:1513646972106702919> Maintain Respect**
 Greenville Roleplay Society will not tolerate any disrespect, defamatory comments or complaints about Greenville Roleplay Society or affiliated communities. Any user found being disrespectful will be moderated.
 
-**12. <:yellowarrow:1509767080004681839> Voice Channel Conduct**
+**12. <:GVRSarrow:1513646972106702919> Voice Channel Conduct**
 All rules apply in voice channels. Excessive noise, disruptive sounds, or "ear-rape" audio is prohibited and will result in disciplinary action.
 """
 
@@ -3107,7 +3105,7 @@ class ServerInfoSelect(discord.ui.Select):
 
         if choice == "Server Guidelines":
             embed = discord.Embed(
-                title="Greenville Roleplay Society, Server Guidelines",
+                title="__Greenville Roleplay Society, Server Guidelines__",
                 description=SERVER_GUIDELINES_TEXT,
                 color=discord.Color.from_str("#fef1b3")
             )
@@ -3155,8 +3153,8 @@ async def serverinfo(interaction: discord.Interaction):
     banner_embed.set_image(url=SERVER_INFO_IMAGE)
 
     info_embed = discord.Embed(
+        title="<a:GVRSbutterfly:1515852789266518056> __Welcome to Greenville Roleplay Society__",
         description=(
-            "> <a:GVRSbutterfly:1515852789266518056> __Welcome to Greenville Roleplay Society__\n\n"
             "On behalf of the entire team, we are delighted to welcome you to Greenville Roleplay Society. "
             "Founded in April 2026 through the strategic acquisition of the Roblox Roleplay Server, our community has scaled significantly while maintaining the core values that define us.\n\n"
             "Our mission is to set the standard for immersive and authentic Greenville roleplay. "
