@@ -463,7 +463,7 @@ class StaffProfileView(discord.ui.View):
         for index, session in enumerate(sessions, start=1):
             text += (
                 f"**{index}.**\n"
-                f"Date: <t:{session['end_timestamp']}:D>\n"
+                f"Date: <t:{session['end_timestamp']}:f>\n"
                 f"Duration: {session['duration_minutes']} minutes\n"
                 f"Note: {session['note']}\n\n"
             )
@@ -2704,8 +2704,8 @@ class TicketModal(discord.ui.Modal):
         banner_embed.set_image(url=TICKET_OPEN_IMAGE)
 
         embed = discord.Embed(
-            title=f"Greenville Roleplay Society, {self.ticket_type} Ticket",
             description=(
+                f"> ### __Greenville Roleplay Society, {self.ticket_type} Ticket__\n"
                 f"Thank you for opening a **{self.ticket_type} Ticket**.\n\n"
                 f"**Reason for Opening:** {self.reason.value}\n"
                 f"**Additional Information:** {self.additional_info.value or 'None'}\n\n"
@@ -2801,8 +2801,8 @@ async def ticketpanel(interaction: discord.Interaction):
     banner_embed.set_image(url=TICKET_PANEL_IMAGE)
 
     embed = discord.Embed(
-        title="❕ Greenville Roleplay Society, Assistance",
         description=(
+            "> ### <a:GVRSheartspin:1515852938604445896> __Greenville Roleplay Society, Assistance__\n"
             "Welcome to **Greenville Roleplay Society's** assistance channel. "
             "Within this channel, you may create a ticket for assistance if needed and one of our Staff Members will assist you.\n\n"
             "**<:GVRSarrow:1513646972106702919> `General Assistance`** — You may open this ticket if you have any questions or need assistance.\n\n"
