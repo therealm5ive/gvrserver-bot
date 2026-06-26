@@ -984,12 +984,54 @@ async def earlyaccess(interaction: discord.Interaction, link: str):
 # /release
 # =====================================
 
+
+async def peacetime_status_autocomplete(
+    interaction: discord.Interaction,
+    current: str
+) -> list[app_commands.Choice[str]]:
+    options = ["Normal", "Strict", "Off"]
+    return [
+        app_commands.Choice(name=option, value=option)
+        for option in options
+        if current.lower() in option.lower()
+    ]
+
+
+async def frp_speeds_autocomplete(
+    interaction: discord.Interaction,
+    current: str
+) -> list[app_commands.Choice[str]]:
+    options = ["65", "80", "95"]
+    return [
+        app_commands.Choice(name=option, value=option)
+        for option in options
+        if current.lower() in option.lower()
+    ]
+
+
+async def leo_status_autocomplete(
+    interaction: discord.Interaction,
+    current: str
+) -> list[app_commands.Choice[str]]:
+    options = ["Offline", "Online"]
+    return [
+        app_commands.Choice(name=option, value=option)
+        for option in options
+        if current.lower() in option.lower()
+    ]
+
+
 @bot.tree.command(name="release", description="Sends a roleplay release message")
 @app_commands.describe(
     session_link="Enter the roleplay link here",
     peacetime_status="Peacetime status",
     frp_speeds="FRP speed limit",
     leo_status="LEO status"
+)
+@app_commands.autocomplete(
+    peacetime_status=peacetime_status_autocomplete,
+    frp_speeds=frp_speeds_autocomplete,
+    leo_status=leo_status_autocomplete
 )
 async def release(
     interaction: discord.Interaction,
@@ -1077,6 +1119,11 @@ async def release(
     frp_speeds="FRP speed limit",
     leo_status="LEO status",
     reactions="Required amount of reactions"
+)
+@app_commands.autocomplete(
+    peacetime_status=peacetime_status_autocomplete,
+    frp_speeds=frp_speeds_autocomplete,
+    leo_status=leo_status_autocomplete
 )
 async def reinvites(
     interaction: discord.Interaction,
@@ -3747,10 +3794,22 @@ async def purge(ctx, amount: int):
     def not_pinned(message):
         return not message.pinned
 
-    await ctx.channel.purge(
+    deleted_messages = await ctx.channel.purge(
         limit=amount + 1,
         check=not_pinned
     )
+
+    purged_count = max(len(deleted_messages) - 1, 0)
+    embed = discord.Embed(
+        description=f"Purged **{purged_count}** messages.",
+        color=discord.Color.from_str("#fef1b3")
+    )
+    embed.set_footer(
+        text="Greenville Roleplay Society™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    await ctx.channel.send(embed=embed)
 
     await send_log(
     ctx.guild,
