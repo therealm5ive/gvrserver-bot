@@ -36,6 +36,10 @@ ROLEPLAY_RESTRICTED_ROLE_ID = 1290705580025184282
 WELCOME_CHANNEL_ID = 1290705580905861223
 BOOK_EMOJI = "<:GVRSbook:1515852761948749874>"
 SUN_EMOJI = "☀️"
+PRIMARY_ARROW_EMOJI = "<:GVRSarrow:1513646972106702919>"
+YELLOW_ARROW_EMOJI = "<:yellowarrow:1517392101678121040>"
+STARTUP_REACTION_EMOJI_ID = 1513524676180054107
+STARTUP_REACTION_EMOJI = f"<:yellowcheck:{STARTUP_REACTION_EMOJI_ID}>"
 
 DB_FILE = "bot_data.db"
 
@@ -309,7 +313,7 @@ async def send_log(guild, user, command_name: str, extra: str = None):
 
     embed.add_field(
         name="Executed by",
-        value=f"{user.mention}\n`{user}`",
+        value=f"{user.mention}\n`{user.id}`",
         inline=False
     )
 
@@ -751,20 +755,19 @@ async def startup(
     host = interaction.user.mention
 
     embed = discord.Embed(
-        title="<a:yellowmovingbow:1509751680651100230> Greenville Roleplay Society, Roleplay Startup! <a:yellowmovingbow:1509751680651100230>",
+        description=(
+            f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Society, Roleplay Startup!__ <a:yellowmovingbow:1509751680651100230>\n"
+            f"{PRIMARY_ARROW_EMOJI} {host} is currently hosting a roleplay session.\n\n"
+            f"Prior to joining, please ensure to review the server information "
+            f"and all roleplay regulations displayed below to avoid potential moderation.\n\n"
+            f"<:yellownotification:1509751686179061760> **Roleplay Regulations**\n"
+            f"{YELLOW_ARROW_EMOJI} Read over our Restricted Vehicles List to avoid infractions.\n"
+            f"{YELLOW_ARROW_EMOJI} Ensure you have registered all of your vehicles.\n"
+            f"{YELLOW_ARROW_EMOJI} Ensure you've enabled ROBLOX joins so everyone can invite you.\n\n"
+            f"{YELLOW_ARROW_EMOJI} For this roleplay session to commence, we must achieve "
+            f"**{reactions}+ reactions** on this startup message."
+        ),
         color=discord.Color.from_str("#fef1b3")
-    )
-
-    embed.description = (
-        f"<:yellowarrow1:1509767083041226862> {host} is currently hosting a roleplay session.\n\n"
-        f"Prior to joining, please ensure to review the server information "
-        f"and all roleplay regulations displayed below to avoid potential moderation.\n\n"
-        f"<:yellownotification:1509751686179061760> **Roleplay Regulations**\n"
-        f"<:yellowarrow:1509767080004681839> Read over our Restricted Vehicles List to avoid infractions.\n"
-        f"<:yellowarrow:1509767080004681839> Ensure you have registered all of your vehicles.\n"
-        f"<:yellowarrow:1509767080004681839> Ensure you've enabled ROBLOX joins so everyone can invite you.\n\n"
-        f"<:yellowarrow:1509767080004681839> For this roleplay session to commence, we must achieve "
-        f"**{reactions}+ reactions** on this startup message."
     )
 
     embed.set_image(url=STARTUP_IMAGE)
@@ -784,7 +787,7 @@ async def startup(
     ACTIVE_STARTUPS[active_key] = message.id
     save_active_session(active_key, message.id, start_timestamp)
 
-    await message.add_reaction("<:yellowcheck:1513524676180054107>")
+    await message.add_reaction(STARTUP_REACTION_EMOJI)
     await interaction.response.send_message("Startup message executed!", ephemeral=True)
     await send_log(
     interaction.guild,
@@ -803,14 +806,14 @@ async def startup(
                 updated_message = await interaction.channel.fetch_message(message.id)
 
                 for reaction in updated_message.reactions:
-                    if str(reaction.emoji) == "<:yellowcheck:1513524676180054107>":
+                    if getattr(reaction.emoji, "id", None) == STARTUP_REACTION_EMOJI_ID:
                         count = reaction.count - 1
 
                         if count >= reactions:
                             setup_embed = discord.Embed(
                                 title="<a:GVRSloading:1513623240004735116> Roleplay Setting Up!",
                                 description=(
-                                    f"<:yellowarrow1:1509767083041226862> {host} is now **setting up** their roleplay session. Please note that it may take the host 5-10 Minutes to release the session. Due to technical issues, it may take even longer.\n\n"
+                                    f"{PRIMARY_ARROW_EMOJI} {host} is now **setting up** their roleplay session. Please note that it may take the host 5-10 Minutes to release the session. Due to technical issues, it may take even longer.\n\n"
                                 ),
                                 color=discord.Color.from_str("#fef1b3")
                             )
@@ -887,7 +890,7 @@ async def earlyaccess(interaction: discord.Interaction, link: str):
     embed = discord.Embed(
         title="<a:yellowtada:1509751747248390175> Greenville Roleplay Society, Early Access! <a:yellowtada:1509751747248390175>",
         description=(
-            f"<:yellowarrow1:1509767083041226862> {host} has now released early access to their roleplay session.\n\n"
+            f"<:GVRSarrow:1513646972106702919> {host} has now released early access to their roleplay session.\n\n"
             "Nitro Boosters, Early Access members, and Staff Team members may now join using the button below, "
             "but sharing this link will result in the permanent removal of your Early Access privileges."
         ),
@@ -958,17 +961,17 @@ async def release(
     embed = discord.Embed(
         title="<a:yellowanimatedstar:1509767076838113371> Greenville Roleplay Society, Roleplay Released! <a:yellowanimatedstar:1509767076838113371>",
         description=(
-            f"<:yellowarrow1:1509767083041226862> {host} has now **released** their roleplay session.\n"
+            f"<:GVRSarrow:1513646972106702919> {host} has now **released** their roleplay session.\n"
             f"Prior to joining, please ensure to review the server information and all the roleplay regulations displayed below.\n\n"
 
             f"<:yellowrightarrow:1509751702075740191> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
             f"Reinvites will occur every 20-30 minutes, so please do not ask the host for the link.\n\n"
 
             f"<:yellownotification:1509751686179061760> **Roleplay Regulations:**\n"
-            f"<:yellowarrow:1509767080004681839> Session Host: {host}\n"
-            f"<:yellowarrow:1509767080004681839> Peacetime Status: {peacetime_status}\n"
-            f"<:yellowarrow:1509767080004681839> FRP Speedlimit: {frp_speeds}\n"
-            f"<:yellowarrow:1509767080004681839> LEO Status: {leo_status}\n\n"
+            f"<:yellowarrow:1517392101678121040> Session Host: {host}\n"
+            f"<:yellowarrow:1517392101678121040> Peacetime Status: {peacetime_status}\n"
+            f"<:yellowarrow:1517392101678121040> FRP Speedlimit: {frp_speeds}\n"
+            f"<:yellowarrow:1517392101678121040> LEO Status: {leo_status}\n\n"
 
             f"<:yellowalarm:1509767056705327114> **Any unauthorized sharing of the link will result in moderation action.**"
         ),
@@ -1047,7 +1050,7 @@ async def reinvites(
     embed = discord.Embed(
         title="<a:yellowanimatedstar:1509767076838113371> Greenville Roleplay Society — Reinvites Released <a:yellowanimatedstar:1509767076838113371>",
         description=(
-            f"<:yellowarrow1:1509767083041226862> {host} has released re-invites for their session!\n\n"
+            f"<:GVRSarrow:1513646972106702919> {host} has released re-invites for their session!\n\n"
             f"Please be sure to follow all instructions given by the host and co-hosts prior to departing from spawn. "
             f"In addition, all Greenville Roleplay Society regulations must be followed throughout the session.\n\n"
 
@@ -1055,9 +1058,9 @@ async def reinvites(
             f"Reinvites will occur every 20-30 minutes, so please do not ask the host for the link.\n\n"
 
             f"<:yellownotification:1509751686179061760> **Session Information:**\n"
-            f"<:yellowarrow:1509767080004681839> FRP Speed Limit: **{frp_speeds}**\n"
-            f"<:yellowarrow:1509767080004681839> Peacetime Status: **{peacetime_status}**\n"
-            f"<:yellowarrow:1509767080004681839> LEO Status: **{leo_status}**\n\n"
+            f"<:yellowarrow:1517392101678121040> FRP Speed Limit: **{frp_speeds}**\n"
+            f"<:yellowarrow:1517392101678121040> Peacetime Status: **{peacetime_status}**\n"
+            f"<:yellowarrow:1517392101678121040> LEO Status: **{leo_status}**\n\n"
 
             f"<:yellowalarm:1509767056705327114> **Any unauthorized sharing of the link will result in moderation action.**"
         ),
@@ -1204,14 +1207,14 @@ async def over(interaction: discord.Interaction, additional_notes: str):
     embed = discord.Embed(
         title="<a:yellowmovingbow:1509751680651100230> Greenville Roleplay Society, Roleplay Concluded! <a:yellowmovingbow:1509751680651100230>",
         description=(
-            f"<:yellowarrow1:1509767083041226862> {host} has concluded their roleplay session.\n\n"
+            f"<:GVRSarrow:1513646972106702919> {host} has concluded their roleplay session.\n\n"
             f"Thank you to all civilians who attended. A new session will be hosted shortly by our staff team. "
             f"Please do not harass staff for sessions, or you may face moderation action.\n\n"
             f"<:yellownotification:1509751686179061760> **Roleplay Notes:**\n"
-            f"<:yellowarrow:1509767080004681839> Session Host: {host}\n"
-            f"<:yellowarrow:1509767080004681839> Session Duration: {session_duration}\n"
-            f"<:yellowarrow:1509767080004681839> Additional Notes: {additional_notes}\n\n"
-            f"<:yellowarrow:1509767080004681839> Need to report a user? Please head over to our #server-assistance channel and create a ticket."
+            f"<:yellowarrow:1517392101678121040> Session Host: {host}\n"
+            f"<:yellowarrow:1517392101678121040> Session Duration: {session_duration}\n"
+            f"<:yellowarrow:1517392101678121040> Additional Notes: {additional_notes}\n\n"
+            f"<:yellowarrow:1517392101678121040> Need to report a user? Please head over to our #server-assistance channel and create a ticket."
         ),
         color=discord.Color.from_str("#fef1b3")
     )
