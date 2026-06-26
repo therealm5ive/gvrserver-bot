@@ -2117,8 +2117,7 @@ async def staff_profile(interaction: discord.Interaction, user: discord.Member =
 
     await interaction.response.send_message(
         embed=embed,
-        view=StaffProfileView(user.id),
-        ephemeral=True
+        view=StaffProfileView(user.id)
     )
 
     await send_log(interaction.guild, interaction.user, "/staff profile", f"Profile: {user.mention}")
