@@ -3779,6 +3779,8 @@ async def repaint(
         pass
 
     async def safe_reply(message: str):
+        message = message[:1900]
+
         try:
             await interaction.followup.send(message, ephemeral=True)
         except:
@@ -3928,7 +3930,10 @@ async def repaint(
         return output
 
     async def send_repaint_report(emoji_label, before_bytes, after_bytes, index):
-        preview = await asyncio.to_thread(make_repaint_preview, before_bytes, after_bytes)
+        preview = await asyncio.wait_for(
+            asyncio.to_thread(make_repaint_preview, before_bytes, after_bytes),
+            timeout=60
+        )
         filename = f"repaint_preview_{index}.png"
         embed = discord.Embed(
             title="Repainted Emoji",
@@ -3964,38 +3969,49 @@ async def repaint(
                 return f"Could not send the repaint report: {error}"
 
     async def repaint_existing_emoji(session, match):
-        is_animated = match.group(1) == "a"
-        emoji_name = match.group(2)
-        emoji_id = int(match.group(3))
-        file_extension = "gif" if is_animated else "png"
-        emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.{file_extension}?quality=lossless"
+        try:
+            is_animated = match.group(1) == "a"
+            emoji_name = match.group(2)
+            emoji_id = int(match.group(3))
+            file_extension = "gif" if is_animated else "png"
+            emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.{file_extension}?quality=lossless"
 
-        async with session.get(emoji_url) as response:
-            if response.status != 200:
-                return None, f"Could not download `{emoji_name}`."
+            async with session.get(emoji_url) as response:
+                if response.status != 200:
+                    return None, f"Could not download `{emoji_name}`."
 
-            image_bytes = await response.read()
+                image_bytes = await response.read()
 
-        new_image_bytes = await asyncio.to_thread(process_emoji_image, image_bytes)
+            new_image_bytes = await asyncio.wait_for(
+                asyncio.to_thread(process_emoji_image, image_bytes),
+                timeout=300
+            )
 
-        if len(new_image_bytes) > 256000:
-            return None, f"`{emoji_name}` is too large for Discord after repainting."
+            if len(new_image_bytes) > 256000:
+                return None, f"`{emoji_name}` is too large for Discord after repainting."
 
-        old_emoji = discord.utils.get(interaction.guild.emojis, id=emoji_id)
+            old_emoji = discord.utils.get(interaction.guild.emojis, id=emoji_id)
 
-        if old_emoji is not None:
-            try:
-                await old_emoji.delete(
+            if old_emoji is not None:
+                try:
+                    await old_emoji.delete(
+                        reason=f"Emoji repainted by {interaction.user}"
+                    )
+                except:
+                    pass
+
+            new_emoji = await asyncio.wait_for(
+                interaction.guild.create_custom_emoji(
+                    name=emoji_name,
+                    image=new_image_bytes,
                     reason=f"Emoji repainted by {interaction.user}"
-                )
-            except:
-                pass
-
-        new_emoji = await interaction.guild.create_custom_emoji(
-            name=emoji_name,
-            image=new_image_bytes,
-            reason=f"Emoji repainted by {interaction.user}"
-        )
+                ),
+                timeout=60
+            )
+        except asyncio.TimeoutError:
+            return None, f"`{match.group(2)}` took too long to repaint."
+        except Exception as error:
+            return None, f"`{match.group(2)}` failed: {error}"
 
         return {
             "emoji": new_emoji,
@@ -4004,34 +4020,45 @@ async def repaint(
         }, None
 
     async def repaint_attachment(attachment: discord.Attachment, index: int):
-        image_bytes = await attachment.read()
-        new_image_bytes = await asyncio.to_thread(process_emoji_image, image_bytes)
+        try:
+            image_bytes = await asyncio.wait_for(attachment.read(), timeout=60)
+            new_image_bytes = await asyncio.wait_for(
+                asyncio.to_thread(process_emoji_image, image_bytes),
+                timeout=300
+            )
 
-        if len(new_image_bytes) > 256000:
-            return None, f"`{attachment.filename}` is too large for Discord after repainting."
+            if len(new_image_bytes) > 256000:
+                return None, f"`{attachment.filename}` is too large for Discord after repainting."
 
-        emoji_name = sanitize_emoji_name(attachment.filename, f"repainted_{index}")
+            emoji_name = sanitize_emoji_name(attachment.filename, f"repainted_{index}")
 
-        if emoji_name in processed_attachment_names:
-            return None, f"`{emoji_name}` was already provided and was skipped to avoid a duplicate."
+            if emoji_name in processed_attachment_names:
+                return None, f"`{emoji_name}` was already provided and was skipped to avoid a duplicate."
 
-        processed_attachment_names.add(emoji_name)
+            processed_attachment_names.add(emoji_name)
 
-        old_emoji = discord.utils.get(interaction.guild.emojis, name=emoji_name)
+            old_emoji = discord.utils.get(interaction.guild.emojis, name=emoji_name)
 
-        if old_emoji is not None:
-            try:
-                await old_emoji.delete(
-                    reason=f"Emoji replaced from image by {interaction.user}"
-                )
-            except:
-                pass
+            if old_emoji is not None:
+                try:
+                    await old_emoji.delete(
+                        reason=f"Emoji replaced from image by {interaction.user}"
+                    )
+                except:
+                    pass
 
-        new_emoji = await interaction.guild.create_custom_emoji(
-            name=emoji_name,
-            image=new_image_bytes,
-            reason=f"Emoji created from image by {interaction.user}"
-        )
+            new_emoji = await asyncio.wait_for(
+                interaction.guild.create_custom_emoji(
+                    name=emoji_name,
+                    image=new_image_bytes,
+                    reason=f"Emoji created from image by {interaction.user}"
+                ),
+                timeout=60
+            )
+        except asyncio.TimeoutError:
+            return None, f"`{attachment.filename}` took too long to repaint."
+        except Exception as error:
+            return None, f"`{attachment.filename}` failed: {error}"
 
         return {
             "emoji": new_emoji,
