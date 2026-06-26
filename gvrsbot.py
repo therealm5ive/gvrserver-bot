@@ -30,6 +30,8 @@ WELCOME_THUMBNAIL = "https://cdn.discordapp.com/attachments/1479130697800089622/
 STAFF_INFORMATION_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1519309639471075468/Society_-_Embed_-_Staff_Information.webp?ex=6a3d16dd&is=6a3bc55d&hm=4dec9cec71bd426376ae543e24e310ca57595d585d114ec10f519e2e4d096fa8&"
 
 EARLYACCESS_ROLE_ID = 1290705580046024725
+SERVER_BOOSTER_ROLE_ID = 1333516817431265392
+STAFF_TEAM_ROLE_ID = 1290705579982979178
 CIVILIANS_ROLE_ID = 1290705580025184277
 TICKET_CATEGORY_ID = 1506043336987906231
 ROLEPLAY_RESTRICTED_ROLE_ID = 1290705580025184282
@@ -39,7 +41,7 @@ SUN_EMOJI = "☀️"
 PRIMARY_ARROW_EMOJI = "<:GVRSarrow:1513646972106702919>"
 YELLOW_ARROW_EMOJI = "<:yellowarrow:1517392101678121040>"
 STARTUP_REACTION_EMOJI_ID = 1513524676180054107
-STARTUP_REACTION_EMOJI = f"<:yellowcheck:{STARTUP_REACTION_EMOJI_ID}>"
+STARTUP_REACTION_EMOJI = f"<:GVRScheck:{STARTUP_REACTION_EMOJI_ID}>"
 
 DB_FILE = "bot_data.db"
 
@@ -344,9 +346,20 @@ class EarlyAccessView(discord.ui.View):
 
     @discord.ui.button(label="Early Access Link", style=discord.ButtonStyle.secondary)
     async def early_access_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if not any(role.id == EARLYACCESS_ROLE_ID for role in interaction.user.roles):
+        allowed_role_ids = {
+            EARLYACCESS_ROLE_ID,
+            SERVER_BOOSTER_ROLE_ID,
+            STAFF_TEAM_ROLE_ID,
+        }
+        allowed_role_names = {"Early Access", "Server Booster", "Staff Team"}
+        has_early_access = any(
+            role.id in allowed_role_ids or role.name in allowed_role_names
+            for role in interaction.user.roles
+        )
+
+        if not has_early_access:
             await interaction.response.send_message(
-                "You do not have permission to use early access!",
+                "You do not have early access and therefore wait for the release.",
                 ephemeral=True
             )
             return
@@ -354,12 +367,40 @@ class EarlyAccessView(discord.ui.View):
         await interaction.response.send_message(self.link, ephemeral=True)
 
 class ReleaseView(discord.ui.View):
-    def __init__(self, link: str):
+    def __init__(self, link: str, startup_message_id: int):
         super().__init__(timeout=None)
         self.link = link
+        self.startup_message_id = startup_message_id
+
+    async def user_reacted_to_startup(self, interaction: discord.Interaction) -> bool:
+        try:
+            startup_message = await interaction.channel.fetch_message(self.startup_message_id)
+        except (discord.NotFound, discord.Forbidden, discord.HTTPException):
+            return False
+
+        for reaction in startup_message.reactions:
+            if getattr(reaction.emoji, "id", None) != STARTUP_REACTION_EMOJI_ID:
+                continue
+
+            async for user in reaction.users():
+                if user.id == interaction.user.id:
+                    return True
+
+        return False
 
     @discord.ui.button(label="Roleplay Link", style=discord.ButtonStyle.secondary)
     async def roleplay_link_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not await self.user_reacted_to_startup(interaction):
+            startup_url = (
+                f"https://discord.com/channels/"
+                f"{interaction.guild.id}/{interaction.channel.id}/{self.startup_message_id}"
+            )
+            await interaction.response.send_message(
+                f"React [here]({startup_url}) in order to join the session!",
+                ephemeral=True
+            )
+            return
+
         await interaction.response.send_message(self.link, ephemeral=True)
 
 class StaffProfileView(discord.ui.View):
@@ -756,7 +797,7 @@ async def startup(
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Society, Roleplay Startup!__ <a:yellowmovingbow:1509751680651100230>\n"
+            f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Society, Roleplay Startup!__\n"
             f"{PRIMARY_ARROW_EMOJI} {host} is currently hosting a roleplay session.\n\n"
             f"Prior to joining, please ensure to review the server information "
             f"and all roleplay regulations displayed below to avoid potential moderation.\n\n"
@@ -888,9 +929,9 @@ async def earlyaccess(interaction: discord.Interaction, link: str):
     )
 
     embed = discord.Embed(
-        title="<a:yellowtada:1509751747248390175> Greenville Roleplay Society, Early Access! <a:yellowtada:1509751747248390175>",
         description=(
-            f"<:GVRSarrow:1513646972106702919> {host} has now released early access to their roleplay session.\n\n"
+            f"> ### <a:yellowtada:1509751747248390175> __Greenville Roleplay Society, Early Access!__\n"
+            f"{PRIMARY_ARROW_EMOJI} {host} has now released early access to their roleplay session.\n\n"
             "Nitro Boosters, Early Access members, and Staff Team members may now join using the button below, "
             "but sharing this link will result in the permanent removal of your Early Access privileges."
         ),
@@ -959,21 +1000,21 @@ async def release(
     host = interaction.user.mention
 
     embed = discord.Embed(
-        title="<a:yellowanimatedstar:1509767076838113371> Greenville Roleplay Society, Roleplay Released! <a:yellowanimatedstar:1509767076838113371>",
         description=(
-            f"<:GVRSarrow:1513646972106702919> {host} has now **released** their roleplay session.\n"
+            f"> ### <a:yellowanimatedstar:1509793309713764432> __Greenville Roleplay Society, Roleplay Released!__\n"
+            f"{PRIMARY_ARROW_EMOJI} {host} has now **released** their roleplay session.\n"
             f"Prior to joining, please ensure to review the server information and all the roleplay regulations displayed below.\n\n"
 
             f"<:yellowrightarrow:1509751702075740191> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
             f"Reinvites will occur every 20-30 minutes, so please do not ask the host for the link.\n\n"
 
-            f"<:yellownotification:1509751686179061760> **Roleplay Regulations:**\n"
-            f"<:yellowarrow:1517392101678121040> Session Host: {host}\n"
-            f"<:yellowarrow:1517392101678121040> Peacetime Status: {peacetime_status}\n"
-            f"<:yellowarrow:1517392101678121040> FRP Speedlimit: {frp_speeds}\n"
-            f"<:yellowarrow:1517392101678121040> LEO Status: {leo_status}\n\n"
+            f"{BOOK_EMOJI} **Roleplay Regulations:**\n"
+            f"{YELLOW_ARROW_EMOJI} Session Host: {host}\n"
+            f"{YELLOW_ARROW_EMOJI} Peacetime Status: {peacetime_status}\n"
+            f"{YELLOW_ARROW_EMOJI} FRP Speedlimit: {frp_speeds}\n"
+            f"{YELLOW_ARROW_EMOJI} LEO Status: {leo_status}\n\n"
 
-            f"<:yellowalarm:1509767056705327114> **Any unauthorized sharing of the link will result in moderation action.**"
+            f"<:alertbell:1520085233876078803> **Any unauthorized sharing of the link will result in moderation action.**"
         ),
         color=discord.Color.from_str("#fef1b3")
     )
@@ -988,7 +1029,7 @@ async def release(
     await interaction.channel.send(
         f"<@&{CIVILIANS_ROLE_ID}>",
         embed=embed,
-        view=ReleaseView(session_link)
+        view=ReleaseView(session_link, ACTIVE_STARTUPS[active_key])
     )
 
     await interaction.response.send_message("Release message executed!", ephemeral=True)
@@ -1048,21 +1089,21 @@ async def reinvites(
     host = interaction.user.mention
 
     embed = discord.Embed(
-        title="<a:yellowanimatedstar:1509767076838113371> Greenville Roleplay Society — Reinvites Released <a:yellowanimatedstar:1509767076838113371>",
         description=(
-            f"<:GVRSarrow:1513646972106702919> {host} has released re-invites for their session!\n\n"
+            f"> ### <a:yellowanimatedstar:1509793309713764432> __Greenville Roleplay Society, Reinvites Released!__\n"
+            f"{PRIMARY_ARROW_EMOJI} {host} has released re-invites for their session!\n\n"
             f"Please be sure to follow all instructions given by the host and co-hosts prior to departing from spawn. "
             f"In addition, all Greenville Roleplay Society regulations must be followed throughout the session.\n\n"
 
             f"<:yellowrightarrow:1509751702075740191> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
             f"Reinvites will occur every 20-30 minutes, so please do not ask the host for the link.\n\n"
 
-            f"<:yellownotification:1509751686179061760> **Session Information:**\n"
-            f"<:yellowarrow:1517392101678121040> FRP Speed Limit: **{frp_speeds}**\n"
-            f"<:yellowarrow:1517392101678121040> Peacetime Status: **{peacetime_status}**\n"
-            f"<:yellowarrow:1517392101678121040> LEO Status: **{leo_status}**\n\n"
+            f"{BOOK_EMOJI} **Session Information:**\n"
+            f"{YELLOW_ARROW_EMOJI} FRP Speed Limit: **{frp_speeds}**\n"
+            f"{YELLOW_ARROW_EMOJI} Peacetime Status: **{peacetime_status}**\n"
+            f"{YELLOW_ARROW_EMOJI} LEO Status: **{leo_status}**\n\n"
 
-            f"<:yellowalarm:1509767056705327114> **Any unauthorized sharing of the link will result in moderation action.**"
+            f"<:alertbell:1520085233876078803> **Any unauthorized sharing of the link will result in moderation action.**"
         ),
         color=discord.Color.from_str("#fef1b3")
     )
@@ -1078,7 +1119,7 @@ async def reinvites(
     await interaction.channel.send(
         "@everyone",
         embed=embed,
-        view=ReleaseView(session_link)
+        view=ReleaseView(session_link, ACTIVE_STARTUPS[active_key])
     )
 
     await interaction.response.send_message(
@@ -1121,7 +1162,7 @@ async def linkregen(interaction: discord.Interaction):
     )
 
     message = await interaction.channel.send("@here", embed=embed)
-    await message.add_reaction("<:yellowcheck:1509767574752333904>")
+    await message.add_reaction(STARTUP_REACTION_EMOJI)
 
     await interaction.response.send_message("Link regeneration message executed!", ephemeral=True)
     await send_log(
