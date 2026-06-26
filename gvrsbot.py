@@ -49,6 +49,7 @@ SESSION_START_TIMES = {}
 ACTIVE_COHOSTS = {}
 ACTIVE_SUPERVISIONS = {}
 ACTIVE_STARTUPS = {}
+ACTIVE_HOSTS = {}
 
 ALLOWED_ROLEPLAY_CHANNELS = ["roleplay-1", "bot-testing-dont-remove"]
 MAX_TIMEOUT_DURATION = timedelta(days=28)
@@ -143,6 +144,12 @@ def init_db():
         )
     """)
 
+    cur.execute("PRAGMA table_info(active_sessions)")
+    active_session_columns = [row["name"] for row in cur.fetchall()]
+
+    if "host_id" not in active_session_columns:
+        cur.execute("ALTER TABLE active_sessions ADD COLUMN host_id TEXT")
+
     cur.execute("""
         CREATE TABLE IF NOT EXISTS active_staff_timers (
             guild_id TEXT NOT NULL,
@@ -170,6 +177,7 @@ def init_db():
 
 def load_active_state():
     ACTIVE_STARTUPS.clear()
+    ACTIVE_HOSTS.clear()
     SESSION_START_TIMES.clear()
     ACTIVE_COHOSTS.clear()
     ACTIVE_SUPERVISIONS.clear()
@@ -182,6 +190,8 @@ def load_active_state():
         key = (int(row["guild_id"]), int(row["channel_id"]))
         ACTIVE_STARTUPS[key] = int(row["message_id"])
         SESSION_START_TIMES[key] = row["start_timestamp"]
+        if row["host_id"] is not None:
+            ACTIVE_HOSTS[key] = int(row["host_id"])
 
     cur.execute("SELECT * FROM active_staff_timers")
     for row in cur.fetchall():
@@ -195,19 +205,20 @@ def load_active_state():
     conn.close()
 
 
-def save_active_session(active_key, message_id, start_timestamp):
+def save_active_session(active_key, message_id, start_timestamp, host_id):
     conn = get_db()
     cur = conn.cursor()
 
     cur.execute("""
         INSERT OR REPLACE INTO active_sessions
-        (guild_id, channel_id, message_id, start_timestamp)
-        VALUES (?, ?, ?, ?)
+        (guild_id, channel_id, message_id, start_timestamp, host_id)
+        VALUES (?, ?, ?, ?, ?)
     """, (
         str(active_key[0]),
         str(active_key[1]),
         str(message_id),
-        start_timestamp
+        start_timestamp,
+        str(host_id)
     ))
 
     conn.commit()
@@ -849,7 +860,8 @@ async def startup(
     start_timestamp = int(message.created_at.timestamp())
     SESSION_START_TIMES[active_key] = start_timestamp
     ACTIVE_STARTUPS[active_key] = message.id
-    save_active_session(active_key, message.id, start_timestamp)
+    ACTIVE_HOSTS[active_key] = interaction.user.id
+    save_active_session(active_key, message.id, start_timestamp, interaction.user.id)
 
     await message.add_reaction(STARTUP_REACTION_EMOJI)
     await interaction.response.send_message("Startup message executed!", ephemeral=True)
@@ -1314,6 +1326,7 @@ async def sessionclear(interaction: discord.Interaction):
 
     active_key = session_key(interaction)
     ACTIVE_STARTUPS.pop(active_key, None)
+    ACTIVE_HOSTS.pop(active_key, None)
     SESSION_START_TIMES.pop(active_key, None)
     clear_active_session(active_key)
 
@@ -1346,6 +1359,13 @@ async def over(interaction: discord.Interaction, additional_notes: str):
 
     if not is_staff(interaction.user):
         await interaction.response.defer(ephemeral=True)
+        return
+
+    if ACTIVE_HOSTS.get(active_key) != interaction.user.id:
+        await interaction.response.send_message(
+            "You are not the host!",
+            ephemeral=True
+        )
         return
 
     host = interaction.user.mention
@@ -1431,11 +1451,150 @@ async def over(interaction: discord.Interaction, additional_notes: str):
         ACTIVE_SUPERVISIONS.pop(supervise_key, None)
 
     ACTIVE_STARTUPS.pop(active_key, None)
+    ACTIVE_HOSTS.pop(active_key, None)
     SESSION_START_TIMES.pop(active_key, None)
     clear_active_session(active_key)
     clear_staff_timers_for_session(active_key)
 
     await interaction.channel.send(embed=embed)
+
+
+force_group = app_commands.Group(
+    name="force",
+    description="Force session commands"
+)
+
+
+@force_group.command(name="end", description="Force-end the active roleplay session")
+async def force_end(interaction: discord.Interaction):
+    allowed_channels = ALLOWED_ROLEPLAY_CHANNELS
+    active_key = session_key(interaction)
+
+    if interaction.channel.name not in allowed_channels:
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    if active_key not in ACTIVE_STARTUPS:
+        await interaction.response.send_message(
+            "There is no active startup in this channel.",
+            ephemeral=True
+        )
+        return
+
+    if not is_high_command(interaction.user):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    host_id = ACTIVE_HOSTS.get(active_key)
+
+    if host_id is None:
+        await interaction.response.send_message(
+            "Session host could not be found.",
+            ephemeral=True
+        )
+        return
+
+    if host_id == interaction.user.id:
+        await interaction.response.send_message(
+            "You cannot force-end your own session.",
+            ephemeral=True
+        )
+        return
+
+    host_member = interaction.guild.get_member(host_id)
+    host = host_member.mention if host_member else f"<@{host_id}>"
+    start_timestamp = SESSION_START_TIMES.get(active_key)
+
+    if start_timestamp:
+        end_timestamp = int(discord.utils.utcnow().timestamp())
+        session_duration = f"<t:{start_timestamp}:t> - <t:{end_timestamp}:t>"
+
+        add_staff_session(
+            host_id,
+            "hosted",
+            f"Force-ended by {interaction.user.display_name}",
+            start_timestamp,
+            end_timestamp
+        )
+    else:
+        end_timestamp = int(discord.utils.utcnow().timestamp())
+        session_duration = "Unknown"
+
+    embed = discord.Embed(
+        description=(
+            f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Society, Roleplay Concluded!__\n"
+            f"{PRIMARY_ARROW_EMOJI} {interaction.user.mention} has force-ended {host}'s roleplay session.\n\n"
+            f"<:GVRSarrow2:1515852723713474611> Thank you to all civilians who attended. A new session will be hosted shortly by our staff team. "
+            f"Please do not harass staff for sessions, or you may face moderation action.\n\n"
+            f"<:yellownotification:1509751686179061760> **Roleplay Notes:**\n"
+            f"{YELLOW_ARROW_EMOJI} Session Host: {host}\n"
+            f"{YELLOW_ARROW_EMOJI} Session Duration: {session_duration}\n"
+            f"{YELLOW_ARROW_EMOJI} Additional Notes: Force-ended by {interaction.user.mention}\n\n"
+            f"{YELLOW_ARROW_EMOJI} Need to report a user? Please head over to our #server-assistance channel and create a ticket."
+        ),
+        color=discord.Color.from_str("#fef1b3")
+    )
+
+    embed.set_image(url=OVER_IMAGE)
+
+    embed.set_footer(
+        text="Greenville Roleplay Society™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    await interaction.response.send_message("Force end message executed!", ephemeral=True)
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/force end",
+        f"Host: {host}"
+    )
+
+    await purge_channels_by_name(
+        interaction.guild,
+        {interaction.channel.name, "checkpoint-1"}
+    )
+
+    for cohost_key, cohost_start_timestamp in list(ACTIVE_COHOSTS.items()):
+        if cohost_key[:2] != active_key:
+            continue
+
+        user_id = cohost_key[2]
+        add_staff_session(
+            user_id,
+            "cohosted",
+            f"Automatically ended when session force-ended by {interaction.user.display_name}",
+            cohost_start_timestamp,
+            end_timestamp
+        )
+
+        ACTIVE_COHOSTS.pop(cohost_key, None)
+
+    for supervise_key, supervise_start_timestamp in list(ACTIVE_SUPERVISIONS.items()):
+        if supervise_key[:2] != active_key:
+            continue
+
+        user_id = supervise_key[2]
+        add_staff_session(
+            user_id,
+            "supervised",
+            f"Automatically ended when session force-ended by {interaction.user.display_name}",
+            supervise_start_timestamp,
+            end_timestamp
+        )
+
+        ACTIVE_SUPERVISIONS.pop(supervise_key, None)
+
+    ACTIVE_STARTUPS.pop(active_key, None)
+    ACTIVE_HOSTS.pop(active_key, None)
+    SESSION_START_TIMES.pop(active_key, None)
+    clear_active_session(active_key)
+    clear_staff_timers_for_session(active_key)
+
+    await interaction.channel.send(embed=embed)
+
+
+bot.tree.add_command(force_group)
 
 # =====================================
 # /loa
@@ -2679,7 +2838,7 @@ async def ticketpanel(interaction: discord.Interaction):
 APPEAL_TICKET_LINK = "https://discord.com/channels/1290705579953754163/1503269938624856156"
 
 STAFF_TEAM_ROLE = "Staff Team"
-HIGH_COMMAND_ROLES = ["High Ranking Staff", "Senior High Ranking Staff"]
+HIGH_COMMAND_ROLES = ["High Ranking Staff", "Senior High Ranking Staff", "Senior High Ranking"]
 
 INFRACTION_ROLES = ["Infraction 1/4", "Infraction 2/4", "Infraction 3/4", "Infraction 4/4"]
 STAFF_INFRACTION_ROLES = ["Staff Strike 1/3", "Staff Strike 2/3", "Staff Strike 3/3"]
