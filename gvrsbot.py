@@ -998,6 +998,7 @@ async def release(
         return
 
     host = interaction.user.mention
+    startup_message_id = ACTIVE_STARTUPS[active_key]
 
     embed = discord.Embed(
         description=(
@@ -1029,7 +1030,7 @@ async def release(
     await interaction.channel.send(
         f"<@&{CIVILIANS_ROLE_ID}>",
         embed=embed,
-        view=ReleaseView(session_link, ACTIVE_STARTUPS[active_key])
+        view=ReleaseView(session_link, startup_message_id)
     )
 
     await interaction.response.send_message("Release message executed!", ephemeral=True)
@@ -1051,14 +1052,16 @@ async def release(
     session_link="Session link",
     peacetime_status="Peacetime status",
     frp_speeds="FRP speed limit",
-    leo_status="LEO status"
+    leo_status="LEO status",
+    reactions="Required amount of reactions"
 )
 async def reinvites(
     interaction: discord.Interaction,
     session_link: str,
     peacetime_status: str,
     frp_speeds: str,
-    leo_status: str
+    leo_status: str,
+    reactions: int
 ):
 
     allowed_channels = ALLOWED_ROLEPLAY_CHANNELS
@@ -1086,44 +1089,94 @@ async def reinvites(
         )
         return
 
+    if reactions < 1:
+        await interaction.response.send_message(
+            "Reactions must be at least 1.",
+            ephemeral=True
+        )
+        return
+
     host = interaction.user.mention
+    startup_message_id = ACTIVE_STARTUPS[active_key]
 
-    embed = discord.Embed(
+    commencing_embed = discord.Embed(
         description=(
-            f"> ### <a:yellowanimatedstar:1509793309713764432> __Greenville Roleplay Society, Reinvites Released!__\n"
-            f"{PRIMARY_ARROW_EMOJI} {host} has released re-invites for their session!\n\n"
-            f"Please be sure to follow all instructions given by the host and co-hosts prior to departing from spawn. "
-            f"In addition, all Greenville Roleplay Society regulations must be followed throughout the session.\n\n"
-
-            f"<:yellowrightarrow:1509751702075740191> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
-            f"Reinvites will occur every 20-30 minutes, so please do not ask the host for the link.\n\n"
-
-            f"{BOOK_EMOJI} **Session Information:**\n"
-            f"{YELLOW_ARROW_EMOJI} FRP Speed Limit: **{frp_speeds}**\n"
-            f"{YELLOW_ARROW_EMOJI} Peacetime Status: **{peacetime_status}**\n"
-            f"{YELLOW_ARROW_EMOJI} LEO Status: **{leo_status}**\n\n"
-
-            f"<:alertbell:1520085233876078803> **Any unauthorized sharing of the link will result in moderation action.**"
+            f"> ### <a:GVRSbutterfly:1515852830668357732> __Greenville Roleplay Society, Reinvites Commencing!__\n"
+            f"<:GVRSdot:1513624330045493309> {host} is releasing reinvites for their **Greenville Roleplay Society** soon. "
+            f"In order to become the session link, the host needs **{reactions}** reactions."
         ),
         color=discord.Color.from_str("#fef1b3")
     )
 
-    # HIER DEIN REINVITES BILD EINFÜGEN
-    embed.set_image(url=REINVITES_IMAGE)
+    commencing_embed.set_image(url=REINVITES_IMAGE)
 
-    embed.set_footer(
-    text="Greenville Roleplay Society™",
-    icon_url=bot.user.display_avatar.url
-)
-
-    await interaction.channel.send(
-        "@everyone",
-        embed=embed,
-        view=ReleaseView(session_link, ACTIVE_STARTUPS[active_key])
+    commencing_embed.set_footer(
+        text="Greenville Roleplay Society™",
+        icon_url=bot.user.display_avatar.url
     )
 
+    message = await interaction.channel.send("@here", embed=commencing_embed)
+    await message.add_reaction(STARTUP_REACTION_EMOJI)
+
+    async def send_reinvites_message():
+        embed = discord.Embed(
+            description=(
+                f"> ### <a:yellowanimatedstar:1509793309713764432> __Greenville Roleplay Society, Reinvites Released!__\n"
+                f"{PRIMARY_ARROW_EMOJI} {host} has released re-invites for their session!\n\n"
+                f"Please be sure to follow all instructions given by the host and co-hosts prior to departing from spawn. "
+                f"In addition, all Greenville Roleplay Society regulations must be followed throughout the session.\n\n"
+
+                f"<:yellowrightarrow:1509751702075740191> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
+                f"Reinvites will occur every 20-30 minutes, so please do not ask the host for the link.\n\n"
+
+                f"{BOOK_EMOJI} **Session Information:**\n"
+                f"{YELLOW_ARROW_EMOJI} FRP Speed Limit: **{frp_speeds}**\n"
+                f"{YELLOW_ARROW_EMOJI} Peacetime Status: **{peacetime_status}**\n"
+                f"{YELLOW_ARROW_EMOJI} LEO Status: **{leo_status}**\n\n"
+
+                f"<:alertbell:1520085233876078803> **Any unauthorized sharing of the link will result in moderation action.**"
+            ),
+            color=discord.Color.from_str("#fef1b3")
+        )
+
+        embed.set_image(url=REINVITES_IMAGE)
+
+        embed.set_footer(
+            text="Greenville Roleplay Society™",
+            icon_url=bot.user.display_avatar.url
+        )
+
+        await interaction.channel.send(
+            "@everyone",
+            embed=embed,
+            view=ReleaseView(session_link, startup_message_id)
+        )
+
+    async def wait_for_reinvite_reactions():
+        while True:
+            await asyncio.sleep(5)
+
+            try:
+                updated_message = await interaction.channel.fetch_message(message.id)
+
+                for reaction in updated_message.reactions:
+                    if getattr(reaction.emoji, "id", None) != STARTUP_REACTION_EMOJI_ID:
+                        continue
+
+                    count = reaction.count - 1
+
+                    if count >= reactions:
+                        await send_reinvites_message()
+                        return
+
+            except Exception as e:
+                print(e)
+                return
+
+    asyncio.create_task(wait_for_reinvite_reactions())
+
     await interaction.response.send_message(
-        "Reinvites message executed!",
+        "Reinvites commencing message executed!",
         ephemeral=True
     )
     await send_log(
