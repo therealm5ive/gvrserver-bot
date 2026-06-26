@@ -472,9 +472,9 @@ class LOARequestView(discord.ui.View):
         )
 
 
-class SayModal(discord.ui.Modal):
+class AnnouncementModal(discord.ui.Modal):
     def __init__(self):
-        super().__init__(title="Say Message")
+        super().__init__(title="Announcement Message")
 
         self.text = discord.ui.TextInput(
             label="Message",
@@ -494,7 +494,7 @@ class SayModal(discord.ui.Modal):
 
         message_text = str(self.text.value)
 
-        await send_log(interaction.guild, interaction.user, "/say", f"Text: {message_text}")
+        await send_log(interaction.guild, interaction.user, "/announcement", f"Text: {message_text}")
 
         await interaction.channel.send(
             message_text,
@@ -583,7 +583,10 @@ async def on_member_join(member: discord.Member):
     name="say",
     description="The bot sends your text"
 )
-async def say(interaction: discord.Interaction):
+@app_commands.describe(
+    text="Message to send"
+)
+async def say(interaction: discord.Interaction, text: str):
 
     if not any(
         role.name in ["Senior High Ranking Staff", "High Ranking Staff"]
@@ -592,7 +595,36 @@ async def say(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         return
 
-    await interaction.response.send_modal(SayModal())
+    await interaction.response.send_message(
+        "Command executed!",
+        ephemeral=True
+    )
+
+    await send_log(interaction.guild, interaction.user, "/say", f"Text: {text}")
+
+    await interaction.channel.send(
+        text,
+        allowed_mentions=discord.AllowedMentions(
+            everyone=True,
+            roles=True,
+            users=True
+        )
+    )
+
+
+@bot.tree.command(
+    name="announcement",
+    description="The bot sends a multi-line announcement"
+)
+async def announcement(interaction: discord.Interaction):
+    if not any(
+        role.name in ["Senior High Ranking Staff", "High Ranking Staff"]
+        for role in interaction.user.roles
+    ):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    await interaction.response.send_modal(AnnouncementModal())
 
 # =====================================
 # /startup
