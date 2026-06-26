@@ -522,27 +522,36 @@ class SendEmbedModal(discord.ui.Modal):
         self.add_item(self.text)
 
     async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
         message_text = str(self.text.value)
 
-        if self.image_url:
-            image_embed = discord.Embed(color=discord.Color.from_str("#fef1b3"))
-            image_embed.set_image(url=self.image_url)
-            await interaction.channel.send(embed=image_embed)
+        try:
+            if self.image_url:
+                image_embed = discord.Embed(color=discord.Color.from_str("#fef1b3"))
+                image_embed.set_image(url=self.image_url)
+                await interaction.channel.send(embed=image_embed)
 
-        text_embed = discord.Embed(
-            description=message_text,
-            color=discord.Color.from_str("#fef1b3")
-        )
+            text_embed = discord.Embed(
+                description=message_text,
+                color=discord.Color.from_str("#fef1b3")
+            )
 
-        await interaction.channel.send(embed=text_embed)
+            await interaction.channel.send(embed=text_embed)
 
-        await interaction.response.send_message(
-            "Embed sent!",
-            ephemeral=True
-        )
+            await interaction.followup.send(
+                "Embed sent!",
+                ephemeral=True
+            )
 
-        details = f"Image: {self.image_url or 'None'}\nText: {message_text}"
-        await send_log(interaction.guild, interaction.user, "/send embed", details)
+            details = f"Image: {self.image_url or 'None'}\nText: {message_text}"
+            await send_log(interaction.guild, interaction.user, "/send embed", details)
+
+        except Exception as e:
+            await interaction.followup.send(
+                f"Something went wrong while sending the embed: `{e}`",
+                ephemeral=True
+            )
 
 
 @bot.event
