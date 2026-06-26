@@ -3800,8 +3800,9 @@ async def purge(ctx, amount: int):
     )
 
     purged_count = max(len(deleted_messages) - 1, 0)
+    message_word = "message" if purged_count == 1 else "messages"
     embed = discord.Embed(
-        description=f"Purged **{purged_count}** messages.",
+        description=f"> Purged **{purged_count}** {message_word}.",
         color=discord.Color.from_str("#fef1b3")
     )
     embed.set_footer(
@@ -3809,7 +3810,8 @@ async def purge(ctx, amount: int):
         icon_url=bot.user.display_avatar.url
     )
 
-    await ctx.channel.send(embed=embed)
+    confirmation = await ctx.channel.send(embed=embed)
+    await confirmation.delete(delay=5)
 
     await send_log(
     ctx.guild,
