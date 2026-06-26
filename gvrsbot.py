@@ -367,10 +367,11 @@ class EarlyAccessView(discord.ui.View):
         await interaction.response.send_message(self.link, ephemeral=True)
 
 class ReleaseView(discord.ui.View):
-    def __init__(self, link: str, startup_message_id: int):
+    def __init__(self, link: str, startup_message_id: int, host: str):
         super().__init__(timeout=None)
         self.link = link
         self.startup_message_id = startup_message_id
+        self.host = host
 
     async def user_reacted_to_startup(self, interaction: discord.Interaction) -> bool:
         try:
@@ -396,7 +397,7 @@ class ReleaseView(discord.ui.View):
                 f"{interaction.guild.id}/{interaction.channel.id}/{self.startup_message_id}"
             )
             await interaction.response.send_message(
-                f"React [here]({startup_url}) in order to join the session!",
+                f"Please react [here]({startup_url}) in order to join {self.host}'s session.",
                 ephemeral=True
             )
             return
@@ -1030,7 +1031,7 @@ async def release(
     await interaction.channel.send(
         f"<@&{CIVILIANS_ROLE_ID}>",
         embed=embed,
-        view=ReleaseView(session_link, startup_message_id)
+        view=ReleaseView(session_link, startup_message_id, host)
     )
 
     await interaction.response.send_message("Release message executed!", ephemeral=True)
@@ -1123,9 +1124,6 @@ async def reinvites(
             description=(
                 f"> ### <a:yellowanimatedstar:1509793309713764432> __Greenville Roleplay Society, Reinvites Released!__\n"
                 f"{PRIMARY_ARROW_EMOJI} {host} has released re-invites for their session!\n\n"
-                f"Please be sure to follow all instructions given by the host and co-hosts prior to departing from spawn. "
-                f"In addition, all Greenville Roleplay Society regulations must be followed throughout the session.\n\n"
-
                 f"<:yellowrightarrow:1509751702075740191> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
                 f"Reinvites will occur every 20-30 minutes, so please do not ask the host for the link.\n\n"
 
@@ -1149,7 +1147,7 @@ async def reinvites(
         await interaction.channel.send(
             "@everyone",
             embed=embed,
-            view=ReleaseView(session_link, startup_message_id)
+            view=ReleaseView(session_link, startup_message_id, host)
         )
 
     async def wait_for_reinvite_reactions():
@@ -1166,6 +1164,7 @@ async def reinvites(
                     count = reaction.count - 1
 
                     if count >= reactions:
+                        await updated_message.delete()
                         await send_reinvites_message()
                         return
 
