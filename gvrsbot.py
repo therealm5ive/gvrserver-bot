@@ -506,6 +506,45 @@ class AnnouncementModal(discord.ui.Modal):
         )
 
 
+class SendEmbedModal(discord.ui.Modal):
+    def __init__(self, image_url: str = None):
+        super().__init__(title="Send Embed")
+        self.image_url = image_url
+
+        self.text = discord.ui.TextInput(
+            label="Embed message",
+            placeholder="Write the embed text here...",
+            style=discord.TextStyle.paragraph,
+            required=True,
+            max_length=4000
+        )
+
+        self.add_item(self.text)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        message_text = str(self.text.value)
+
+        if self.image_url:
+            image_embed = discord.Embed(color=discord.Color.from_str("#fef1b3"))
+            image_embed.set_image(url=self.image_url)
+            await interaction.channel.send(embed=image_embed)
+
+        text_embed = discord.Embed(
+            description=message_text,
+            color=discord.Color.from_str("#fef1b3")
+        )
+
+        await interaction.channel.send(embed=text_embed)
+
+        await interaction.response.send_message(
+            "Embed sent!",
+            ephemeral=True
+        )
+
+        details = f"Image: {self.image_url or 'None'}\nText: {message_text}"
+        await send_log(interaction.guild, interaction.user, "/send embed", details)
+
+
 @bot.event
 async def on_ready():
     init_db()
@@ -625,6 +664,36 @@ async def announcement(interaction: discord.Interaction):
         return
 
     await interaction.response.send_modal(AnnouncementModal())
+
+
+# =====================================
+# /send
+# =====================================
+
+send_group = app_commands.Group(
+    name="send",
+    description="Send message tools"
+)
+
+
+@send_group.command(name="embed", description="Send an embed message")
+@app_commands.describe(image_url="Optional image URL to send above the text embed")
+async def send_embed(interaction: discord.Interaction, image_url: str = None):
+    if not any(role.name == "Ownership Team" for role in interaction.user.roles):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    if image_url and not is_allowed_url(image_url):
+        await interaction.response.send_message(
+            "Please provide a valid HTTPS image URL.",
+            ephemeral=True
+        )
+        return
+
+    await interaction.response.send_modal(SendEmbedModal(image_url))
+
+
+bot.tree.add_command(send_group)
 
 # =====================================
 # /startup
