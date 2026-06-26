@@ -50,7 +50,7 @@ ACTIVE_COHOSTS = {}
 ACTIVE_SUPERVISIONS = {}
 ACTIVE_STARTUPS = {}
 
-ALLOWED_ROLEPLAY_CHANNELS = ["roleplay-1", "roleplay-2", "bot-testing-dont-remove"]
+ALLOWED_ROLEPLAY_CHANNELS = ["roleplay-1", "bot-testing-dont-remove"]
 MAX_TIMEOUT_DURATION = timedelta(days=28)
 MAX_EMOJI_DOWNLOAD_BYTES = 2 * 1024 * 1024
 MAX_GIF_FRAMES = 80
@@ -77,6 +77,23 @@ def is_allowed_url(value: str, allowed_hosts=None):
 
     hostname = parsed.hostname or ""
     return any(hostname == host or hostname.endswith(f".{host}") for host in allowed_hosts)
+
+
+async def purge_channels_by_name(guild: discord.Guild, channel_names: set[str], limit: int = 500):
+    if not guild:
+        return
+
+    for channel in guild.text_channels:
+        if channel.name not in channel_names:
+            continue
+
+        try:
+            await channel.purge(
+                limit=limit,
+                check=lambda message: not message.pinned
+            )
+        except (discord.Forbidden, discord.HTTPException):
+            pass
 
 
 def get_db():
@@ -794,6 +811,11 @@ async def startup(
         await interaction.response.defer(ephemeral=True)
         return
 
+    await purge_channels_by_name(
+        interaction.guild,
+        {"roleplay-1", "bot-testing-dont-remove"}
+    )
+
     host = interaction.user.mention
 
     embed = discord.Embed(
@@ -1319,9 +1341,6 @@ async def over(interaction: discord.Interaction, additional_notes: str):
         icon_url=bot.user.display_avatar.url
     )
 
-    def not_pinned(message):
-        return not message.pinned
-
     await interaction.response.send_message("Over message executed!", ephemeral=True)
     await send_log(
     interaction.guild,
@@ -1329,9 +1348,9 @@ async def over(interaction: discord.Interaction, additional_notes: str):
     "/over"
 )
 
-    await interaction.channel.purge(
-        limit=500,
-        check=not_pinned
+    await purge_channels_by_name(
+        interaction.guild,
+        {interaction.channel.name, "checkpoint-1"}
     )
 
     for cohost_key, cohost_start_timestamp in list(ACTIVE_COHOSTS.items()):
@@ -2059,18 +2078,38 @@ async def staff_profile(interaction: discord.Interaction, user: discord.Member =
     for row in cur.fetchall():
         counts[row["session_type"]] = row["count"]
 
+    cur.execute("""
+        SELECT COUNT(*) as count
+        FROM warnings
+        WHERE user_id = ? AND active = 1 AND type LIKE 'Staff Strike%'
+    """, (str(user.id),))
+    strikes = cur.fetchone()["count"]
+
     conn.close()
 
     embed = discord.Embed(
         title="Staff Profile",
         description=(
-            f"**User:** {user.mention}\n\n"
-            f"**Hosted Sessions:** {counts['hosted']}\n"
-            f"**Co-Hosted Sessions:** {counts['cohosted']}\n"
-            f"**Supervised Sessions:** {counts['supervised']}\n\n"
-            f"Use the buttons below to view saved sessions."
+            f"**User:** {user.mention}\n"
+            f"**Strikes:** {strikes}"
         ),
         color=discord.Color.from_str("#fef1b3")
+    )
+
+    embed.add_field(
+        name="Hosted Sessions:",
+        value=f"{counts['hosted']} session(s)",
+        inline=True
+    )
+    embed.add_field(
+        name="Co-Hosted Sessions:",
+        value=f"{counts['cohosted']} session(s)",
+        inline=True
+    )
+    embed.add_field(
+        name="Supervised Sessions:",
+        value=f"{counts['supervised']} session(s)",
+        inline=True
     )
 
     if user.avatar:
