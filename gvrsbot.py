@@ -933,7 +933,7 @@ async def earlyaccess(interaction: discord.Interaction, link: str):
         description=(
             f"> ### <a:yellowtada:1509751747248390175> __Greenville Roleplay Society, Early Access!__\n"
             f"{PRIMARY_ARROW_EMOJI} {host} has now released early access to their roleplay session.\n\n"
-            "Nitro Boosters, Early Access members, and Staff Team members may now join using the button below, "
+            "<:GVRSarrow2:1515852723713474611> Nitro Boosters, Early Access members, and Staff Team members may now join using the button below, "
             "but sharing this link will result in the permanent removal of your Early Access privileges."
         ),
         color=discord.Color.from_str("#fef1b3")
@@ -1298,16 +1298,16 @@ async def over(interaction: discord.Interaction, additional_notes: str):
         session_duration = "Unknown"
 
     embed = discord.Embed(
-        title="<a:yellowmovingbow:1509751680651100230> Greenville Roleplay Society, Roleplay Concluded! <a:yellowmovingbow:1509751680651100230>",
         description=(
-            f"<:GVRSarrow:1513646972106702919> {host} has concluded their roleplay session.\n\n"
-            f"Thank you to all civilians who attended. A new session will be hosted shortly by our staff team. "
+            f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Society, Roleplay Concluded!__\n"
+            f"{PRIMARY_ARROW_EMOJI} {host} has concluded their roleplay session.\n\n"
+            f"<:GVRSarrow2:1515852723713474611> Thank you to all civilians who attended. A new session will be hosted shortly by our staff team. "
             f"Please do not harass staff for sessions, or you may face moderation action.\n\n"
             f"<:yellownotification:1509751686179061760> **Roleplay Notes:**\n"
-            f"<:yellowarrow:1517392101678121040> Session Host: {host}\n"
-            f"<:yellowarrow:1517392101678121040> Session Duration: {session_duration}\n"
-            f"<:yellowarrow:1517392101678121040> Additional Notes: {additional_notes}\n\n"
-            f"<:yellowarrow:1517392101678121040> Need to report a user? Please head over to our #server-assistance channel and create a ticket."
+            f"{YELLOW_ARROW_EMOJI} Session Host: {host}\n"
+            f"{YELLOW_ARROW_EMOJI} Session Duration: {session_duration}\n"
+            f"{YELLOW_ARROW_EMOJI} Additional Notes: {additional_notes}\n\n"
+            f"{YELLOW_ARROW_EMOJI} Need to report a user? Please head over to our #server-assistance channel and create a ticket."
         ),
         color=discord.Color.from_str("#fef1b3")
     )
