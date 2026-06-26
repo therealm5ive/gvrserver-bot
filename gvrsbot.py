@@ -853,8 +853,8 @@ async def startup(
 
                         if count >= reactions:
                             setup_embed = discord.Embed(
-                                title="<a:GVRSloading:1513623240004735116> Roleplay Setting Up!",
                                 description=(
+                                    f"> ### <a:GVRSloading:1513623240004735116> __Roleplay Setting Up!__\n"
                                     f"{PRIMARY_ARROW_EMOJI} {host} is now **setting up** their roleplay session. Please note that it may take the host 5-10 Minutes to release the session. Due to technical issues, it may take even longer.\n\n"
                                 ),
                                 color=discord.Color.from_str("#fef1b3")
