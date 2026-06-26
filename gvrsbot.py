@@ -55,7 +55,6 @@ ACTIVE_HOSTS = {}
 ALLOWED_ROLEPLAY_CHANNELS = ["roleplay-1", "bot-testing-dont-remove"]
 MAX_TIMEOUT_DURATION = timedelta(days=28)
 MAX_EMOJI_DOWNLOAD_BYTES = 2 * 1024 * 1024
-MAX_GIF_FRAMES = 80
 
 
 def session_key(interaction):
@@ -3854,9 +3853,6 @@ async def repaint(
         is_animated = frame_count > 1
 
         if is_animated:
-            if frame_count > MAX_GIF_FRAMES:
-                raise ValueError(f"Animated emojis are limited to {MAX_GIF_FRAMES} frames.")
-
             frames = []
             durations = []
 
@@ -3917,10 +3913,10 @@ async def repaint(
 
         before = first_frame(before_bytes)
         after = first_frame(after_bytes)
-        preview = Image.new("RGBA", (320, 160), (35, 35, 40, 255))
+        preview = Image.new("RGBA", (380, 160), (35, 35, 40, 255))
 
-        before_x = 48 - before.width // 2
-        after_x = 224 - after.width // 2
+        before_x = 95 - before.width // 2
+        after_x = 265 - after.width // 2
         before_y = 80 - before.height // 2
         after_y = 80 - after.height // 2
 
