@@ -570,7 +570,11 @@ async def say(interaction: discord.Interaction, text: str):
 
     await interaction.channel.send(
         text,
-        allowed_mentions=discord.AllowedMentions.none()
+        allowed_mentions=discord.AllowedMentions(
+            everyone=True,
+            roles=True,
+            users=True
+        )
     )
 
 # =====================================
