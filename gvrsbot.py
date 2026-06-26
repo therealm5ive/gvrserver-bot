@@ -6,6 +6,7 @@ import io
 import aiohttp
 import colorsys
 import sqlite3
+import gc
 from PIL import Image
 from discord.ext import commands
 from discord import app_commands
@@ -3738,10 +3739,24 @@ async def role(interaction: discord.Interaction):
     description="Repaints a static or animated emoji"
 )
 @app_commands.describe(
-    emoji="Paste the custom emoji here",
-    hex_color="New HEX color, example: #ffb7c5"
+    emojis="Paste one or more custom emojis here",
+    hex="New HEX color without #, example: ffb7c5",
+    image="Optional image to turn into an emoji",
+    image_2="Optional second image",
+    image_3="Optional third image",
+    image_4="Optional fourth image",
+    image_5="Optional fifth image"
 )
-async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
+async def repaint(
+    interaction: discord.Interaction,
+    emojis: str = "",
+    hex: str = "",
+    image: discord.Attachment = None,
+    image_2: discord.Attachment = None,
+    image_3: discord.Attachment = None,
+    image_4: discord.Attachment = None,
+    image_5: discord.Attachment = None
+):
 
     ALLOWED_REPAINT_ROLES = [
         "Bot Developer",
@@ -3774,23 +3789,25 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
             except:
                 pass
 
-    if not re.fullmatch(r"#[0-9a-fA-F]{6}", hex_color):
-        await safe_reply("Please use a valid HEX color, example: `#ffb7c5`.")
+    hex_color = hex.strip().lstrip("#")
+
+    if not re.fullmatch(r"[0-9a-fA-F]{6}", hex_color):
+        await safe_reply("Please use a valid HEX color without `#`, example: `ffb7c5`.")
         return
 
-    match = re.match(r"<(a?):(\w+):(\d+)>", emoji)
+    attachments = [
+        attachment for attachment in [image, image_2, image_3, image_4, image_5]
+        if attachment is not None
+    ]
+    emoji_matches = list(re.finditer(r"<(a?):(\w+):(\d+)>", emojis or ""))
 
-    if not match:
-        await safe_reply("Please paste a valid custom emoji.")
+    if not emoji_matches and not attachments:
+        await safe_reply("Please provide at least one custom emoji or image.")
         return
 
-    is_animated = match.group(1) == "a"
-    emoji_name = match.group(2)
-    emoji_id = int(match.group(3))
-
-    target_r = int(hex_color[1:3], 16)
-    target_g = int(hex_color[3:5], 16)
-    target_b = int(hex_color[5:7], 16)
+    target_r = int(hex_color[0:2], 16)
+    target_g = int(hex_color[2:4], 16)
+    target_b = int(hex_color[4:6], 16)
 
     target_h, _, _ = colorsys.rgb_to_hls(
         target_r / 255,
@@ -3821,16 +3838,22 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
             alpha
         )
 
-    file_extension = "gif" if is_animated else "png"
-    emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.{file_extension}?quality=lossless"
+    def sanitize_emoji_name(name: str, fallback: str):
+        clean_name = re.sub(r"\W+", "_", name.rsplit(".", 1)[0]).strip("_")
+        clean_name = clean_name[:32]
+
+        if len(clean_name) < 2:
+            clean_name = fallback
+
+        return clean_name
 
     def process_emoji_image(image_bytes):
         output = io.BytesIO()
+        image = Image.open(io.BytesIO(image_bytes))
+        frame_count = getattr(image, "n_frames", 1)
+        is_animated = frame_count > 1
 
         if is_animated:
-            image = Image.open(io.BytesIO(image_bytes))
-            frame_count = getattr(image, "n_frames", 1)
-
             if frame_count > MAX_GIF_FRAMES:
                 raise ValueError(f"Animated emojis are limited to {MAX_GIF_FRAMES} frames.")
 
@@ -3867,7 +3890,7 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
             )
 
         else:
-            image = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
+            image = image.convert("RGBA")
 
             if image.width > 128 or image.height > 128:
                 image.thumbnail((128, 128), Image.LANCZOS)
@@ -3884,34 +3907,69 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
         output.seek(0)
         return output.read()
 
-    try:
-        timeout = aiohttp.ClientTimeout(total=15)
+    def make_repaint_preview(before_bytes, after_bytes):
+        def first_frame(image_bytes):
+            image = Image.open(io.BytesIO(image_bytes))
+            image.seek(0)
+            frame = image.convert("RGBA")
+            frame.thumbnail((128, 128), Image.LANCZOS)
+            return frame
 
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.get(emoji_url) as response:
-                if response.status != 200:
-                    await safe_reply("Could not download this emoji.")
-                    return
+        before = first_frame(before_bytes)
+        after = first_frame(after_bytes)
+        preview = Image.new("RGBA", (320, 160), (35, 35, 40, 255))
 
-                content_length = response.headers.get("Content-Length")
+        before_x = 48 - before.width // 2
+        after_x = 224 - after.width // 2
+        before_y = 80 - before.height // 2
+        after_y = 80 - after.height // 2
 
-                if content_length and int(content_length) > MAX_EMOJI_DOWNLOAD_BYTES:
-                    await safe_reply("This emoji is too large to repaint.")
-                    return
+        preview.alpha_composite(before, (before_x, before_y))
+        preview.alpha_composite(after, (after_x, after_y))
 
-                image_bytes = await response.read()
+        output = io.BytesIO()
+        preview.save(output, format="PNG", optimize=True)
+        output.seek(0)
+        return output
 
-        if len(image_bytes) > MAX_EMOJI_DOWNLOAD_BYTES:
-            await safe_reply("This emoji is too large to repaint.")
-            return
+    async def send_repaint_report(emoji_label, before_bytes, after_bytes, index):
+        preview = await asyncio.to_thread(make_repaint_preview, before_bytes, after_bytes)
+        filename = f"repaint_preview_{index}.png"
+        file = discord.File(preview, filename=filename)
+        embed = discord.Embed(
+            title="Repainted Emoji",
+            description=(
+                f"Hex: `#{hex_color}`\n"
+                f"Executed by {interaction.user.mention}\n\n"
+                f"**Before -> After**\n{emoji_label}"
+            ),
+            color=discord.Color.from_str("#fef1b3")
+        )
+        embed.set_image(url=f"attachment://{filename}")
+        embed.set_footer(
+            text="Greenville Roleplay Society™",
+            icon_url=bot.user.display_avatar.url
+        )
+
+        await interaction.channel.send(embed=embed, file=file)
+
+    async def repaint_existing_emoji(session, match):
+        is_animated = match.group(1) == "a"
+        emoji_name = match.group(2)
+        emoji_id = int(match.group(3))
+        file_extension = "gif" if is_animated else "png"
+        emoji_url = f"https://cdn.discordapp.com/emojis/{emoji_id}.{file_extension}?quality=lossless"
+
+        async with session.get(emoji_url) as response:
+            if response.status != 200:
+                return None, f"Could not download `{emoji_name}`."
+
+            image_bytes = await response.read()
 
         new_image_bytes = await asyncio.to_thread(process_emoji_image, image_bytes)
 
         if len(new_image_bytes) > 256000:
-            await safe_reply(
-                "The repainted emoji is too large for Discord. Try a smaller emoji/GIF."
-            )
-            return
+            return None, f"`{emoji_name}` is too large for Discord after repainting."
 
         old_emoji = discord.utils.get(interaction.guild.emojis, id=emoji_id)
 
@@ -3929,17 +3987,117 @@ async def repaint(interaction: discord.Interaction, emoji: str, hex_color: str):
             reason=f"Emoji repainted by {interaction.user}"
         )
 
-        await safe_reply(f"Emoji repainted successfully: {new_emoji}")
+        return {
+            "emoji": new_emoji,
+            "before_bytes": image_bytes,
+            "after_bytes": new_image_bytes,
+        }, None
+
+    async def repaint_attachment(attachment: discord.Attachment, index: int):
+        image_bytes = await attachment.read()
+        new_image_bytes = await asyncio.to_thread(process_emoji_image, image_bytes)
+
+        if len(new_image_bytes) > 256000:
+            return None, f"`{attachment.filename}` is too large for Discord after repainting."
+
+        emoji_name = sanitize_emoji_name(attachment.filename, f"repainted_{index}")
+        new_emoji = await interaction.guild.create_custom_emoji(
+            name=emoji_name,
+            image=new_image_bytes,
+            reason=f"Emoji created from image by {interaction.user}"
+        )
+
+        return {
+            "emoji": new_emoji,
+            "before_bytes": image_bytes,
+            "after_bytes": new_image_bytes,
+        }, None
+
+    try:
+        timeout = aiohttp.ClientTimeout(total=15)
+        created_emojis = []
+        created_results = []
+        failures = []
+
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            for match in emoji_matches:
+                result, error = await repaint_existing_emoji(session, match)
+                if error:
+                    failures.append(error)
+                else:
+                    created_results.append(result)
+                    created_emojis.append(str(result["emoji"]))
+
+        for index, attachment in enumerate(attachments, start=1):
+            result, error = await repaint_attachment(attachment, index)
+            if error:
+                failures.append(error)
+            else:
+                created_results.append(result)
+                created_emojis.append(str(result["emoji"]))
+
+        for index, result in enumerate(created_results, start=1):
+            await send_repaint_report(
+                str(result["emoji"]),
+                result["before_bytes"],
+                result["after_bytes"],
+                index
+            )
+
+        response_lines = []
+
+        if created_emojis:
+            response_lines.append(f"Repainted/created emoji(s): {' '.join(created_emojis)}")
+
+        if failures:
+            response_lines.append("Failed:\n" + "\n".join(f"- {failure}" for failure in failures))
+
+        await safe_reply("\n\n".join(response_lines) or "No emojis were repainted.")
 
         await send_log(
             interaction.guild,
             interaction.user,
             "/repaint",
-            f"Emoji: {emoji}\nColor: {hex_color}"
+            f"Emojis: {emojis or 'None'}\nImages: {len(attachments)}\nColor: #{hex_color}"
         )
 
     except Exception as e:
         await safe_reply(f"Something went wrong: `{e}`")
+
+
+clear_group = app_commands.Group(
+    name="clear",
+    description="Clear bot-side data"
+)
+
+clear_emoji_group = app_commands.Group(
+    name="emoji",
+    description="Clear emoji data"
+)
+
+
+@clear_emoji_group.command(name="data", description="Clears temporary emoji data from the bot")
+async def clear_emoji_data(interaction: discord.Interaction):
+    if not any(role.name in ["Bot Developer", "Ownership Team"] for role in interaction.user.roles):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    gc.collect()
+
+    await interaction.response.send_message(
+        "Temporary emoji data cleared. The bot does not store repainted emoji image data in the database, so Discord server emojis stay untouched.",
+        ephemeral=True
+    )
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/clear emoji data"
+    )
+
+
+clear_group.add_command(clear_emoji_group)
+bot.tree.add_command(clear_group)
 
 # =====================================
 # .purge
