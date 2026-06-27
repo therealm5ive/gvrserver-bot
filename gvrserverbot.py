@@ -681,7 +681,7 @@ async def on_member_join(member: discord.Member):
     )
 
     await channel.send(
-        content=f"{SUN_EMOJI} Welcome to Greenville Roleplay Server {member.mention}!",
+        content=member.mention,
         embed=embed,
         allowed_mentions=discord.AllowedMentions(users=True)
     )
