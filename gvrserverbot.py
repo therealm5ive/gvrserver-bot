@@ -642,7 +642,7 @@ async def on_ready():
     await bot.change_presence(
         activity=discord.Activity(
             type=discord.ActivityType.watching,
-            name="🍀 discord.gg/6rzre8cs76"
+            name="🍀 discord.gg/gvrpserver"
         )
     )
 
