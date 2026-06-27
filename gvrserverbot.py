@@ -2800,18 +2800,16 @@ async def ticketpanel(interaction: discord.Interaction):
     embed = discord.Embed(
         description=(
             "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server™, Support Directory__**\n"
-            "Welcome to the Greenville Roleplay Server™, Support Directory! This channel allows you to request assistance, such as General Support, Staff Report, or a Civilian Report. If you are facing any issues within the server, please do not hesitate to make a ticket below!\n\n"
-            "**General Assistance:**\n"
+            "<:arrow:1520566971777810463> Welcome to the Greenville Roleplay Server™, Support Directory! This channel allows you to request assistance, such as General Support, Staff Report, or a Civilian Report. If you are facing any issues within the server, please do not hesitate to make a ticket below!\n\n"
+            "**__General Assistance:__**\n"
             "<:download_15:1520397591500816485>  Use this support ticket to ask questions about rules or sessions. You may also use this ticket to Request Partnerships, Claim Perks, or for Application Requests. This is not to be used to report someone, as there are other tickets to use that for.\n\n"
-            "**Civilian Report:**\n"
+            "**__Civilian Report:__**\n"
             "<:download_15:1520397591500816485> Use this to report a Civilian who might be breaking the rules. Make sure to gather proof as it is necessary so that the server High Command Team can take action, depending on the severity. If further support is needed, please request the Staff Member to assist you further.\n\n"
-            "**Staff Report:**\n"
+            "**__Staff Report:__**\n"
             "<:download_15:1520397591500816485>  Use this to report a Staff Member who might be breaking the rules. Make sure to gather proof as it is necessary so that the server High Command Team can take action, depending on the severity. If further support is needed, please request the High Command Member to assist you further.\n\n"
-            "**Partnership:**\n"
+            "**__Partnership:__**\n"
             "<:download_15:1520397591500816485>  Use this ticket if you are looking to partner with Greenville Roleplay Server.\n\n"
-            "<:download_3:1520445268938461427>  **Please Note:** If you do not respond to your ticket within 24 Hours, it will be automatically closed. Processing your support tickets may take between 2-3 Hours.\n\n"
-            "<:download_18:1520399216013217913>  **__Greenville Roleplay Server™, Support Directory__** <:download_18:1520399216013217913>\n"
-            "Greenville Roleplay Server™"
+            "<:download_3:1520445268938461427>  **Please Note:** If you do not respond to your ticket within 24 Hours, it will be automatically closed. Processing your support tickets may take between 2-3 Hours."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
