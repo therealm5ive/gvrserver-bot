@@ -667,18 +667,9 @@ async def on_member_join(member: discord.Member):
 
     embed = discord.Embed(
         description=(
-            "Welcome to **Greenville Roleplay Server** — a community built on professionalism, realism, and "
-            "an engaging Greenville roleplay experience! We’re excited to have you here.\n\n"
-            "Whether you're joining to patrol, roleplay as a civilian, participate in events, or connect with new people, "
-            "GVRS is committed to providing a safe, organized, and enjoyable environment for everyone.\n\n"
-            f"{BOOK_EMOJI} **Getting Started**\n"
-            "• Make sure to read all server rules and in-game regulations\n"
-            "• Claim your roles in the designated channels\n"
-            "• Introduce yourself and meet the community\n"
-            "• Watch for upcoming sessions, events, and announcements\n\n"
-            "**Meet the Team**\n"
-            "Our staff team is here to support you and maintain a smooth experience. If you need help, guidance, "
-            "or have questions, feel free to contact any GVRS staff member."
+            "> ### <:download_19:1520399271776485516>  **__Welcome to Greenville Roleplay Server__** <:download_19:1520399271776485516>\n"
+            "<:download_15:1520397591500816485>  Welcome to **Greenville Roleplay Server**! In order to become a civilian and gain access to the server, simply verify yourself with **__Bloxlink__** and ensure to read through our **__Regulations & Guidelines__** for necessary information.\n\n"
+            "<:download_3:1520445268938461427>  **__Require Assistance?__** Simply reach out to a member of our **__High Command__** team and they will be able to support you!"
         ),
         color=discord.Color.from_str("#93ffa5")
     )
