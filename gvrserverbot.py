@@ -25,7 +25,7 @@ OVER_IMAGE = "https://media.discordapp.net/attachments/1479130697800089622/15134
 REINVITES_IMAGE = "https://media.discordapp.net/attachments/1479130697800089622/1513461960455356526/Server_-_Embed_-_Session_Reinvites.png?ex=6a27d0ca&is=6a267f4a&hm=eaeca4b95415c2dcd907222657cecd95b77b650619da1e2997eb29169ae1801d&=&format=webp&quality=lossless"
 TICKET_PANEL_IMAGE = "https://media.discordapp.net/attachments/1520482344710967316/1520546684210249909/download_39.png?ex=6a4196f3&is=6a404573&hm=1fc370e212b294cc2443e2682c5d3c45c0520feff137fcfec3e2d29ce9c514d2&=&format=webp&quality=lossless"
 TICKET_OPEN_IMAGE = "https://media.discordapp.net/attachments/1520482344710967316/1520546684210249909/download_39.png?ex=6a4196f3&is=6a404573&hm=1fc370e212b294cc2443e2682c5d3c45c0520feff137fcfec3e2d29ce9c514d2&=&format=webp&quality=lossless"
-WELCOME_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1519100047961362463/image.png?ex=6a3c53aa&is=6a3b022a&hm=20dcd9ee3256031229c4245a4eb7ac879aa7f4dd56bc5adc9c948c8ccb4d3fb6&"
+WELCOME_IMAGE = "https://media.discordapp.net/attachments/1520482344710967316/1520546686408196096/download_34.png?ex=6a4196f4&is=6a404574&hm=feb2ad8d8d40a157887fa75e6d09d431a3218ef9383221d381b490c8a41d3597&=&format=webp&quality=lossless"
 WELCOME_THUMBNAIL = "https://cdn.discordapp.com/attachments/1479130697800089622/1519101482203615323/image.png?ex=6a3c5500&is=6a3b0380&hm=efea340a34ed87dc6bec1a9e6c29cfdd545c6103712621e7046220045ade683e&"
 STAFF_INFORMATION_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1519309639471075468/Server_-_Embed_-_Staff_Information.webp?ex=6a3d16dd&is=6a3bc55d&hm=4dec9cec71bd426376ae543e24e310ca57595d585d114ec10f519e2e4d096fa8&"
 
@@ -667,14 +667,13 @@ async def on_member_join(member: discord.Member):
 
     embed = discord.Embed(
         description=(
-            "> ### <:download_19:1520399271776485516>  **__Welcome to Greenville Roleplay Server__** <:download_19:1520399271776485516>\n"
+            "> ### <:download_20:1520444814703853666>  **__Welcome to Greenville Roleplay Server__**\n"
             "<:download_15:1520397591500816485>  Welcome to **Greenville Roleplay Server**! In order to become a civilian and gain access to the server, simply verify yourself with **__Bloxlink__** and ensure to read through our **__Regulations & Guidelines__** for necessary information.\n\n"
             "<:download_3:1520445268938461427>  **__Require Assistance?__** Simply reach out to a member of our **__High Command__** team and they will be able to support you!"
         ),
         color=discord.Color.from_str("#93ffa5")
     )
 
-    embed.set_thumbnail(url=WELCOME_THUMBNAIL)
     embed.set_image(url=WELCOME_IMAGE)
     embed.set_footer(
         text="Greenville Roleplay Server™",
@@ -2735,19 +2734,23 @@ class TicketSelect(discord.ui.Select):
         options = [
             discord.SelectOption(
                 label="General Assistance",
-                description="Open a General Assistance ticket."
+                description="Open a General Assistance ticket.",
+                emoji=discord.PartialEmoji(name="arrow", id=1520566971777810463)
             ),
             discord.SelectOption(
                 label="Civilian Report",
-                description="Report a Civilian within GVRS."
+                description="Report a Civilian within GVRS.",
+                emoji=discord.PartialEmoji(name="arrow", id=1520566971777810463)
             ),
             discord.SelectOption(
                 label="Staff Report",
-                description="Report a staff member in GVRS."
+                description="Report a staff member in GVRS.",
+                emoji=discord.PartialEmoji(name="arrow", id=1520566971777810463)
             ),
             discord.SelectOption(
                 label="Partnership",
-                description="Open a Partnership ticket."
+                description="Open a Partnership ticket.",
+                emoji=discord.PartialEmoji(name="arrow", id=1520566971777810463)
             )
         ]
 
@@ -2785,9 +2788,6 @@ async def ticketpanel(interaction: discord.Interaction):
 
     await interaction.response.defer(ephemeral=True)
 
-    banner_embed = discord.Embed(color=discord.Color.from_str("#93ffa5"))
-    banner_embed.set_image(url=TICKET_PANEL_IMAGE)
-
     embed = discord.Embed(
         description=(
             "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server™, Support Directory__**\n"
@@ -2805,12 +2805,11 @@ async def ticketpanel(interaction: discord.Interaction):
         color=discord.Color.from_str("#93ffa5")
     )
 
+    embed.set_image(url=TICKET_PANEL_IMAGE)
     embed.set_footer(
         text="Greenville Roleplay Server™",
         icon_url=bot.user.display_avatar.url
     )
-
-    await interaction.channel.send(embed=banner_embed)
 
     await interaction.channel.send(
         embed=embed,
