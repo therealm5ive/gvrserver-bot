@@ -2744,23 +2744,19 @@ class TicketSelect(discord.ui.Select):
         options = [
             discord.SelectOption(
                 label="General Assistance",
-                description="Open a General Assistance ticket.",
-                emoji=discord.PartialEmoji(name="yellowrightarrow", id=1509751702075740191)
+                description="Open a General Assistance ticket."
             ),
             discord.SelectOption(
                 label="Civilian Report",
-                description="Report a Civilian within GVRS.",
-                emoji=discord.PartialEmoji(name="yellowrightarrow", id=1509751702075740191)
+                description="Report a Civilian within GVRS."
             ),
             discord.SelectOption(
                 label="Staff Report",
-                description="Report a staff member in GVRS.",
-                emoji=discord.PartialEmoji(name="yellowrightarrow", id=1509751702075740191)
+                description="Report a staff member in GVRS."
             ),
             discord.SelectOption(
                 label="Partnership",
-                description="Open a Partnership ticket.",
-                emoji=discord.PartialEmoji(name="yellowrightarrow", id=1509751702075740191)
+                description="Open a Partnership ticket."
             )
         ]
 
@@ -2796,6 +2792,8 @@ async def ticketpanel(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         return
 
+    await interaction.response.defer(ephemeral=True)
+
     banner_embed = discord.Embed(color=discord.Color.from_str("#93ffa5"))
     banner_embed.set_image(url=TICKET_PANEL_IMAGE)
 
@@ -2830,7 +2828,7 @@ async def ticketpanel(interaction: discord.Interaction):
         view=TicketPanelView()
     )
 
-    await interaction.response.send_message(
+    await interaction.followup.send(
         "Ticket panel sent!",
         ephemeral=True
     )
