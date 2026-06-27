@@ -493,7 +493,7 @@ class LOARequestView(discord.ui.View):
         super().__init__(timeout=None)
 
     def can_handle_loa(self, member):
-        return any(role.name == "High Ranking Staff" for role in member.roles)
+        return any(role.name == "High Command" for role in member.roles)
 
     async def finish_loa_request(self, interaction: discord.Interaction, message: str, accepted: bool):
         for item in self.children:
@@ -710,7 +710,7 @@ async def on_member_join(member: discord.Member):
 async def say(interaction: discord.Interaction, text: str):
 
     if not any(
-        role.name in ["Senior High Ranking Staff", "High Ranking Staff"]
+        role.name in ["Senior High Command", "High Command"]
         for role in interaction.user.roles
     ):
         await interaction.response.defer(ephemeral=True)
@@ -739,7 +739,7 @@ async def say(interaction: discord.Interaction, text: str):
 )
 async def announcement(interaction: discord.Interaction):
     if not any(
-        role.name in ["Senior High Ranking Staff", "High Ranking Staff"]
+        role.name in ["Senior High Command", "High Command"]
         for role in interaction.user.roles
     ):
         await interaction.response.defer(ephemeral=True)
@@ -815,7 +815,7 @@ async def startup(
         return
 
     if not any(
-        role.name in ["Staff Team", "High Ranking Staff"]
+        role.name in ["Staff Team", "High Command"]
         for role in interaction.user.roles
     ):
         await interaction.response.defer(ephemeral=True)
@@ -2436,7 +2436,7 @@ bot.tree.add_command(staff_group)
 
 SERVER_OVERSEER_ROLE_NAME = "Bot Developer"
 STAFF_ROLE_NAME = "Staff Team"
-HIGH_COMMAND_ROLE_NAMES = ["High Ranking Staff"]
+HIGH_COMMAND_ROLE_NAMES = ["High Command"]
 
 
 def get_ticket_info(channel):
@@ -2843,7 +2843,7 @@ async def ticketpanel(interaction: discord.Interaction):
 APPEAL_TICKET_LINK = "https://discord.com/channels/1290705579953754163/1503269938624856156"
 
 STAFF_TEAM_ROLE = "Staff Team"
-HIGH_COMMAND_ROLES = ["High Ranking Staff", "Senior High Ranking Staff", "Senior High Ranking"]
+HIGH_COMMAND_ROLES = ["High Command", "Senior High Command", "Senior High Ranking"]
 
 INFRACTION_ROLES = ["Infraction 1/4", "Infraction 2/4", "Infraction 3/4", "Infraction 4/4"]
 STAFF_INFRACTION_ROLES = ["Staff Strike 1/3", "Staff Strike 2/3", "Staff Strike 3/3"]
@@ -2862,8 +2862,8 @@ STAFF_REMOVE_ROLES = [
     "Senior Administration",
     "High Ranking Intern",
     "Trial Management",
-    "High Ranking Staff",
-    "Senior High Ranking Staff",
+    "High Command",
+    "Senior High Command",
     "Staffing Management",
     "Community Management",
     "Executive Management",
