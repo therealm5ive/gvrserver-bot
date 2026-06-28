@@ -668,8 +668,8 @@ async def on_member_join(member: discord.Member):
     embed = discord.Embed(
         description=(
             "> ### <:download_20:1520444814703853666>  **__Welcome to Greenville Roleplay Server__**\n"
-            "<:download_15:1520397591500816485>  Welcome to **Greenville Roleplay Server**! In order to become a civilian and gain access to the server, simply verify yourself with **__Bloxlink__** and ensure to read through our **__Regulations & Guidelines__** for necessary information.\n\n"
-            "<:download_3:1520445268938461427>  **__Require Assistance?__** Simply reach out to a member of our **__High Command__** team and they will be able to support you!"
+            "<:pink_arrow2:1520813009923215581>  Welcome to **__Greenville Roleplay Server__**! In order to become a civilian and gain access to the server, simply verify yourself with **__Bloxlink__** and ensure to read through our **__Regulations & Guidelines__** for necessary information.\n\n"
+            "<:pink_notification:1520813330254659594>  **__Require Assistance?__** Simply reach out to a member of our **__High Command__** team and they will be able to support you!"
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -942,12 +942,12 @@ async def startup_one(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Roleplay 1__** <:download_18:1520399216013217913>\n"
+            "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Roleplay 1__** <:download_18:1520399216013217913>\n"
             "Welcome to the Greenville Roleplay Server's roleplay startup 1, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information.\n\n"
             "<:download_16:1520399105694629968>  **__| Roleplay Information__**\n"
-            "<:download_3:1520445268938461427>  Familiarize yourself with our server rules & regulations for a smoother roleplay experience within our sessions.\n"
-            "<:download_3:1520445268938461427>  Ensure you register your vehicle(s) with the /register command in the bot-input channel.\n"
-            "<:download_3:1520445268938461427>  Please ensure you have the correct roles for your vehicles. Refer to the dropdown below for the restricted vehicle list."
+            "<:pink_notification:1520813330254659594>  Familiarize yourself with our server rules & regulations for a smoother roleplay experience within our sessions.\n"
+            "<:pink_notification:1520813330254659594>  Ensure you register your vehicle(s) with the /register command in the bot-input channel.\n"
+            "<:pink_notification:1520813330254659594>  Please ensure you have the correct roles for your vehicles. Refer to the dropdown below for the restricted vehicle list."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -985,12 +985,12 @@ async def startup_two(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Roleplay 2__** <:download_18:1520399216013217913>\n"
+            "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Roleplay 2__** <:download_18:1520399216013217913>\n"
             "Welcome to the Greenville Roleplay Server's roleplay startup 2, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information.\n\n"
             "<:download_16:1520399105694629968>  **__| Roleplay Information__**\n"
-            "<:download_3:1520445268938461427>  Familiarize yourself with our server rules & regulations for a smoother roleplay experience within our sessions.\n"
-            "<:download_3:1520445268938461427>  Ensure you register your vehicle(s) with the /register command in the bot-input channel.\n"
-            "<:download_3:1520445268938461427>  Please ensure you have the correct roles for your vehicles. Refer to the dropdown below for the restricted vehicle list."
+            "<:pink_notification:1520813330254659594>  Familiarize yourself with our server rules & regulations for a smoother roleplay experience within our sessions.\n"
+            "<:pink_notification:1520813330254659594>  Ensure you register your vehicle(s) with the /register command in the bot-input channel.\n"
+            "<:pink_notification:1520813330254659594>  Please ensure you have the correct roles for your vehicles. Refer to the dropdown below for the restricted vehicle list."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -1078,9 +1078,9 @@ async def giveaway(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            "> ### <:download_15:1520397591500816485>  **__Greenville Roleplay Server, Server Giveaways__** <:download_15:1520397591500816485>\n"
+            "> ### <:pink_arrow2:1520813009923215581>  **__Greenville Roleplay Server, Server Giveaways__** <:pink_arrow2:1520813009923215581>\n"
             "Welcome to Greenville Roleplay Servers Server Giveaways. Within our server, we strive to give back to our community by hosting regular giveaways of Robux, Server Perks, Discord Nitro & More! All giveaways & sponsors can be found within this channel, if you are interested in sponsoring your server, please click the button below!\n\n"
-            "<:download_3:1520445268938461427>  Please Note, that using alternate accounts may result in consequential action, if you are trying to artificially increase your chances of winning. If you have any questions or require support, please feel free to contact a High Command team member! Additionally, please note that GVRS is not responsible for any giveaways hosted by other servers or communities."
+            "<:pink_notification:1520813330254659594>  Please Note, that using alternate accounts may result in consequential action, if you are trying to artificially increase your chances of winning. If you have any questions or require support, please feel free to contact a High Command team member! Additionally, please note that GVRS is not responsible for any giveaways hosted by other servers or communities."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -1128,11 +1128,11 @@ async def server_chat_one(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Server Chat 1__** <:download_15:1520397591500816485>\n"
+            "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Server Chat 1__** <:pink_arrow2:1520813009923215581>\n"
             "<a:arrowburst:1513228669479292928> In order to actively enforce our roleplay guidelines regardless of Roblox's chat restrictions, staff members will utilize this channel to communicate with players who are in a different age group or who do not have access to the in-game chat. If you fall under either of these categories, please ensure that you regularly monitor this channel, as staff members or law enforcement officers may use it to contact you.\n\n"
             "<:download_16:1520399105694629968>  **__Public Services__**\n"
             "<:download_23:1520536462712377344>   Public Services members will also be required to use this to get in contact with civilians during traffic stops if they do not have access to the chat within the game. You are still expected to follow all guidelines when chatting within this channel.\n\n"
-            "<:download_3:1520445268938461427>  Side chatting in this channel will result in a mute, this is only permitted for use when Roleplay Sessions are being hosted."
+            "<:pink_notification:1520813330254659594>  Side chatting in this channel will result in a mute, this is only permitted for use when Roleplay Sessions are being hosted."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -1166,11 +1166,11 @@ async def server_chat_two(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Server Chat 2__** <:download_15:1520397591500816485>\n"
+            "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Server Chat 2__** <:pink_arrow2:1520813009923215581>\n"
             "<a:arrowburst:1513228669479292928> In order to actively enforce our roleplay guidelines regardless of Roblox's chat restrictions, staff members will utilize this channel to communicate with players who are in a different age group or who do not have access to the in-game chat. If you fall under either of these categories, please ensure that you regularly monitor this channel, as staff members or law enforcement officers may use it to contact you.\n\n"
             "<:download_16:1520399105694629968>  **__Public Services__**\n"
             "<:download_23:1520536462712377344>   Public Services members will also be required to use this to get in contact with civilians during traffic stops if they do not have access to the chat within the game. You are still expected to follow all guidelines when chatting within this channel.\n\n"
-            "<:download_3:1520445268938461427>  Side chatting in this channel will result in a mute, this is only permitted for use when Roleplay Sessions are being hosted."
+            "<:pink_notification:1520813330254659594>  Side chatting in this channel will result in a mute, this is only permitted for use when Roleplay Sessions are being hosted."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -1884,7 +1884,7 @@ async def loa_request(
     end_of_loa: str
 ):
     embed = discord.Embed(
-        description="> ### <:download_19:1520399271776485516>  **__LOA Request__**",
+        description="> ### <a:pink_butterfly_1:1520813020811366601>  **__LOA Request__**",
         color=discord.Color.from_str("#93ffa5")
     )
 
@@ -2098,7 +2098,7 @@ async def cohost_start(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            f"> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Session Co-Host__**\n"
+            f"> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Session Co-Host__**\n"
             f"{interaction.user.mention} is co-hosting the session above! If you need support and the host is busy, please redirect to the co-host."
         ),
         color=discord.Color.from_str("#93ffa5")
@@ -2207,7 +2207,7 @@ async def supervise_start(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            f"> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Session Supervising__**\n"
+            f"> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Session Supervising__**\n"
             f"{interaction.user.mention} is supervising the session above! If you need support and the host is busy, please redirect to the supervisor"
         ),
         color=discord.Color.from_str("#93ffa5")
@@ -2606,7 +2606,7 @@ async def staff_profile(interaction: discord.Interaction, user: discord.Member =
 
     embed = discord.Embed(
         description=(
-            "> ### <:download_19:1520399271776485516>  **__Staff Profile__**\n"
+            "> ### <a:pink_butterfly_1:1520813020811366601>  **__Staff Profile__**\n"
             f"**User:** {user.mention}\n"
             f"**Strikes:** {strikes}"
         ),
@@ -2803,7 +2803,7 @@ class TicketCloseConfirmView(discord.ui.View):
 
                 dm_embed = discord.Embed(
                     description=(
-                        "> ### <:download_19:1520399271776485516>  **__Ticket Closed__**\n"
+                        "> ### <a:pink_butterfly_1:1520813020811366601>  **__Ticket Closed__**\n"
                         f"Hello {opener.mention}, your ticket has been successfully closed by "
                         f"{interaction.user.mention}. We hope our team was able to resolve your issue.\n\n"
                         f"**Closed by**\n{interaction.user.mention}\n\n"
@@ -2922,7 +2922,7 @@ class PersistentTicketView(discord.ui.View):
 
         embed = discord.Embed(
             description=(
-                "> ### <:download_19:1520399271776485516>  **__Close Ticket__**\n"
+                "> ### <a:pink_butterfly_1:1520813020811366601>  **__Close Ticket__**\n"
                 "Are you sure you want to close this ticket?"
             ),
             color=discord.Color.from_str("#93ffa5")
@@ -3018,7 +3018,7 @@ class TicketModal(discord.ui.Modal):
 
         embed = discord.Embed(
             description=(
-                f"> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, {self.ticket_type} Ticket__**\n"
+                f"> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, {self.ticket_type} Ticket__**\n"
                 f"Thank you for opening a **{self.ticket_type} Ticket**.\n\n"
                 f"**Reason for Opening:** {self.reason.value}\n"
                 f"**Additional Information:** {self.additional_info.value or 'None'}\n\n"
@@ -3058,19 +3058,23 @@ class TicketSelect(discord.ui.Select):
         options = [
             discord.SelectOption(
                 label="General Assistance",
-                description="Open a General Assistance ticket."
+                description="Open a General Assistance ticket.",
+                emoji=discord.PartialEmoji(name="pink_animatedarrow", id=1520813005829439578, animated=True)
             ),
             discord.SelectOption(
                 label="Civilian Report",
-                description="Report a Civilian within GVRS."
+                description="Report a Civilian within GVRS.",
+                emoji=discord.PartialEmoji(name="pink_animatedarrow", id=1520813005829439578, animated=True)
             ),
             discord.SelectOption(
                 label="Staff Report",
-                description="Report a staff member in GVRS."
+                description="Report a staff member in GVRS.",
+                emoji=discord.PartialEmoji(name="pink_animatedarrow", id=1520813005829439578, animated=True)
             ),
             discord.SelectOption(
                 label="Partnership",
-                description="Open a Partnership ticket."
+                description="Open a Partnership ticket.",
+                emoji=discord.PartialEmoji(name="pink_animatedarrow", id=1520813005829439578, animated=True)
             )
         ]
 
@@ -3103,24 +3107,27 @@ class TicketPanelView(discord.ui.View):
 )
 async def ticketpanel(interaction: discord.Interaction):
     if not any(role.name == SERVER_OVERSEER_ROLE_NAME for role in interaction.user.roles):
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.send_message(
+            "You do not have permission to use this command.",
+            ephemeral=True
+        )
         return
 
     await interaction.response.defer(ephemeral=True)
 
     embed = discord.Embed(
         description=(
-            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server™, Support Directory__**\n"
-            "<:arrow:1520566971777810463> Welcome to the Greenville Roleplay Server™, Support Directory! This channel allows you to request assistance, such as General Support, Staff Report, or a Civilian Report. If you are facing any issues within the server, please do not hesitate to make a ticket below!\n\n"
+            "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server™, Support Directory__**\n"
+            "<:pink_dot:1520813056546963667> Welcome to the **__Greenville Roleplay Server__**™, Support Directory! This channel allows you to request assistance, such as General Support, Staff Report, or a Civilian Report. If you are facing any issues within the server, please do not hesitate to make a ticket below!\n\n"
             "**__General Assistance:__**\n"
-            "<:download_15:1520397591500816485>  Use this support ticket to ask questions about rules or sessions. You may also use this ticket to Request Partnerships, Claim Perks, or for Application Requests. This is not to be used to report someone, as there are other tickets to use that for.\n\n"
+            "<:pink_arrow2:1520813009923215581>  Use this support ticket to ask questions about rules or sessions. You may also use this ticket to Request Partnerships, Claim Perks, or for Application Requests. This is not to be used to report someone, as there are other tickets to use that for.\n\n"
             "**__Civilian Report:__**\n"
-            "<:download_15:1520397591500816485> Use this to report a Civilian who might be breaking the rules. Make sure to gather proof as it is necessary so that the server High Command Team can take action, depending on the severity. If further support is needed, please request the Staff Member to assist you further.\n\n"
+            "<:pink_arrow2:1520813009923215581> Use this to report a Civilian who might be breaking the rules. Make sure to gather proof as it is necessary so that the server High Command Team can take action, depending on the severity. If further support is needed, please request the Staff Member to assist you further.\n\n"
             "**__Staff Report:__**\n"
-            "<:download_15:1520397591500816485>  Use this to report a Staff Member who might be breaking the rules. Make sure to gather proof as it is necessary so that the server High Command Team can take action, depending on the severity. If further support is needed, please request the High Command Member to assist you further.\n\n"
+            "<:pink_arrow2:1520813009923215581>  Use this to report a Staff Member who might be breaking the rules. Make sure to gather proof as it is necessary so that the server High Command Team can take action, depending on the severity. If further support is needed, please request the High Command Member to assist you further.\n\n"
             "**__Partnership:__**\n"
-            "<:download_15:1520397591500816485>  Use this ticket if you are looking to partner with Greenville Roleplay Server.\n\n"
-            "<:download_3:1520445268938461427>  **Please Note:** If you do not respond to your ticket within 24 Hours, it will be automatically closed. Processing your support tickets may take between 2-3 Hours."
+            "<:pink_arrow2:1520813009923215581>  Use this ticket if you are looking to partner with Greenville Roleplay Server.\n\n"
+            "<:pink_notification:1520813330254659594>  **Please Note:** If you do not respond to your ticket within 24 Hours, it will be automatically closed. Processing your support tickets may take between 2-3 Hours."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -3397,7 +3404,7 @@ class DeleteWarningButtonView(discord.ui.View):
 
         embed = discord.Embed(
             description=(
-                "> ### <:download_19:1520399271776485516>  **__Delete a Warning__**\n"
+                "> ### <a:pink_butterfly_1:1520813020811366601>  **__Delete a Warning__**\n"
                 f"{self.target.mention} has **{len(self.warnings)}** warning(s). Select a warning to delete."
             ),
             color=discord.Color.red()
@@ -3757,7 +3764,7 @@ async def warnings(interaction: discord.Interaction, user: str):
 
     embed = discord.Embed(
         description=(
-            f"> ### <:download_19:1520399271776485516>  **__{len(warnings_list)} Warning{'s' if len(warnings_list) != 1 else ''} for {target} ({target.id})__**\n"
+            f"> ### <a:pink_butterfly_1:1520813020811366601>  **__{len(warnings_list)} Warning{'s' if len(warnings_list) != 1 else ''} for {target} ({target.id})__**\n"
             f"{text[:3900]}"
         ),
         color=discord.Color.from_str("#93ffa5")
@@ -3810,7 +3817,7 @@ async def modlogs(interaction: discord.Interaction, user: str):
 
     embed = discord.Embed(
         description=(
-            f"> ### <:download_19:1520399271776485516>  **__Modlogs for {target}__**\n"
+            f"> ### <a:pink_butterfly_1:1520813020811366601>  **__Modlogs for {target}__**\n"
             f"{text[:3900]}"
         ),
         color=discord.Color.from_str("#93ffa5")
@@ -3832,7 +3839,7 @@ async def membercount(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            f"> ### <:download_19:1520399271776485516>  **__{interaction.guild.member_count} Members__**\n"
+            f"> ### <a:pink_butterfly_1:1520813020811366601>  **__{interaction.guild.member_count} Members__**\n"
             f"<t:{timestamp}:f>"
         ),
         color=discord.Color.from_str("#93ffa5")
@@ -4259,7 +4266,7 @@ async def repaint(
         filename = f"repaint_preview_{index}.png"
         embed = discord.Embed(
             description=(
-                "> ### <:download_19:1520399271776485516>  **__Repainted Emoji__**\n"
+                "> ### <a:pink_butterfly_1:1520813020811366601>  **__Repainted Emoji__**\n"
                 f"Hex: `#{hex_color}`\n"
                 f"Executed by {interaction.user.mention}\n\n"
                 f"**Before -> After**\n{emoji_label}"
