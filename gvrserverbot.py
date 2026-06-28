@@ -52,6 +52,15 @@ ACTIVE_STARTUPS = {}
 ACTIVE_HOSTS = {}
 
 ALLOWED_ROLEPLAY_CHANNELS = ["roleplay-1", "roleplay-2"]
+MESSAGE_COMMAND_CHANNELS = [
+    "roleplay-1",
+    "roleplay-2",
+    "checkpoint-1",
+    "checkpoint-2",
+    "server-chat-1",
+    "server-chat-2"
+]
+BOT_DEVELOPER_ROLE_NAME = "Bot Developer"
 MAX_TIMEOUT_DURATION = timedelta(days=28)
 MAX_EMOJI_DOWNLOAD_BYTES = 2 * 1024 * 1024
 
@@ -64,6 +73,10 @@ def session_key(interaction):
 def user_session_key(interaction):
     guild_id, channel_id = session_key(interaction)
     return guild_id, channel_id, interaction.user.id
+
+
+def has_bot_developer_role(member):
+    return any(role.name == BOT_DEVELOPER_ROLE_NAME for role in member.roles)
 
 
 def is_allowed_url(value: str, allowed_hosts=None):
@@ -929,15 +942,18 @@ async def startup(
     description="Sends the roleplay 1 startup information message"
 )
 async def startup_one(interaction: discord.Interaction):
-    if interaction.channel.name not in ALLOWED_ROLEPLAY_CHANNELS:
-        await interaction.response.defer(ephemeral=True)
+    if interaction.channel.name not in MESSAGE_COMMAND_CHANNELS:
+        await interaction.response.send_message(
+            "You can only use this command in an approved session channel.",
+            ephemeral=True
+        )
         return
 
-    if not any(
-        role.name in ["Staff Team", "High Command"]
-        for role in interaction.user.roles
-    ):
-        await interaction.response.defer(ephemeral=True)
+    if not has_bot_developer_role(interaction.user):
+        await interaction.response.send_message(
+            "You do not have permission to use this command.",
+            ephemeral=True
+        )
         return
 
     embed = discord.Embed(
@@ -972,15 +988,18 @@ async def startup_one(interaction: discord.Interaction):
     description="Sends the roleplay 2 startup information message"
 )
 async def startup_two(interaction: discord.Interaction):
-    if interaction.channel.name not in ALLOWED_ROLEPLAY_CHANNELS:
-        await interaction.response.defer(ephemeral=True)
+    if interaction.channel.name not in MESSAGE_COMMAND_CHANNELS:
+        await interaction.response.send_message(
+            "You can only use this command in an approved session channel.",
+            ephemeral=True
+        )
         return
 
-    if not any(
-        role.name in ["Staff Team", "High Command"]
-        for role in interaction.user.roles
-    ):
-        await interaction.response.defer(ephemeral=True)
+    if not has_bot_developer_role(interaction.user):
+        await interaction.response.send_message(
+            "You do not have permission to use this command.",
+            ephemeral=True
+        )
         return
 
     embed = discord.Embed(
@@ -1021,15 +1040,18 @@ bot.tree.add_command(startup_group)
     description="Sends the roleplay checkpoint message"
 )
 async def checkpoint(interaction: discord.Interaction):
-    if interaction.channel.name not in ALLOWED_ROLEPLAY_CHANNELS:
-        await interaction.response.defer(ephemeral=True)
+    if interaction.channel.name not in MESSAGE_COMMAND_CHANNELS:
+        await interaction.response.send_message(
+            "You can only use this command in an approved session channel.",
+            ephemeral=True
+        )
         return
 
-    if not any(
-        role.name in ["Staff Team", "High Command"]
-        for role in interaction.user.roles
-    ):
-        await interaction.response.defer(ephemeral=True)
+    if not has_bot_developer_role(interaction.user):
+        await interaction.response.send_message(
+            "You do not have permission to use this command.",
+            ephemeral=True
+        )
         return
 
     embed = discord.Embed(
@@ -1051,7 +1073,15 @@ async def checkpoint(interaction: discord.Interaction):
         icon_url=bot.user.display_avatar.url
     )
 
-    await interaction.channel.send(embed=embed)
+    try:
+        await interaction.channel.send(embed=embed)
+    except discord.DiscordException as error:
+        await interaction.response.send_message(
+            f"Checkpoint message could not be sent: `{error}`",
+            ephemeral=True
+        )
+        return
+
     await interaction.response.send_message("Checkpoint message sent!", ephemeral=True)
 
     await send_log(
@@ -1119,11 +1149,18 @@ server_chat_group = app_commands.Group(
     description="Sends the server chat 1 message"
 )
 async def server_chat_one(interaction: discord.Interaction):
-    if not any(
-        role.name in ["Staff Team", "High Command"]
-        for role in interaction.user.roles
-    ):
-        await interaction.response.defer(ephemeral=True)
+    if interaction.channel.name not in MESSAGE_COMMAND_CHANNELS:
+        await interaction.response.send_message(
+            "You can only use this command in an approved session channel.",
+            ephemeral=True
+        )
+        return
+
+    if not has_bot_developer_role(interaction.user):
+        await interaction.response.send_message(
+            "You do not have permission to use this command.",
+            ephemeral=True
+        )
         return
 
     embed = discord.Embed(
@@ -3900,15 +3937,18 @@ class ServerInfoSelect(discord.ui.Select):
         options = [
             discord.SelectOption(
                 label="Server Guidelines",
-                description="View the server guidelines."
+                description="View the server guidelines.",
+                emoji=discord.PartialEmoji(name="gvrs_animatedarrow", id=1520813005829439578, animated=True)
             ),
             discord.SelectOption(
                 label="Roblox Group",
-                description="Get the official Roblox group link."
+                description="Get the official Roblox group link.",
+                emoji=discord.PartialEmoji(name="gvrs_animatedarrow", id=1520813005829439578, animated=True)
             ),
             discord.SelectOption(
                 label="Restricted Vehicles List",
-                description="View the restricted vehicles list."
+                description="View the restricted vehicles list.",
+                emoji=discord.PartialEmoji(name="gvrs_animatedarrow", id=1520813005829439578, animated=True)
             )
         ]
 
@@ -3976,7 +4016,7 @@ async def serverinfo(interaction: discord.Interaction):
 
     info_embed = discord.Embed(
         description=(
-            "> ### <a:pink_desolvingheart:1520813054281912441>  **__Greenville Roleplay Server — Opening Remarks__** \n"
+            "> ### <a:pink_desolvingheart:1520813054281912441>   **__Greenville Roleplay Server — Opening Remarks__** \n"
             " <:pink_dot:1520813056546963667> Welcome to **Greenville Roleplay Server**, a third-party Greenville roleplay server dedicated to delivering a smooth, realistic, and enjoyable civilian-based roleplay experience within Greenville, Wisconsin. Proudly bringing roleplay to over 20 members, we strive to create an engaging and welcoming community for everyone.\n\n"
             "  <:pink_dot:1520813056546963667> Established in 2026 and founded by <@1472547347383718105>  and @zion_streax , this community was created for players who enjoy immersive, high-quality roleplay and a welcoming environment. Through active sessions and community interaction, we aim to bring the world of Greenville Roleplay to life in an engaging and realistic way.\n\n"
             " <:pink_dot:1520813056546963667> Before getting started, please take a moment to review the information available in the dropdown menu below. It includes key details about our community and helpful resources to ensure a smooth and enjoyable experience."
