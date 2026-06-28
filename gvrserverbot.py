@@ -163,6 +163,18 @@ async def ensure_civilian_role_after_join(member):
     await ensure_civilian_role_for_verified(fresh_member)
 
 
+async def ensure_civilian_role_after_update(member):
+    await asyncio.sleep(3)
+
+    try:
+        fresh_member = member.guild.get_member(member.id) or await member.guild.fetch_member(member.id)
+    except discord.DiscordException as error:
+        print(f"Failed to fetch member after role update for Civilians role check: {member} ({error})")
+        return
+
+    await ensure_civilian_role_for_verified(fresh_member)
+
+
 async def send_image_embed(channel, image_url):
     image_embed = discord.Embed(color=discord.Color.from_str("#93ffa5"))
     image_embed.set_image(url=image_url)
@@ -802,7 +814,9 @@ async def on_member_update(before: discord.Member, after: discord.Member):
     if before_role_ids == after_role_ids:
         return
 
-    await ensure_civilian_role_for_verified(after)
+    auto_role_task = asyncio.create_task(ensure_civilian_role_after_update(after))
+    AUTO_CIVILIAN_ROLE_TASKS.add(auto_role_task)
+    auto_role_task.add_done_callback(AUTO_CIVILIAN_ROLE_TASKS.discard)
 
 # =====================================
 # /say
