@@ -38,7 +38,7 @@ ROLEPLAY_RESTRICTED_ROLE_ID = 1520556110581338122
 WELCOME_CHANNEL_ID = 1519463214264352768
 BOOK_EMOJI = "<:GVRSbook:1515852761948749874>"
 SUN_EMOJI = "☀️"
-PRIMARY_ARROW_EMOJI = "<:GVRSarrow:1513646972106702919>"
+PRIMARY_ARROW_EMOJI = "<:pink_arrow2:1520813009923215581>"
 YELLOW_ARROW_EMOJI = "<:yellowarrow:1517392101678121040>"
 STARTUP_REACTION_EMOJI_ID = 1513524676180054107
 STARTUP_REACTION_EMOJI = f"<:GVRScheck:{STARTUP_REACTION_EMOJI_ID}>"
@@ -1555,7 +1555,7 @@ async def linkregen(interaction: discord.Interaction):
         return
 
     embed = discord.Embed(
-        description="<:GVRSarrow:1513646972106702919> The session link has been regenerated. React below for Re-invites!",
+        description="<:pink_arrow2:1520813009923215581> The session link has been regenerated. React below for Re-invites!",
         color=discord.Color.from_str("#93ffa5")
     )
 
@@ -3058,23 +3058,19 @@ class TicketSelect(discord.ui.Select):
         options = [
             discord.SelectOption(
                 label="General Assistance",
-                description="Open a General Assistance ticket.",
-                emoji=discord.PartialEmoji(name="arrow", id=1520566971777810463)
+                description="Open a General Assistance ticket."
             ),
             discord.SelectOption(
                 label="Civilian Report",
-                description="Report a Civilian within GVRS.",
-                emoji=discord.PartialEmoji(name="arrow", id=1520566971777810463)
+                description="Report a Civilian within GVRS."
             ),
             discord.SelectOption(
                 label="Staff Report",
-                description="Report a staff member in GVRS.",
-                emoji=discord.PartialEmoji(name="arrow", id=1520566971777810463)
+                description="Report a staff member in GVRS."
             ),
             discord.SelectOption(
                 label="Partnership",
-                description="Open a Partnership ticket.",
-                emoji=discord.PartialEmoji(name="arrow", id=1520566971777810463)
+                description="Open a Partnership ticket."
             )
         ]
 
@@ -3135,10 +3131,17 @@ async def ticketpanel(interaction: discord.Interaction):
         icon_url=bot.user.display_avatar.url
     )
 
-    await interaction.channel.send(
-        embed=embed,
-        view=TicketPanelView()
-    )
+    try:
+        await interaction.channel.send(
+            embed=embed,
+            view=TicketPanelView()
+        )
+    except discord.DiscordException as error:
+        await interaction.followup.send(
+            f"Ticket panel could not be sent: `{error}`",
+            ephemeral=True
+        )
+        return
 
     await interaction.followup.send(
         "Ticket panel sent!",
@@ -3849,41 +3852,41 @@ ROBLOX_GROUP_LINK = "https://www.roblox.com"
 RESTRICTED_VEHICLES_LINK = "https://www.roblox.com"
 
 SERVER_GUIDELINES_TEXT = """
-**1. <:GVRSarrow:1513646972106702919> Read the Regulations**
+**1. <:pink_arrow2:1520813009923215581> Read the Regulations**
 All Greenville Roleplay Server members must read and acknowledge the regulations listed in our information channels. Failure to comply may result in serious consequences.
 
-**2. <:GVRSarrow:1513646972106702919> Follow All Staff Instructions**
+**2. <:pink_arrow2:1520813009923215581> Follow All Staff Instructions**
 Members are required to follow directions given by staff. For example, if instructed to leave a session, you must comply immediately.
 
 
-**3. <:GVRSarrow:1513646972106702919> Exercise Common Sense**
+**3. <:pink_arrow2:1520813009923215581> Exercise Common Sense**
 Use sound judgment when determining whether actions violate the rules. If it would be unacceptable in another community, it is not acceptable here.
 
-**4. <:GVRSarrow:1513646972106702919> Age Requirement (13+)**
+**4. <:pink_arrow2:1520813009923215581> Age Requirement (13+)**
 In accordance with Discord's Terms of Service, all members must be at least 13 years old. Anyone found under this age will be removed until they meet the requirement.
 
-**5. <:GVRSarrow:1513646972106702919> No Harassment or Personal Attacks**
+**5. <:pink_arrow2:1520813009923215581> No Harassment or Personal Attacks**
 Any form of harassment or targeting of other members is prohibited. Violations may result in timeouts, strikes, or removal from the community.
 
-**6. <:GVRSarrow:1513646972106702919> No Slurs or Offensive Remarks**
+**6. <:pink_arrow2:1520813009923215581> No Slurs or Offensive Remarks**
 Use of discriminatory language or offensive comments based on race, gender identity, weight, ethnicity, or similar factors is strictly forbidden.
 
-**7. <:GVRSarrow:1513646972106702919> No Advertising**
+**7. <:pink_arrow2:1520813009923215581> No Advertising**
 Advertising of any kind is prohibited, including direct messages and public channels. Any server found recruiting Greenville Roleplay Server members or staff will be blacklisted, and involved members will be removed.
 
-**8. <:GVRSarrow:1513646972106702919> No Resource Theft**
+**8. <:pink_arrow2:1520813009923215581> No Resource Theft**
 Stealing any Greenville Roleplay Server resources, such as announcements, documentation or any other assets will lead to an immediate ban from Greenville Roleplay Server and all affiliated servers.
 
-**9. <:GVRSarrow:1513646972106702919> No Sharing of Personal Information**
+**9. <:pink_arrow2:1520813009923215581> No Sharing of Personal Information**
 Leaking, doxxing, or otherwise sharing personal information about any member will result in an immediate and permanent ban.
 
-**10. <:GVRSarrow:1513646972106702919> No NSFW Content**
+**10. <:pink_arrow2:1520813009923215581> No NSFW Content**
 Posting or distributing not safe for work material, including pornography, gore, or violent imagery, is strictly prohibited. First offense results in a warning, although the second offense results in an immediate ban.
 
-**11. <:GVRSarrow:1513646972106702919> Maintain Respect**
+**11. <:pink_arrow2:1520813009923215581> Maintain Respect**
 Greenville Roleplay Server will not tolerate any disrespect, defamatory comments or complaints about Greenville Roleplay Server or affiliated communities. Any user found being disrespectful will be moderated.
 
-**12. <:GVRSarrow:1513646972106702919> Voice Channel Conduct**
+**12. <:pink_arrow2:1520813009923215581> Voice Channel Conduct**
 All rules apply in voice channels. Excessive noise, disruptive sounds, or "ear-rape" audio is prohibited and will result in disciplinary action.
 """
 
@@ -3916,7 +3919,7 @@ class ServerInfoSelect(discord.ui.Select):
         if choice == "Server Guidelines":
             embed = discord.Embed(
                 description=(
-                    "> ### <a:GVRSbutterfly:1515852789266518056>  **__Greenville Roleplay Server, Server Guidelines__** <a:GVRSbutterfly:1515852789266518056>\n"
+                    "> ### <:pink_link:1520813318716002476>  **__Greenville Roleplay Server, Server Guidelines__** \n"
                     f"{SERVER_GUIDELINES_TEXT}"
                 ),
                 color=discord.Color.from_str("#93ffa5")
@@ -3968,10 +3971,10 @@ async def serverinfo(interaction: discord.Interaction):
 
     info_embed = discord.Embed(
         description=(
-            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server — Opening Remarks__** <:download_19:1520399271776485516>\n"
-            " <:download_15:1520397591500816485> Welcome to Greenville Roleplay Server, a third-party Greenville roleplay server dedicated to delivering a smooth, realistic, and enjoyable civilian-based roleplay experience within Greenville, Wisconsin. Proudly bringing roleplay to over 20,000 members, we strive to create an engaging and welcoming community for everyone.\n\n"
-            "  <:download_17:1520399162062016615> Established in 2026 and founded by <@1472547347383718105>  and @zion_streax , this community was created for players who enjoy immersive, high-quality roleplay and a welcoming environment. Through active sessions and community interaction, we aim to bring the world of Greenville Roleplay to life in an engaging and realistic way.\n\n"
-            " <:download_17:1520399162062016615> Before getting started, please take a moment to review the information available in the dropdown menu below. It includes key details about our community and helpful resources to ensure a smooth and enjoyable experience."
+            "> ### <a:pink_desolvingheart:1520813054281912441>  **__Greenville Roleplay Server — Opening Remarks__** \n"
+            " <:pink_dot:1520813056546963667> Welcome to **Greenville Roleplay Server**, a third-party Greenville roleplay server dedicated to delivering a smooth, realistic, and enjoyable civilian-based roleplay experience within Greenville, Wisconsin. Proudly bringing roleplay to over 20 members, we strive to create an engaging and welcoming community for everyone.\n\n"
+            "  <:pink_dot:1520813056546963667> Established in 2026 and founded by <@1472547347383718105>  and @zion_streax , this community was created for players who enjoy immersive, high-quality roleplay and a welcoming environment. Through active sessions and community interaction, we aim to bring the world of Greenville Roleplay to life in an engaging and realistic way.\n\n"
+            " <:pink_dot:1520813056546963667> Before getting started, please take a moment to review the information available in the dropdown menu below. It includes key details about our community and helpful resources to ensure a smooth and enjoyable experience."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
