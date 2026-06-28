@@ -43,9 +43,9 @@ WELCOME_CHANNEL_ID = 1519463214264352768
 BOOK_EMOJI = "<:GVRSbook:1515852761948749874>"
 SUN_EMOJI = "☀️"
 PRIMARY_ARROW_EMOJI = "<:pink_arrow2:1520813009923215581>"
-YELLOW_ARROW_EMOJI = "<:yellowarrow:1517392101678121040>"
-STARTUP_REACTION_EMOJI_ID = 1513524676180054107
-STARTUP_REACTION_EMOJI = f"<:GVRScheck:{STARTUP_REACTION_EMOJI_ID}>"
+YELLOW_ARROW_EMOJI = "<:gvrs_arrow2:1520813009923215581>"
+STARTUP_REACTION_EMOJI_ID = 1520813030831816877
+STARTUP_REACTION_EMOJI = f"<:gvrs_check:{STARTUP_REACTION_EMOJI_ID}>"
 
 DB_FILE = "bot_data.db"
 
@@ -849,14 +849,14 @@ async def startup(
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowmovingbow:1509751680651100230>  **__Greenville Roleplay Server, Roleplay Startup!__**\n"
+            f"> ### <a:gvrs_drippingheart:1520813287451656527>  **__Greenville Roleplay Server, Roleplay Startup!__**\n"
             f"{PRIMARY_ARROW_EMOJI} A session is now being hosted by {host}.\n\n"
-            f"Please ensure that you have read & familiarised yourself with all #server-information and that you abide by these rules within session. "
-            f"<:yellownotification:1509751686179061760> **Roleplay Regulations**\n"
+            f"Please ensure that you have read & familiarised yourself with all #server-information and that you abide by these rules within the session.\n\n"
+            f"<:gvrs_link:1520813318716002476> **__Roleplay Regulations__**\n"
             f"{YELLOW_ARROW_EMOJI} Please check to make sure your vehicle isn't a banned vehicle.\n"
             f"{YELLOW_ARROW_EMOJI} Ensure you have registered all of your vehicles.\n"
             f"{YELLOW_ARROW_EMOJI} Ensure you've enabled ROBLOX joins so everyone can invite you.\n\n"
-            f"{YELLOW_ARROW_EMOJI} In order for this session to begin, the host has requested "
+            f"<:gvrs_arrow1:1520813007892906074> In order for this session to begin, the host has requested "
             f"**{reactions}+ reactions**."
         ),
         color=discord.Color.from_str("#93ffa5")
@@ -1082,7 +1082,7 @@ async def checkpoint(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            "> ### <:gvrs_book:1520813015849767012>  **__| Roleplay Checkpoint__**\n"
+            "> ### <:gvrs_book:1520813015849767012>  **__Greenville Roleplay Server, Roleplay Checkpoint__**\n"
             "<:gvrs_dot:1520813056546963667> Civilians must strictly follow the designated format when passing through checkpoints to ensure smooth interactions and avoid delays or complications.\n\n"
             "**__Checkpoint Format:__**\n"
             "<:gvrs_right_arrow_1:1520878718745317577> If the host requests that you ping them for approval in the session, it is essential to follow all instructions swiftly to avoid complications.\n\n"
@@ -1743,11 +1743,11 @@ async def over(interaction: discord.Interaction, additional_notes: str):
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowmovingbow:1509751680651100230>  **__Greenville Roleplay Server, Session Over!__**\n"
+            f"> ### <a:gvrs_drippingheart:1520813287451656527>  **__Greenville Roleplay Server, Session Over!__**\n"
             f"{PRIMARY_ARROW_EMOJI} {host} has concluded their roleplay session.\n\n"
             f"Thank you for joining the session hosted by {host}, we hope you had an enjoyable experience throughout the session! "
             f"Please do not harass staff for sessions, or you may face moderation action.\n\n"
-            f"<:yellownotification:1509751686179061760> **Roleplay Notes:**\n"
+            f"<:gvrs_link:1520813318716002476> **Roleplay Notes:**\n"
             f"{YELLOW_ARROW_EMOJI} Session Host: {host}\n"
             f"{YELLOW_ARROW_EMOJI} Session Duration: {session_duration}\n"
             f"{YELLOW_ARROW_EMOJI} Additional Notes: {additional_notes}\n\n"
@@ -1877,11 +1877,11 @@ async def force_end(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowmovingbow:1509751680651100230>  **__Greenville Roleplay Server, Roleplay Concluded!__**\n"
+            f"> ### <a:gvrs_drippingheart:1520813287451656527>  **__Greenville Roleplay Server, Roleplay Concluded!__**\n"
             f"{PRIMARY_ARROW_EMOJI} {interaction.user.mention} has force-ended {host}'s roleplay session.\n\n"
             f"<:GVRSarrow2:1515852723713474611> Thank you to all civilians who attended. A new session will be hosted shortly by our staff team. "
             f"Please do not harass staff for sessions, or you may face moderation action.\n\n"
-            f"<:yellownotification:1509751686179061760> **Roleplay Notes:**\n"
+            f"<:gvrs_link:1520813318716002476> **Roleplay Notes:**\n"
             f"{YELLOW_ARROW_EMOJI} Session Host: {host}\n"
             f"{YELLOW_ARROW_EMOJI} Session Duration: {session_duration}\n"
             f"{YELLOW_ARROW_EMOJI} Additional Notes: Force-ended by {interaction.user.mention}\n\n"
@@ -2406,28 +2406,28 @@ STAFF_REGULATIONS_TEXT = """
 <:GVRSarrow2:1515852723713474611> **Community Safety & Moderation**
 Staff members are entrusted with maintaining order and fairness throughout the server. This includes:
 
-<:yellowarrow:1517392101678121040> Enforcing all server and roleplay rules consistently and fairly.
-<:yellowarrow:1517392101678121040> Monitoring Discord channels and in-game activity for compliance.
-<:yellowarrow:1517392101678121040> Addressing reports, concerns, and rule violations promptly.
-<:yellowarrow:1517392101678121040> Ensuring sessions operate smoothly, safely, and without disruption.
+<:gvrs_arrow2:1520813009923215581> Enforcing all server and roleplay rules consistently and fairly.
+<:gvrs_arrow2:1520813009923215581> Monitoring Discord channels and in-game activity for compliance.
+<:gvrs_arrow2:1520813009923215581> Addressing reports, concerns, and rule violations promptly.
+<:gvrs_arrow2:1520813009923215581> Ensuring sessions operate smoothly, safely, and without disruption.
 
 
 <:GVRSarrow2:1515852723713474611> **Support & Communication**
 Staff presence plays a key role in preventing issues before they escalate and maintaining a welcoming environment for all members. A critical part of being staff is providing assistance and clear communication to the community. Staff are expected to:
 
-<:yellowarrow:1517392101678121040> Assist members with questions, concerns, or technical issues.
-<:yellowarrow:1517392101678121040> Respond to support tickets in a timely and professional manner.
-<:yellowarrow:1517392101678121040> Foster a welcoming and respectful atmosphere for new and existing members.
-<:yellowarrow:1517392101678121040> Communicate clearly and effectively during roleplay sessions and events.
+<:gvrs_arrow2:1520813009923215581> Assist members with questions, concerns, or technical issues.
+<:gvrs_arrow2:1520813009923215581> Respond to support tickets in a timely and professional manner.
+<:gvrs_arrow2:1520813009923215581> Foster a welcoming and respectful atmosphere for new and existing members.
+<:gvrs_arrow2:1520813009923215581> Communicate clearly and effectively during roleplay sessions and events.
 
 
 <:GVRSarrow2:1515852723713474611> **Professional Conduct**
 Professional communication reflects the overall quality and structure of GVRS. Staff members must uphold the highest standards of professionalism at all times. This includes:
 
-<:yellowarrow:1517392101678121040> Using staff permissions responsibly and appropriately.
-<:yellowarrow:1517392101678121040> Treating all members fairly, equally, and without bias.
-<:yellowarrow:1517392101678121040> Following all staff policies, procedures, and internal guidelines.
-<:yellowarrow:1517392101678121040> Serving as a positive role model within the community.
+<:gvrs_arrow2:1520813009923215581> Using staff permissions responsibly and appropriately.
+<:gvrs_arrow2:1520813009923215581> Treating all members fairly, equally, and without bias.
+<:gvrs_arrow2:1520813009923215581> Following all staff policies, procedures, and internal guidelines.
+<:gvrs_arrow2:1520813009923215581> Serving as a positive role model within the community.
 """
 
 STAFF_QUOTA_TEXT = """
@@ -2435,30 +2435,30 @@ STAFF_QUOTA_TEXT = """
 Your behavior sets the example for how members should conduct themselves. To remain active and in good standing, staff members are required to meet weekly activity quotas based on their rank.
 
 **Low Ranking Staff**
-<:yellowarrow:1517392101678121040> 4 sessions per week OR 8 moderation/activity logs per week
+<:gvrs_arrow2:1520813009923215581> 4 sessions per week OR 8 moderation/activity logs per week
 
 **Middle Ranking Staff**
-<:yellowarrow:1517392101678121040> 3 sessions per week OR 6 moderation/activity logs per week
-<:yellowarrow:1517392101678121040> Assist and guide lower-ranking staff
-<:yellowarrow:1517392101678121040> Participate in staff discussions and internal communication
+<:gvrs_arrow2:1520813009923215581> 3 sessions per week OR 6 moderation/activity logs per week
+<:gvrs_arrow2:1520813009923215581> Assist and guide lower-ranking staff
+<:gvrs_arrow2:1520813009923215581> Participate in staff discussions and internal communication
 
 **High-Ranking Staff <:GVRSarrow2:1515852723713474611> Senior High Ranking**
-<:yellowarrow:1517392101678121040> 2 hosted sessions per week
-<:yellowarrow:1517392101678121040> 4 moderation/activity logs per week
-<:yellowarrow:1517392101678121040> Oversee staff performance and address escalated situations
-<:yellowarrow:1517392101678121040> Provide support and coordination with Ownership
+<:gvrs_arrow2:1520813009923215581> 2 hosted sessions per week
+<:gvrs_arrow2:1520813009923215581> 4 moderation/activity logs per week
+<:gvrs_arrow2:1520813009923215581> Oversee staff performance and address escalated situations
+<:gvrs_arrow2:1520813009923215581> Provide support and coordination with Ownership
 
 **Executive Team**
-<:yellowarrow:1517392101678121040> Quota exempt
-<:yellowarrow:1517392101678121040> Expected to lead by example and ensure overall server stability
+<:gvrs_arrow2:1520813009923215581> Quota exempt
+<:gvrs_arrow2:1520813009923215581> Expected to lead by example and ensure overall server stability
 
 <:GVRSarrow2:1515852723713474611> **Missed Quota Policy**
 Meeting quota demonstrates reliability, activity, and commitment to the server. Failure to meet quota without an approved Leave of Absence (LOA) may result in:
 
-<:yellowarrow:1517392101678121040> Verbal or written warnings
-<:yellowarrow:1517392101678121040> Staff strikes
-<:yellowarrow:1517392101678121040> Temporary suspension
-<:yellowarrow:1517392101678121040> Demotion for repeated noncompliance
+<:gvrs_arrow2:1520813009923215581> Verbal or written warnings
+<:gvrs_arrow2:1520813009923215581> Staff strikes
+<:gvrs_arrow2:1520813009923215581> Temporary suspension
+<:gvrs_arrow2:1520813009923215581> Demotion for repeated noncompliance
 
 If real-life responsibilities arise, staff are encouraged to submit an LOA in advance. Communication is key, and we understand that availability can change.
 """
