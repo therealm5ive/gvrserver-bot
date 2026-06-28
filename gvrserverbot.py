@@ -94,27 +94,35 @@ async def ensure_civilian_role_for_verified(member):
     if verified_role is None or civilians_role is None:
         return False
 
-    if unverified_role in member.roles and verified_role in member.roles:
+    if unverified_role in member.roles:
         try:
+            roles_to_remove = [
+                role for role in (verified_role, civilians_role)
+                if role in member.roles
+            ]
+
+            if not roles_to_remove:
+                return False
+
             await member.remove_roles(
-                verified_role,
-                reason="Member has both Verified and Unverified roles."
+                *roles_to_remove,
+                reason="Member is unverified and cannot keep Verified or Civilians roles."
             )
 
             await send_log(
                 member.guild,
                 bot.user or member,
-                "Auto Verified Role Removed",
+                "Auto Unverified Role Cleanup",
                 (
                     f"Member: {member.mention}\n"
                     f"Member ID: `{member.id}`\n"
-                    f"Removed role: <@&{VERIFIED_ROLE_ID}>\n"
-                    f"Reason: Member had both Verified and Unverified roles."
+                    f"Removed roles: {', '.join(role.mention for role in roles_to_remove)}\n"
+                    f"Reason: Member has the Unverified role."
                 )
             )
             return True
         except discord.DiscordException as error:
-            print(f"Failed to remove Verified role from {member}: {error}")
+            print(f"Failed to clean up roles from unverified member {member}: {error}")
             return False
 
     if verified_role not in member.roles or civilians_role in member.roles:
