@@ -883,8 +883,8 @@ async def startup(
                             setup_embed = discord.Embed(
                                 description=(
                                     f"> ### <a:GVRSloading:1513623240004735116> __Roleplay Setting Up!__\n"
-                                    f"{PRIMARY_ARROW_EMOJI} {host} is now setting up the roleplaying experience, staff, early access, contributors, and P/S may join using the EA link; allow the host up to 10 minutes to release.
-                                    f"Please do not bother the host during this time, and wait until the session has been released. \n\n"
+                                    f"{PRIMARY_ARROW_EMOJI} {host} is now setting up the roleplaying experience, staff, early access, contributors, and P/S may join using the EA link; allow the host up to 10 minutes to release. "
+                                    "Please do not bother the host during this time, and wait until the session has been released.\n\n"
                                 ),
                                 color=discord.Color.from_str("#93ffa5")
                             )
@@ -3836,18 +3836,15 @@ class ServerInfoSelect(discord.ui.Select):
         options = [
             discord.SelectOption(
                 label="Server Guidelines",
-                description="View the server guidelines.",
-                emoji=discord.PartialEmoji(name="GVRSarrow", id=1513646972106702919)
+                description="View the server guidelines."
             ),
             discord.SelectOption(
                 label="Roblox Group",
-                description="Get the official Roblox group link.",
-                emoji=discord.PartialEmoji(name="GVRSarrow", id=1513646972106702919)
+                description="Get the official Roblox group link."
             ),
             discord.SelectOption(
                 label="Restricted Vehicles List",
-                description="View the restricted vehicles list.",
-                emoji=discord.PartialEmoji(name="GVRSarrow", id=1513646972106702919)
+                description="View the restricted vehicles list."
             )
         ]
 
@@ -3908,6 +3905,8 @@ async def serverinfo(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         return
 
+    await interaction.response.defer(ephemeral=True)
+
     banner_embed = discord.Embed(color=discord.Color.from_str("#93ffa5"))
     banner_embed.set_image(url=SERVER_INFO_IMAGE)
 
@@ -3933,7 +3932,7 @@ async def serverinfo(interaction: discord.Interaction):
         view=ServerInfoView()
     )
 
-    await interaction.response.send_message(
+    await interaction.followup.send(
         "Server information panel sent!",
         ephemeral=True
     )
