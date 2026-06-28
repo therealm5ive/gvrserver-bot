@@ -17,17 +17,17 @@ load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
 
-STARTUP_IMAGE = "https://media.discordapp.net/attachments/1479130697800089622/1513461961269182604/Server_-_Embed_-_Session_Startup.png?ex=6a27d0ca&is=6a267f4a&hm=18740e4a1d98af9cc8af01f6215e00389dec33b1369de0e09f4b55488224aed9&=&format=webp&quality=lossless"
-SETTINGUP_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1513567354863485029/Server_-_Embed_-_Setting_Up.png?ex=6a2832f2&is=6a26e172&hm=735140119f487af1ee9610a777452bf0a3dcec125e775b6e1ca9b726c290957e&"
-EARLYACCESS_IMAGE = "https://media.discordapp.net/attachments/1479130697800089622/1513461961021587507/Server_-_Embed_-_Early_Access.png?ex=6a27d0ca&is=6a267f4a&hm=6a41537a1ce99096852afcd3353324e350aea59befaf12030ebadd89dff6685f&=&format=webp&quality=lossless"
-RELEASE_IMAGE = "https://media.discordapp.net/attachments/1479130697800089622/1513461960761413702/Server_-_Embed_-_Session_Release.png?ex=6a27d0ca&is=6a267f4a&hm=1573b02e59a9bce5bb8427ceb419e5d201a39efaf8162b879671beae398f39dd&=&format=webp&quality=lossless"
-OVER_IMAGE = "https://media.discordapp.net/attachments/1479130697800089622/1513461960165822626/Server_-_Embed_-_Session_Concluded.png?ex=6a27d0ca&is=6a267f4a&hm=25d4fdfdca98d0e7dbd789dc00c6a70f81115868bca6862a40bdfb28c7737817&=&format=webp&quality=lossless"
-REINVITES_IMAGE = "https://media.discordapp.net/attachments/1479130697800089622/1513461960455356526/Server_-_Embed_-_Session_Reinvites.png?ex=6a27d0ca&is=6a267f4a&hm=eaeca4b95415c2dcd907222657cecd95b77b650619da1e2997eb29169ae1801d&=&format=webp&quality=lossless"
-TICKET_PANEL_IMAGE = "https://media.discordapp.net/attachments/1520482344710967316/1520546684210249909/download_39.png?ex=6a4196f3&is=6a404573&hm=1fc370e212b294cc2443e2682c5d3c45c0520feff137fcfec3e2d29ce9c514d2&=&format=webp&quality=lossless"
-TICKET_OPEN_IMAGE = "https://media.discordapp.net/attachments/1520482344710967316/1520546684210249909/download_39.png?ex=6a4196f3&is=6a404573&hm=1fc370e212b294cc2443e2682c5d3c45c0520feff137fcfec3e2d29ce9c514d2&=&format=webp&quality=lossless"
-WELCOME_IMAGE = "https://media.discordapp.net/attachments/1520482344710967316/1520546686408196096/download_34.png?ex=6a4196f4&is=6a404574&hm=feb2ad8d8d40a157887fa75e6d09d431a3218ef9383221d381b490c8a41d3597&=&format=webp&quality=lossless"
-WELCOME_THUMBNAIL = "https://cdn.discordapp.com/attachments/1479130697800089622/1519101482203615323/image.png?ex=6a3c5500&is=6a3b0380&hm=efea340a34ed87dc6bec1a9e6c29cfdd545c6103712621e7046220045ade683e&"
-STAFF_INFORMATION_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1519309639471075468/Server_-_Embed_-_Staff_Information.webp?ex=6a3d16dd&is=6a3bc55d&hm=4dec9cec71bd426376ae543e24e310ca57595d585d114ec10f519e2e4d096fa8&"
+STARTUP_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520767329582186496/image_3.png?ex=6a426471&is=6a4112f1&hm=4426bca554c0c98f4b4913e6545e9dd5241b9f805a96393e0d8e4cd91d4a1d3b&=&format=webp&quality=lossless"
+SETTINGUP_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520786390416359564/image_12.png?ex=6a427632&is=6a4124b2&hm=4a6e0d1f6e6c4541c18693ee28c8ed3d32e497be44d485ad0ca0a67010c6b215&=&format=webp&quality=lossless"
+EARLYACCESS_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520767328411844679/image_6.png?ex=6a426471&is=6a4112f1&hm=3e700053dcac5cdbdae6a0f79aa5d882861c3a3c742e93d06ee93fe8426963a2&=&format=webp&quality=lossless"
+RELEASE_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520767329229602856/image_4.png?ex=6a426471&is=6a4112f1&hm=ef9a8a0e2d1547e7935705efc0983f3cfb60d70103f23f873d82663e674ec476&=&format=webp&quality=lossless"
+OVER_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520767328802046105/image_5.png?ex=6a426471&is=6a4112f1&hm=510271d8056728cc46d0d510f081e6fca4a15d742c0dc13dcb5c5aef16527e88&=&format=webp&quality=lossless"
+REINVITES_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520792487994593321/image_14.png?ex=6a427be0&is=6a412a60&hm=1bcbb8f8fc0a3456deadf61d657e9ac622e7db50c946e7d9eda1883a56659ef1&=&format=webp&quality=lossless"
+TICKET_PANEL_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520767329967804436/image_2.png?ex=6a426471&is=6a4112f1&hm=fefcae175c25326ca80a30754ef6bbaa047a187005107aa9c9c6cefe950e7fce&=&format=webp&quality=lossless"
+TICKET_OPEN_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520767329967804436/image_2.png?ex=6a426471&is=6a4112f1&hm=fefcae175c25326ca80a30754ef6bbaa047a187005107aa9c9c6cefe950e7fce&=&format=webp&quality=lossless"
+WELCOME_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520767327761862768/image_7.png?ex=6a426471&is=6a4112f1&hm=a2b2fe9b97ff75ecaf0291e233fa159090355f190869af57e3538538f1f6bfc0&=&format=webp&quality=lossless"
+WELCOME_THUMBNAIL = ""
+STAFF_INFORMATION_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520786390017773810/image_13.png?ex=6a427632&is=6a4124b2&hm=374b695cf5879f3f6c9d5556ec836ea1021798d15aaba88a51338815655a8160&=&format=webp&quality=lossless"
 
 EARLYACCESS_ROLE_ID = 1520526497834860747
 SERVER_BOOSTER_ROLE_ID = 1520149560750506208
@@ -51,7 +51,7 @@ ACTIVE_SUPERVISIONS = {}
 ACTIVE_STARTUPS = {}
 ACTIVE_HOSTS = {}
 
-ALLOWED_ROLEPLAY_CHANNELS = ["roleplay-1", "bot-testing-dont-remove"]
+ALLOWED_ROLEPLAY_CHANNELS = ["roleplay-1", "roleplay-2"]
 MAX_TIMEOUT_DURATION = timedelta(days=28)
 MAX_EMOJI_DOWNLOAD_BYTES = 2 * 1024 * 1024
 
@@ -771,8 +771,14 @@ bot.tree.add_command(send_group)
 # /startup
 # =====================================
 
-@bot.tree.command(
+startup_group = app_commands.Group(
     name="startup",
+    description="Roleplay startup tools"
+)
+
+
+@startup_group.command(
+    name="session",
     description="Sends a roleplay startup message"
 )
 @app_commands.describe(
@@ -813,7 +819,7 @@ async def startup(
 
     await purge_channels_by_name(
         interaction.guild,
-        {"roleplay-1", "bot-testing-dont-remove"}
+        {"roleplay-1", "roleplay-2"}
     )
 
     host = interaction.user.mention
@@ -821,15 +827,14 @@ async def startup(
     embed = discord.Embed(
         description=(
             f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Server, Roleplay Startup!__\n"
-            f"{PRIMARY_ARROW_EMOJI} {host} is currently hosting a roleplay session.\n\n"
-            f"Prior to joining, please ensure to review the server information "
-            f"and all roleplay regulations displayed below to avoid potential moderation.\n\n"
+            f"{PRIMARY_ARROW_EMOJI} A session is now being hosted by {host}.\n\n"
+            f"Please ensure that you have read & familiarised yourself with all #server-information and that you abide by these rules within session. "
             f"<:yellownotification:1509751686179061760> **Roleplay Regulations**\n"
-            f"{YELLOW_ARROW_EMOJI} Read over our Restricted Vehicles List to avoid infractions.\n"
+            f"{YELLOW_ARROW_EMOJI} Please check to make sure your vehicle isn't a banned vehicle.\n"
             f"{YELLOW_ARROW_EMOJI} Ensure you have registered all of your vehicles.\n"
             f"{YELLOW_ARROW_EMOJI} Ensure you've enabled ROBLOX joins so everyone can invite you.\n\n"
-            f"{YELLOW_ARROW_EMOJI} For this roleplay session to commence, we must achieve "
-            f"**{reactions}+ reactions** on this startup message."
+            f"{YELLOW_ARROW_EMOJI} In order for this session to begin, the host has requested "
+            f"**{reactions}+ reactions**."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -878,7 +883,8 @@ async def startup(
                             setup_embed = discord.Embed(
                                 description=(
                                     f"> ### <a:GVRSloading:1513623240004735116> __Roleplay Setting Up!__\n"
-                                    f"{PRIMARY_ARROW_EMOJI} {host} is now **setting up** their roleplay session. Please note that it may take the host 5-10 Minutes to release the session. Due to technical issues, it may take even longer.\n\n"
+                                    f"{PRIMARY_ARROW_EMOJI} {host} is now setting up the roleplaying experience, staff, early access, contributors, and P/S may join using the EA link; allow the host up to 10 minutes to release.
+                                    f"Please do not bother the host during this time, and wait until the session has been released. \n\n"
                                 ),
                                 color=discord.Color.from_str("#93ffa5")
                             )
@@ -916,6 +922,276 @@ async def startup(
                 return
 
     asyncio.create_task(wait_for_reactions())
+
+
+@startup_group.command(
+    name="1",
+    description="Sends the roleplay 1 startup information message"
+)
+async def startup_one(interaction: discord.Interaction):
+    if interaction.channel.name not in ALLOWED_ROLEPLAY_CHANNELS:
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    if not any(
+        role.name in ["Staff Team", "High Command"]
+        for role in interaction.user.roles
+    ):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        description=(
+            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Roleplay 1__** <:download_18:1520399216013217913>\n"
+            "Welcome to the Greenville Roleplay Server's roleplay startup 1, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information.\n\n"
+            "<:download_16:1520399105694629968>  **__| Roleplay Information__**\n"
+            "<:download_3:1520445268938461427>  Familiarize yourself with our server rules & regulations for a smoother roleplay experience within our sessions.\n"
+            "<:download_3:1520445268938461427>  Ensure you register your vehicle(s) with the /register command in the bot-input channel.\n"
+            "<:download_3:1520445268938461427>  Please ensure you have the correct roles for your vehicles. Refer to the dropdown below for the restricted vehicle list."
+        ),
+        color=discord.Color.from_str("#93ffa5")
+    )
+
+    embed.set_footer(
+        text="Greenville Roleplay Server™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    await interaction.channel.send(embed=embed)
+    await interaction.response.send_message("Startup 1 message sent!", ephemeral=True)
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/startup 1"
+    )
+
+
+@startup_group.command(
+    name="2",
+    description="Sends the roleplay 2 startup information message"
+)
+async def startup_two(interaction: discord.Interaction):
+    if interaction.channel.name not in ALLOWED_ROLEPLAY_CHANNELS:
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    if not any(
+        role.name in ["Staff Team", "High Command"]
+        for role in interaction.user.roles
+    ):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        description=(
+            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Roleplay 2__** <:download_18:1520399216013217913>\n"
+            "Welcome to the Greenville Roleplay Server's roleplay startup 2, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information.\n\n"
+            "<:download_16:1520399105694629968>  **__| Roleplay Information__**\n"
+            "<:download_3:1520445268938461427>  Familiarize yourself with our server rules & regulations for a smoother roleplay experience within our sessions.\n"
+            "<:download_3:1520445268938461427>  Ensure you register your vehicle(s) with the /register command in the bot-input channel.\n"
+            "<:download_3:1520445268938461427>  Please ensure you have the correct roles for your vehicles. Refer to the dropdown below for the restricted vehicle list."
+        ),
+        color=discord.Color.from_str("#93ffa5")
+    )
+
+    embed.set_footer(
+        text="Greenville Roleplay Server™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    await interaction.channel.send(embed=embed)
+    await interaction.response.send_message("Startup 2 message sent!", ephemeral=True)
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/startup 2"
+    )
+
+
+bot.tree.add_command(startup_group)
+
+# =====================================
+# /checkpoint
+# =====================================
+
+@bot.tree.command(
+    name="checkpoint",
+    description="Sends the roleplay checkpoint message"
+)
+async def checkpoint(interaction: discord.Interaction):
+    if interaction.channel.name not in ALLOWED_ROLEPLAY_CHANNELS:
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    if not any(
+        role.name in ["Staff Team", "High Command"]
+        for role in interaction.user.roles
+    ):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        description=(
+            "> ### <:download_16:1520399105694629968>  **__| Roleplay Checkpoint__**\n"
+            "Civilians must strictly follow the designated format when passing through checkpoints to ensure smooth interactions and avoid delays or complications.\n\n"
+            "**__Checkpoint Format__**\n"
+            "If the host requests that you ping them for approval in the session, it is essential to follow all instructions swiftly to avoid complications.\n\n"
+            "**Username:**\n"
+            "**Session Host:**\n"
+            "**Vehicle:**\n"
+            "**Vehicle Colour:**"
+        ),
+        color=discord.Color.from_str("#93ffa5")
+    )
+
+    embed.set_footer(
+        text="Greenville Roleplay Server™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    await interaction.channel.send(embed=embed)
+    await interaction.response.send_message("Checkpoint message sent!", ephemeral=True)
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/checkpoint"
+    )
+
+# =====================================
+# /giveaway
+# =====================================
+
+@bot.tree.command(
+    name="giveaway",
+    description="Sends the server giveaways message"
+)
+async def giveaway(interaction: discord.Interaction):
+    if not any(
+        role.name in ["Staff Team", "High Command"]
+        for role in interaction.user.roles
+    ):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        description=(
+            "> ### <:download_15:1520397591500816485>  **__Greenville Roleplay Server, Server Giveaways__** <:download_15:1520397591500816485>\n"
+            "Welcome to Greenville Roleplay Servers Server Giveaways. Within our server, we strive to give back to our community by hosting regular giveaways of Robux, Server Perks, Discord Nitro & More! All giveaways & sponsors can be found within this channel, if you are interested in sponsoring your server, please click the button below!\n\n"
+            "<:download_3:1520445268938461427>  Please Note, that using alternate accounts may result in consequential action, if you are trying to artificially increase your chances of winning. If you have any questions or require support, please feel free to contact a High Command team member! Additionally, please note that GVRS is not responsible for any giveaways hosted by other servers or communities."
+        ),
+        color=discord.Color.from_str("#93ffa5")
+    )
+
+    embed.set_footer(
+        text="Greenville Roleplay Server™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    await interaction.channel.send(embed=embed)
+    await interaction.response.send_message("Giveaway message sent!", ephemeral=True)
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/giveaway"
+    )
+
+# =====================================
+# /server chat
+# =====================================
+
+server_group = app_commands.Group(
+    name="server",
+    description="Server message tools"
+)
+
+server_chat_group = app_commands.Group(
+    name="chat",
+    description="Server chat message tools"
+)
+
+
+@server_chat_group.command(
+    name="1",
+    description="Sends the server chat 1 message"
+)
+async def server_chat_one(interaction: discord.Interaction):
+    if not any(
+        role.name in ["Staff Team", "High Command"]
+        for role in interaction.user.roles
+    ):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        description=(
+            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Server Chat 1__** <:download_15:1520397591500816485>\n"
+            "<a:arrowburst:1513228669479292928> In order to actively enforce our roleplay guidelines regardless of Roblox's chat restrictions, staff members will utilize this channel to communicate with players who are in a different age group or who do not have access to the in-game chat. If you fall under either of these categories, please ensure that you regularly monitor this channel, as staff members or law enforcement officers may use it to contact you.\n\n"
+            "<:download_16:1520399105694629968>  **__Public Services__**\n"
+            "<:download_23:1520536462712377344>   Public Services members will also be required to use this to get in contact with civilians during traffic stops if they do not have access to the chat within the game. You are still expected to follow all guidelines when chatting within this channel.\n\n"
+            "<:download_3:1520445268938461427>  Side chatting in this channel will result in a mute, this is only permitted for use when Roleplay Sessions are being hosted."
+        ),
+        color=discord.Color.from_str("#93ffa5")
+    )
+
+    embed.set_footer(
+        text="Greenville Roleplay Server™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    await interaction.channel.send(embed=embed)
+    await interaction.response.send_message("Server chat 1 message sent!", ephemeral=True)
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/server chat 1"
+    )
+
+
+@server_chat_group.command(
+    name="2",
+    description="Sends the server chat 2 message"
+)
+async def server_chat_two(interaction: discord.Interaction):
+    if not any(
+        role.name in ["Staff Team", "High Command"]
+        for role in interaction.user.roles
+    ):
+        await interaction.response.defer(ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        description=(
+            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Server Chat 2__** <:download_15:1520397591500816485>\n"
+            "<a:arrowburst:1513228669479292928> In order to actively enforce our roleplay guidelines regardless of Roblox's chat restrictions, staff members will utilize this channel to communicate with players who are in a different age group or who do not have access to the in-game chat. If you fall under either of these categories, please ensure that you regularly monitor this channel, as staff members or law enforcement officers may use it to contact you.\n\n"
+            "<:download_16:1520399105694629968>  **__Public Services__**\n"
+            "<:download_23:1520536462712377344>   Public Services members will also be required to use this to get in contact with civilians during traffic stops if they do not have access to the chat within the game. You are still expected to follow all guidelines when chatting within this channel.\n\n"
+            "<:download_3:1520445268938461427>  Side chatting in this channel will result in a mute, this is only permitted for use when Roleplay Sessions are being hosted."
+        ),
+        color=discord.Color.from_str("#93ffa5")
+    )
+
+    embed.set_footer(
+        text="Greenville Roleplay Server™",
+        icon_url=bot.user.display_avatar.url
+    )
+
+    await interaction.channel.send(embed=embed)
+    await interaction.response.send_message("Server chat 2 message sent!", ephemeral=True)
+
+    await send_log(
+        interaction.guild,
+        interaction.user,
+        "/server chat 2"
+    )
+
+
+server_group.add_command(server_chat_group)
+bot.tree.add_command(server_group)
 
 # =====================================
 # /earlyaccess
@@ -956,7 +1232,7 @@ async def earlyaccess(interaction: discord.Interaction, link: str):
         description=(
             f"> ### <a:yellowtada:1509751747248390175> __Greenville Roleplay Server, Early Access!__\n"
             f"{PRIMARY_ARROW_EMOJI} {host} has now released early access to their roleplay session.\n\n"
-            "<:GVRSarrow2:1515852723713474611> Nitro Boosters, Early Access members, and Staff Team members may now join using the button below, "
+            "Early Access members, contributors, staff, and P/S may join  using the button below, "
             "but sharing this link will result in the permanent removal of your Early Access privileges."
         ),
         color=discord.Color.from_str("#93ffa5")
@@ -1377,15 +1653,15 @@ async def over(interaction: discord.Interaction, additional_notes: str):
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Server, Roleplay Concluded!__\n"
+            f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Server, Session Over!__\n"
             f"{PRIMARY_ARROW_EMOJI} {host} has concluded their roleplay session.\n\n"
-            f"<:GVRSarrow2:1515852723713474611> Thank you to all civilians who attended. A new session will be hosted shortly by our staff team. "
+            f"Thank you for joining the session hosted by {host}, we hope you had an enjoyable experience throughout the session! "
             f"Please do not harass staff for sessions, or you may face moderation action.\n\n"
             f"<:yellownotification:1509751686179061760> **Roleplay Notes:**\n"
             f"{YELLOW_ARROW_EMOJI} Session Host: {host}\n"
             f"{YELLOW_ARROW_EMOJI} Session Duration: {session_duration}\n"
             f"{YELLOW_ARROW_EMOJI} Additional Notes: {additional_notes}\n\n"
-            f"{YELLOW_ARROW_EMOJI} Need to report a user? Please head over to our #server-assistance channel and create a ticket."
+            f"{YELLOW_ARROW_EMOJI} Need to report a user? Please head over to our #assistance channel and create a ticket."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -2097,7 +2373,7 @@ SESSION_FORMATS_TEXT_2 = """
 :HA Fail-Roleplay will NOT be tolerated into GVRS sessions, Watch rotations will commence at random, it is your responsibility as a civilian to stay informed of the session Regulations.
 ```
 ```
-:M Ensure to refer to roleplay-1 to gather more information about the current session.
+:M Ensure to refer to roleplay-1/2 to gather more information about the current session.
 ```
 ```
 :HA To avoid moderation, Ensure to check the vehicle list to ensure your desired vehicle is permitted into the session.
@@ -3637,11 +3913,10 @@ async def serverinfo(interaction: discord.Interaction):
 
     info_embed = discord.Embed(
         description=(
-            "<:download_19:1520399271776485516>  **__Greenville Roleplay Server — Opening Remarks__**\n"
-            " <:download_15:1520397591500816485> Welcome to Greenville Roleplay Server, a third-party **Greenville Roleplay Server** dedicated to delivering a smooth, realistic, and enjoyable civilian-based roleplay experience within Greenville, Wisconsin. Proudly bringing roleplay to over 20 members, we strive to create an engaging and welcoming community for everyone.\n\n"
+            "<:download_19:1520399271776485516>  **__Greenville Roleplay Server — Opening Remarks__** <:download_19:1520399271776485516>\n"
+            " <:download_15:1520397591500816485> Welcome to Greenville Roleplay Server, a third-party Greenville roleplay server dedicated to delivering a smooth, realistic, and enjoyable civilian-based roleplay experience within Greenville, Wisconsin. Proudly bringing roleplay to over 20,000 members, we strive to create an engaging and welcoming community for everyone.\n\n"
             "  <:download_17:1520399162062016615> Established in 2026 and founded by <@1472547347383718105>  and @zion_streax , this community was created for players who enjoy immersive, high-quality roleplay and a welcoming environment. Through active sessions and community interaction, we aim to bring the world of Greenville Roleplay to life in an engaging and realistic way.\n\n"
-            " <:download_17:1520399162062016615> Before getting started, please take a moment to review the information available in the dropdown menu below. It includes key details about our community and helpful resources to ensure a smooth and enjoyable experience.\n\n"
-            "Greenville Roleplay Server™"
+            " <:download_17:1520399162062016615> Before getting started, please take a moment to review the information available in the dropdown menu below. It includes key details about our community and helpful resources to ensure a smooth and enjoyable experience."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
