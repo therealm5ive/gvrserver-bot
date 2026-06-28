@@ -969,8 +969,14 @@ async def startup_one(interaction: discord.Interaction):
     embed = discord.Embed(
         description=(
             "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Roleplay 1__**\n"
-            "Welcome to the Greenville Roleplay Server's roleplay startup 1, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information.\n\n"
-            "<:gvrs_book:1520813015849767012>  **__Roleplay Information__**\n"
+            "Welcome to the **Greenville Roleplay Server's** roleplay startup 1, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information."
+        ),
+        color=discord.Color.from_str("#93ffa5")
+    )
+
+    info_embed = discord.Embed(
+        description=(
+            "> ### <:gvrs_book:1520813015849767012>  **__Roleplay Information__**\n"
             "<:gvrs_right_arrow_1:1520878718745317577>  Familiarize yourself with our server rules & regulations for a smoother roleplay experience within our sessions.\n"
             "<:gvrs_right_arrow_1:1520878718745317577>  Ensure you register your vehicle(s) with the /register command in the bot-input channel.\n"
             "<:gvrs_right_arrow_1:1520878718745317577>  Please ensure you have the correct roles for your vehicles. Refer to the dropdown below for the restricted vehicle list."
@@ -978,13 +984,14 @@ async def startup_one(interaction: discord.Interaction):
         color=discord.Color.from_str("#93ffa5")
     )
 
-    embed.set_footer(
+    info_embed.set_footer(
         text="Greenville Roleplay Server™",
         icon_url=bot.user.display_avatar.url
     )
 
     await send_image_embed(interaction.channel, STARTUP_ONE_PANEL_IMAGE)
     await interaction.channel.send(embed=embed)
+    await interaction.channel.send(embed=info_embed)
     await interaction.response.send_message("Startup 1 message sent!", ephemeral=True)
 
     await send_log(
@@ -1016,8 +1023,14 @@ async def startup_two(interaction: discord.Interaction):
     embed = discord.Embed(
         description=(
             "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Roleplay 2__**\n"
-            "Welcome to the Greenville Roleplay Server's roleplay startup 2, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information.\n\n"
-            "<:gvrs_book:1520813015849767012>  **__Roleplay Information__**\n"
+            "Welcome to the **Greenville Roleplay Server's** roleplay startup 2, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information."
+        ),
+        color=discord.Color.from_str("#93ffa5")
+    )
+
+    info_embed = discord.Embed(
+        description=(
+            "> ### <:gvrs_book:1520813015849767012>  **__Roleplay Information__**\n"
             "<:gvrs_right_arrow_1:1520878718745317577>  Familiarize yourself with our server rules & regulations for a smoother roleplay experience within our sessions.\n"
             "<:gvrs_right_arrow_1:1520878718745317577>  Ensure you register your vehicle(s) with the /register command in the bot-input channel.\n"
             "<:gvrs_right_arrow_1:1520878718745317577>  Please ensure you have the correct roles for your vehicles. Refer to the dropdown below for the restricted vehicle list."
@@ -1025,13 +1038,14 @@ async def startup_two(interaction: discord.Interaction):
         color=discord.Color.from_str("#93ffa5")
     )
 
-    embed.set_footer(
+    info_embed.set_footer(
         text="Greenville Roleplay Server™",
         icon_url=bot.user.display_avatar.url
     )
 
     await send_image_embed(interaction.channel, STARTUP_TWO_PANEL_IMAGE)
     await interaction.channel.send(embed=embed)
+    await interaction.channel.send(embed=info_embed)
     await interaction.response.send_message("Startup 2 message sent!", ephemeral=True)
 
     await send_log(
