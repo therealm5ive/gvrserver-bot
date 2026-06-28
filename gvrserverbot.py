@@ -851,7 +851,7 @@ async def startup(
         description=(
             f"> ### <a:gvrs_drippingheart:1520813287451656527>  **__Greenville Roleplay Server, Roleplay Startup!__**\n"
             f"{PRIMARY_ARROW_EMOJI} A session is now being hosted by {host}.\n\n"
-            f"Please ensure that you have read & familiarised yourself with all #server-information and that you abide by these rules within the session.\n\n"
+            f"Please ensure that you have read & familiarised yourself with all <#1519463389699768513> and that you abide by these rules within the session.\n\n"
             f"<:gvrs_link:1520813318716002476> **__Roleplay Regulations__**\n"
             f"{YELLOW_ARROW_EMOJI} Please check to make sure your vehicle isn't a banned vehicle.\n"
             f"{YELLOW_ARROW_EMOJI} Ensure you have registered all of your vehicles.\n"
@@ -905,7 +905,7 @@ async def startup(
                         if count >= reactions:
                             setup_embed = discord.Embed(
                                 description=(
-                                    f"> ### <a:GVRSloading:1513623240004735116>  **__Roleplay Setting Up!__**\n"
+                                    f"> ### <a:gvrs_loading:1520813321945874503>  **__Roleplay Setting Up!__**\n"
                                     f"{PRIMARY_ARROW_EMOJI} {host} is now setting up the roleplaying experience, staff, early access, contributors, and P/S may join using the EA link; allow the host up to 10 minutes to release. "
                                     "Please do not bother the host during this time, and wait until the session has been released.\n\n"
                                 ),
@@ -1315,14 +1315,14 @@ async def earlyaccess(interaction: discord.Interaction, link: str):
     host = interaction.user.mention
 
     await interaction.channel.send(
-        "<@&1290705580046024725> <@&1333516817431265392> <@&1290705579982979178>"
+        "<@&1520526497834860747> <@&1520149560750506208> <@&1520147470909313045>"
     )
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowtada:1509751747248390175>  **__Greenville Roleplay Server, Early Access!__**\n"
+            f"> ### <a:gvrs_exclamationmark:1520813291218407434>  **__Greenville Roleplay Server, Early Access!__**\n"
             f"{PRIMARY_ARROW_EMOJI} {host} has now released early access to their roleplay session.\n\n"
-            "Early Access members, contributors, staff, and P/S may join  using the button below, "
+            "<:gvrs_arrow2:1520813009923215581> Early Access members, contributors, staff, and P/S may join using the button below, "
             "but sharing this link will result in the permanent removal of your Early Access privileges."
         ),
         color=discord.Color.from_str("#93ffa5")
@@ -1434,20 +1434,20 @@ async def release(
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowanimatedstar:1509793309713764432>  **__Greenville Roleplay Server, Roleplay Released!__**\n"
+            f"> ### <a:gvrs_heartspin:1520813314576224527>  **__Greenville Roleplay Server, Roleplay Released!__**\n"
             f"{PRIMARY_ARROW_EMOJI} {host} has now **released** their roleplay session.\n"
             f"Prior to joining, please ensure to review the server information and all the roleplay regulations displayed below.\n\n"
 
-            f"<:yellowrightarrow:1509751702075740191> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
+            f"<:gvrs_arrow1:1520813007892906074> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
             f"Reinvites will occur every 20-30 minutes, so please do not ask the host for the link.\n\n"
 
-            f"{BOOK_EMOJI} **Roleplay Regulations:**\n"
+            f"<:gvrs_book:1520813015849767012> **Roleplay Regulations:**\n"
             f"{YELLOW_ARROW_EMOJI} Session Host: {host}\n"
             f"{YELLOW_ARROW_EMOJI} Peacetime Status: {peacetime_status}\n"
             f"{YELLOW_ARROW_EMOJI} FRP Speedlimit: {frp_speeds}\n"
             f"{YELLOW_ARROW_EMOJI} LEO Status: {leo_status}\n\n"
 
-            f"<:alertbell:1520085233876078803> **Any unauthorized sharing of the link will result in moderation action.**"
+            f"<:gvrs_notification:1520813330254659594> **Any unauthorized sharing of the link will result in moderation action.**"
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -1538,8 +1538,8 @@ async def reinvites(
 
     commencing_embed = discord.Embed(
         description=(
-            f"> ### <a:GVRSbutterfly:1515852830668357732>  **__Greenville Roleplay Server, Reinvites Commencing!__**\n"
-            f"<:GVRSdot:1513624330045493309> {host} is releasing reinvites for their **Greenville Roleplay Server** soon. "
+            f"> ### <a:gvrs_hearts_2:1520813308180037692>  **__Greenville Roleplay Server, Reinvites Commencing!__**\n"
+            f"<:gvrs_dot:1520813056546963667> {host} is releasing reinvites for their **Greenville Roleplay Server** soon. "
             f"In order to become the session link, the host needs **{reactions}** reactions."
         ),
         color=discord.Color.from_str("#93ffa5")
@@ -1558,17 +1558,17 @@ async def reinvites(
     async def send_reinvites_message():
         embed = discord.Embed(
             description=(
-                f"> ### <a:yellowanimatedstar:1509793309713764432>  **__Greenville Roleplay Server, Reinvites Released!__**\n"
+                f"> ### <a:gvrs_hearts_2:1520813308180037692>  **__Greenville Roleplay Server, Reinvites Released!__**\n"
                 f"{PRIMARY_ARROW_EMOJI} {host} has released re-invites for their session!\n\n"
-                f"<:yellowrightarrow:1509751702075740191> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
+                f"<:gvrs_arrow1:1520813007892906074> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
                 f"Reinvites will occur every 20-30 minutes, so please do not ask the host for the link.\n\n"
 
-                f"{BOOK_EMOJI} **Session Information:**\n"
+                f"<:gvrs_book:1520813015849767012> **Session Information:**\n"
                 f"{YELLOW_ARROW_EMOJI} FRP Speed Limit: **{frp_speeds}**\n"
                 f"{YELLOW_ARROW_EMOJI} Peacetime Status: **{peacetime_status}**\n"
                 f"{YELLOW_ARROW_EMOJI} LEO Status: **{leo_status}**\n\n"
 
-                f"<:alertbell:1520085233876078803> **Any unauthorized sharing of the link will result in moderation action.**"
+                f"<:gvrs_notification:1520813330254659594> **Any unauthorized sharing of the link will result in moderation action.**"
             ),
             color=discord.Color.from_str("#93ffa5")
         )
@@ -1745,7 +1745,7 @@ async def over(interaction: discord.Interaction, additional_notes: str):
         description=(
             f"> ### <a:gvrs_drippingheart:1520813287451656527>  **__Greenville Roleplay Server, Session Over!__**\n"
             f"{PRIMARY_ARROW_EMOJI} {host} has concluded their roleplay session.\n\n"
-            f"Thank you for joining the session hosted by {host}, we hope you had an enjoyable experience throughout the session! "
+            f"<:gvrs_arrow1:1520813007892906074> Thank you for joining the session hosted by {host}, we hope you had an enjoyable experience throughout the session! "
             f"Please do not harass staff for sessions, or you may face moderation action.\n\n"
             f"<:gvrs_link:1520813318716002476> **Roleplay Notes:**\n"
             f"{YELLOW_ARROW_EMOJI} Session Host: {host}\n"
@@ -2298,7 +2298,7 @@ async def supervise_start(interaction: discord.Interaction):
     embed = discord.Embed(
         description=(
             f"> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Session Supervising__**\n"
-            f"{interaction.user.mention} is supervising the session above! If you need support and the host is busy, please redirect to the supervisor"
+            f"{interaction.user.mention} is supervising the session above! If you need support and the host is busy, please redirect to the supervisor."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
