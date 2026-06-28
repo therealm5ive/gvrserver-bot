@@ -3843,10 +3843,10 @@ async def membercount(interaction: discord.Interaction):
 # /serverinfo
 # =====================================
 
-SERVER_INFO_IMAGE = "https://cdn.discordapp.com/attachments/1479130697800089622/1513908128557695098/Server_-_Embed_-_Regulations.webp?ex=6a3d36d0&is=6a3be550&hm=2b34b49689c50a78db9ad5d5372699bec636df5f9b8dd8243cdfc5f8085646b4&"
+SERVER_INFO_IMAGE = "https://media.discordapp.net/attachments/1520571194691289129/1520767330534031370/image_1.png?ex=6a426472&is=6a4112f2&hm=cb1abfce83a8663a13044688c2725f56db7c63e684d8906cd6d98646ec3ebc65&=&format=webp&quality=lossless"
 
-ROBLOX_GROUP_LINK = "https://www.roblox.com/communities/650527738/Official-Greenville-Roleplay-Server#!/about"
-RESTRICTED_VEHICLES_LINK = "https://docs.google.com/spreadsheets/d/1ahcV0bVi62XDg6rRYaEpGgFQV3_85_BPcwqXO-EVoVs/edit?gid=16420916#gid=16420916"
+ROBLOX_GROUP_LINK = "https://www.roblox.com"
+RESTRICTED_VEHICLES_LINK = "https://www.roblox.com"
 
 SERVER_GUIDELINES_TEXT = """
 **1. <:GVRSarrow:1513646972106702919> Read the Regulations**
