@@ -37,6 +37,7 @@ EARLYACCESS_ROLE_ID = 1520526497834860747
 SERVER_BOOSTER_ROLE_ID = 1520149560750506208
 STAFF_TEAM_ROLE_ID = 1520147470909313045
 CIVILIANS_ROLE_ID = 1520147861747007528
+VERIFIED_ROLE_ID = 1520188428535205959
 TICKET_CATEGORY_ID = 1520192391301042287
 ROLEPLAY_RESTRICTED_ROLE_ID = 1520556110581338122
 WELCOME_CHANNEL_ID = 1519463214264352768
@@ -54,6 +55,7 @@ ACTIVE_COHOSTS = {}
 ACTIVE_SUPERVISIONS = {}
 ACTIVE_STARTUPS = {}
 ACTIVE_HOSTS = {}
+AUTO_CIVILIAN_ROLE_TASKS = set()
 
 ALLOWED_ROLEPLAY_CHANNELS = ["roleplay-1", "roleplay-2"]
 MESSAGE_COMMAND_CHANNELS = [
@@ -81,6 +83,51 @@ def user_session_key(interaction):
 
 def has_bot_developer_role(member):
     return any(role.name == BOT_DEVELOPER_ROLE_NAME for role in member.roles)
+
+
+async def ensure_civilian_role_for_verified(member):
+    verified_role = member.guild.get_role(VERIFIED_ROLE_ID)
+    civilians_role = member.guild.get_role(CIVILIANS_ROLE_ID)
+
+    if verified_role is None or civilians_role is None:
+        return False
+
+    if verified_role not in member.roles or civilians_role in member.roles:
+        return False
+
+    try:
+        await member.add_roles(
+            civilians_role,
+            reason="Member is verified and missing Civilians role."
+        )
+
+        await send_log(
+            member.guild,
+            bot.user or member,
+            "Auto Civilians Role",
+            (
+                f"Member: {member.mention}\n"
+                f"Member ID: `{member.id}`\n"
+                f"Verified role: <@&{VERIFIED_ROLE_ID}>\n"
+                f"Added role: <@&{CIVILIANS_ROLE_ID}>"
+            )
+        )
+        return True
+    except discord.DiscordException as error:
+        print(f"Failed to add Civilians role to {member}: {error}")
+        return False
+
+
+async def ensure_civilian_role_after_join(member):
+    await asyncio.sleep(3)
+
+    try:
+        fresh_member = member.guild.get_member(member.id) or await member.guild.fetch_member(member.id)
+    except discord.DiscordException as error:
+        print(f"Failed to fetch member after join for Civilians role check: {member} ({error})")
+        return
+
+    await ensure_civilian_role_for_verified(fresh_member)
 
 
 async def send_image_embed(channel, image_url):
@@ -683,6 +730,10 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member: discord.Member):
+    auto_role_task = asyncio.create_task(ensure_civilian_role_after_join(member))
+    AUTO_CIVILIAN_ROLE_TASKS.add(auto_role_task)
+    auto_role_task.add_done_callback(AUTO_CIVILIAN_ROLE_TASKS.discard)
+
     channel = member.guild.get_channel(WELCOME_CHANNEL_ID)
 
     if channel is None:
