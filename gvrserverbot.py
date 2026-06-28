@@ -826,7 +826,7 @@ async def startup(
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Server, Roleplay Startup!__\n"
+            f"> ### <a:yellowmovingbow:1509751680651100230>  **__Greenville Roleplay Server, Roleplay Startup!__**\n"
             f"{PRIMARY_ARROW_EMOJI} A session is now being hosted by {host}.\n\n"
             f"Please ensure that you have read & familiarised yourself with all #server-information and that you abide by these rules within session. "
             f"<:yellownotification:1509751686179061760> **Roleplay Regulations**\n"
@@ -882,7 +882,7 @@ async def startup(
                         if count >= reactions:
                             setup_embed = discord.Embed(
                                 description=(
-                                    f"> ### <a:GVRSloading:1513623240004735116> __Roleplay Setting Up!__\n"
+                                    f"> ### <a:GVRSloading:1513623240004735116>  **__Roleplay Setting Up!__**\n"
                                     f"{PRIMARY_ARROW_EMOJI} {host} is now setting up the roleplaying experience, staff, early access, contributors, and P/S may join using the EA link; allow the host up to 10 minutes to release. "
                                     "Please do not bother the host during this time, and wait until the session has been released.\n\n"
                                 ),
@@ -1230,7 +1230,7 @@ async def earlyaccess(interaction: discord.Interaction, link: str):
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowtada:1509751747248390175> __Greenville Roleplay Server, Early Access!__\n"
+            f"> ### <a:yellowtada:1509751747248390175>  **__Greenville Roleplay Server, Early Access!__**\n"
             f"{PRIMARY_ARROW_EMOJI} {host} has now released early access to their roleplay session.\n\n"
             "Early Access members, contributors, staff, and P/S may join  using the button below, "
             "but sharing this link will result in the permanent removal of your Early Access privileges."
@@ -1344,7 +1344,7 @@ async def release(
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowanimatedstar:1509793309713764432> __Greenville Roleplay Server, Roleplay Released!__\n"
+            f"> ### <a:yellowanimatedstar:1509793309713764432>  **__Greenville Roleplay Server, Roleplay Released!__**\n"
             f"{PRIMARY_ARROW_EMOJI} {host} has now **released** their roleplay session.\n"
             f"Prior to joining, please ensure to review the server information and all the roleplay regulations displayed below.\n\n"
 
@@ -1448,7 +1448,7 @@ async def reinvites(
 
     commencing_embed = discord.Embed(
         description=(
-            f"> ### <a:GVRSbutterfly:1515852830668357732> __Greenville Roleplay Server, Reinvites Commencing!__\n"
+            f"> ### <a:GVRSbutterfly:1515852830668357732>  **__Greenville Roleplay Server, Reinvites Commencing!__**\n"
             f"<:GVRSdot:1513624330045493309> {host} is releasing reinvites for their **Greenville Roleplay Server** soon. "
             f"In order to become the session link, the host needs **{reactions}** reactions."
         ),
@@ -1468,7 +1468,7 @@ async def reinvites(
     async def send_reinvites_message():
         embed = discord.Embed(
             description=(
-                f"> ### <a:yellowanimatedstar:1509793309713764432> __Greenville Roleplay Server, Reinvites Released!__\n"
+                f"> ### <a:yellowanimatedstar:1509793309713764432>  **__Greenville Roleplay Server, Reinvites Released!__**\n"
                 f"{PRIMARY_ARROW_EMOJI} {host} has released re-invites for their session!\n\n"
                 f"<:yellowrightarrow:1509751702075740191> Session links will be regenerated within five minutes of release, so be sure to join quickly. "
                 f"Reinvites will occur every 20-30 minutes, so please do not ask the host for the link.\n\n"
@@ -1653,7 +1653,7 @@ async def over(interaction: discord.Interaction, additional_notes: str):
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Server, Session Over!__\n"
+            f"> ### <a:yellowmovingbow:1509751680651100230>  **__Greenville Roleplay Server, Session Over!__**\n"
             f"{PRIMARY_ARROW_EMOJI} {host} has concluded their roleplay session.\n\n"
             f"Thank you for joining the session hosted by {host}, we hope you had an enjoyable experience throughout the session! "
             f"Please do not harass staff for sessions, or you may face moderation action.\n\n"
@@ -1787,7 +1787,7 @@ async def force_end(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            f"> ### <a:yellowmovingbow:1509751680651100230> __Greenville Roleplay Server, Roleplay Concluded!__\n"
+            f"> ### <a:yellowmovingbow:1509751680651100230>  **__Greenville Roleplay Server, Roleplay Concluded!__**\n"
             f"{PRIMARY_ARROW_EMOJI} {interaction.user.mention} has force-ended {host}'s roleplay session.\n\n"
             f"<:GVRSarrow2:1515852723713474611> Thank you to all civilians who attended. A new session will be hosted shortly by our staff team. "
             f"Please do not harass staff for sessions, or you may face moderation action.\n\n"
@@ -1884,7 +1884,7 @@ async def loa_request(
     end_of_loa: str
 ):
     embed = discord.Embed(
-        title="__LOA Request__",
+        description="> ### <:download_19:1520399271776485516>  **__LOA Request__**",
         color=discord.Color.from_str("#93ffa5")
     )
 
@@ -2091,18 +2091,41 @@ async def cohost_start(interaction: discord.Interaction):
         return
 
     active_key = user_session_key(interaction)
+    channel_key = session_key(interaction)
     start_timestamp = int(discord.utils.utcnow().timestamp())
     ACTIVE_COHOSTS[active_key] = start_timestamp
     save_staff_timer(active_key, "cohost", start_timestamp)
 
     embed = discord.Embed(
-        description=f"{interaction.user.mention} is **co-hosting** the current session.",
+        description=(
+            f"> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Session Co-Host__**\n"
+            f"{interaction.user.mention} is co-hosting the session above! If you need support and the host is busy, please redirect to the co-host."
+        ),
         color=discord.Color.from_str("#93ffa5")
     )
 
-    await interaction.channel.send(
-        embed=embed
+    embed.set_footer(
+        text="Greenville Roleplay Server™",
+        icon_url=bot.user.display_avatar.url
     )
+
+    startup_message = None
+    startup_message_id = ACTIVE_STARTUPS.get(channel_key)
+
+    if startup_message_id:
+        try:
+            startup_message = await interaction.channel.fetch_message(startup_message_id)
+        except discord.DiscordException:
+            startup_message = None
+
+    if startup_message:
+        await interaction.channel.send(
+            embed=embed,
+            reference=startup_message,
+            mention_author=False
+        )
+    else:
+        await interaction.channel.send(embed=embed)
 
     await interaction.response.send_message("Cohost timer started!", ephemeral=True)
     await send_log(
@@ -2177,18 +2200,41 @@ async def supervise_start(interaction: discord.Interaction):
         return
 
     active_key = user_session_key(interaction)
+    channel_key = session_key(interaction)
     start_timestamp = int(discord.utils.utcnow().timestamp())
     ACTIVE_SUPERVISIONS[active_key] = start_timestamp
     save_staff_timer(active_key, "supervise", start_timestamp)
 
     embed = discord.Embed(
-        description=f"{interaction.user.mention} is **supervising** the current session.",
+        description=(
+            f"> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, Session Supervising__**\n"
+            f"{interaction.user.mention} is supervising the session above! If you need support and the host is busy, please redirect to the supervisor"
+        ),
         color=discord.Color.from_str("#93ffa5")
     )
 
-    await interaction.channel.send(
-        embed=embed
+    embed.set_footer(
+        text="Greenville Roleplay Server™",
+        icon_url=bot.user.display_avatar.url
     )
+
+    startup_message = None
+    startup_message_id = ACTIVE_STARTUPS.get(channel_key)
+
+    if startup_message_id:
+        try:
+            startup_message = await interaction.channel.fetch_message(startup_message_id)
+        except discord.DiscordException:
+            startup_message = None
+
+    if startup_message:
+        await interaction.channel.send(
+            embed=embed,
+            reference=startup_message,
+            mention_author=False
+        )
+    else:
+        await interaction.channel.send(embed=embed)
 
     await interaction.response.send_message("Supervision timer started!", ephemeral=True)
     await send_log(
@@ -2257,7 +2303,7 @@ staff_group = app_commands.Group(
 )
 
 STAFF_INFORMATION_TEXT = """
-> ### <a:blue_flower:1518783617160052909> __Welcome to the Greenville Roleplay Server Staff Team__ <a:blue_flower:1518783617160052909>
+> ### <a:blue_flower:1518783617160052909>  **__Welcome to the Greenville Roleplay Server Staff Team__** <a:blue_flower:1518783617160052909>
 Your commitment, professionalism, and leadership are essential to maintaining a safe, organized, and immersive roleplay environment for our community. As a member of the GVRS Staff Team, you represent the standard of conduct and structure that allows our server to operate at a high level. We sincerely appreciate the time and effort you dedicate to supporting GVRS and its members.
 
 <:GVRSarrow2:1515852723713474611> **Notes**
@@ -2328,7 +2374,7 @@ If real-life responsibilities arise, staff are encouraged to submit an LOA in ad
 """
 
 SESSION_FORMATS_TEXT_1 = """
-> ### <a:GVRDdesolvingheart:1515852981205991627> __Greenville Roleplay Server Session Format__ <a:GVRDdesolvingheart:1515852981205991627>
+> ### <a:GVRDdesolvingheart:1515852981205991627>  **__Greenville Roleplay Server Session Format__** <a:GVRDdesolvingheart:1515852981205991627>
 **(Use in this order)**
 
 **Early Entry:** <a:yellowanimatedstar:1509793309713764432>
@@ -2559,8 +2605,8 @@ async def staff_profile(interaction: discord.Interaction, user: discord.Member =
     conn.close()
 
     embed = discord.Embed(
-        title="Staff Profile",
         description=(
+            "> ### <:download_19:1520399271776485516>  **__Staff Profile__**\n"
             f"**User:** {user.mention}\n"
             f"**Strikes:** {strikes}"
         ),
@@ -2756,8 +2802,8 @@ class TicketCloseConfirmView(discord.ui.View):
                 opener = await bot.fetch_user(opener_id)
 
                 dm_embed = discord.Embed(
-                    title="Ticket Closed",
                     description=(
+                        "> ### <:download_19:1520399271776485516>  **__Ticket Closed__**\n"
                         f"Hello {opener.mention}, your ticket has been successfully closed by "
                         f"{interaction.user.mention}. We hope our team was able to resolve your issue.\n\n"
                         f"**Closed by**\n{interaction.user.mention}\n\n"
@@ -2875,8 +2921,10 @@ class PersistentTicketView(discord.ui.View):
             return
 
         embed = discord.Embed(
-            title="Close Ticket",
-            description="Are you sure you want to close this ticket?",
+            description=(
+                "> ### <:download_19:1520399271776485516>  **__Close Ticket__**\n"
+                "Are you sure you want to close this ticket?"
+            ),
             color=discord.Color.from_str("#93ffa5")
         )
 
@@ -2970,7 +3018,7 @@ class TicketModal(discord.ui.Modal):
 
         embed = discord.Embed(
             description=(
-                f"> ### __Greenville Roleplay Server, {self.ticket_type} Ticket__\n"
+                f"> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server, {self.ticket_type} Ticket__**\n"
                 f"Thank you for opening a **{self.ticket_type} Ticket**.\n\n"
                 f"**Reason for Opening:** {self.reason.value}\n"
                 f"**Additional Information:** {self.additional_info.value or 'None'}\n\n"
@@ -3345,8 +3393,10 @@ class DeleteWarningButtonView(discord.ui.View):
             return
 
         embed = discord.Embed(
-            title="Delete a Warning",
-            description=f"{self.target.mention} has **{len(self.warnings)}** warning(s). Select a warning to delete.",
+            description=(
+                "> ### <:download_19:1520399271776485516>  **__Delete a Warning__**\n"
+                f"{self.target.mention} has **{len(self.warnings)}** warning(s). Select a warning to delete."
+            ),
             color=discord.Color.red()
         )
 
@@ -3703,8 +3753,10 @@ async def warnings(interaction: discord.Interaction, user: str):
             )
 
     embed = discord.Embed(
-        title=f"{len(warnings_list)} Warning{'s' if len(warnings_list) != 1 else ''} for {target} ({target.id})",
-        description=text[:4000],
+        description=(
+            f"> ### <:download_19:1520399271776485516>  **__{len(warnings_list)} Warning{'s' if len(warnings_list) != 1 else ''} for {target} ({target.id})__**\n"
+            f"{text[:3900]}"
+        ),
         color=discord.Color.from_str("#93ffa5")
     )
 
@@ -3754,8 +3806,10 @@ async def modlogs(interaction: discord.Interaction, user: str):
         )
 
     embed = discord.Embed(
-        title=f"Modlogs for {target}",
-        description=text[:4000],
+        description=(
+            f"> ### <:download_19:1520399271776485516>  **__Modlogs for {target}__**\n"
+            f"{text[:3900]}"
+        ),
         color=discord.Color.from_str("#93ffa5")
     )
 
@@ -3774,8 +3828,10 @@ async def membercount(interaction: discord.Interaction):
     timestamp = int(discord.utils.utcnow().timestamp())
 
     embed = discord.Embed(
-        title=f"{interaction.guild.member_count} Members",
-        description=f"<t:{timestamp}:f>",
+        description=(
+            f"> ### <:download_19:1520399271776485516>  **__{interaction.guild.member_count} Members__**\n"
+            f"<t:{timestamp}:f>"
+        ),
         color=discord.Color.from_str("#93ffa5")
     )
 
@@ -3860,7 +3916,7 @@ class ServerInfoSelect(discord.ui.Select):
         if choice == "Server Guidelines":
             embed = discord.Embed(
                 description=(
-                    "> ### <a:GVRSbutterfly:1515852789266518056> __Greenville Roleplay Server, Server Guidelines__ <a:GVRSbutterfly:1515852789266518056>\n"
+                    "> ### <a:GVRSbutterfly:1515852789266518056>  **__Greenville Roleplay Server, Server Guidelines__** <a:GVRSbutterfly:1515852789266518056>\n"
                     f"{SERVER_GUIDELINES_TEXT}"
                 ),
                 color=discord.Color.from_str("#93ffa5")
@@ -3912,7 +3968,7 @@ async def serverinfo(interaction: discord.Interaction):
 
     info_embed = discord.Embed(
         description=(
-            "<:download_19:1520399271776485516>  **__Greenville Roleplay Server — Opening Remarks__** <:download_19:1520399271776485516>\n"
+            "> ### <:download_19:1520399271776485516>  **__Greenville Roleplay Server — Opening Remarks__** <:download_19:1520399271776485516>\n"
             " <:download_15:1520397591500816485> Welcome to Greenville Roleplay Server, a third-party Greenville roleplay server dedicated to delivering a smooth, realistic, and enjoyable civilian-based roleplay experience within Greenville, Wisconsin. Proudly bringing roleplay to over 20,000 members, we strive to create an engaging and welcoming community for everyone.\n\n"
             "  <:download_17:1520399162062016615> Established in 2026 and founded by <@1472547347383718105>  and @zion_streax , this community was created for players who enjoy immersive, high-quality roleplay and a welcoming environment. Through active sessions and community interaction, we aim to bring the world of Greenville Roleplay to life in an engaging and realistic way.\n\n"
             " <:download_17:1520399162062016615> Before getting started, please take a moment to review the information available in the dropdown menu below. It includes key details about our community and helpful resources to ensure a smooth and enjoyable experience."
@@ -4199,8 +4255,8 @@ async def repaint(
         )
         filename = f"repaint_preview_{index}.png"
         embed = discord.Embed(
-            title="Repainted Emoji",
             description=(
+                "> ### <:download_19:1520399271776485516>  **__Repainted Emoji__**\n"
                 f"Hex: `#{hex_color}`\n"
                 f"Executed by {interaction.user.mention}\n\n"
                 f"**Before -> After**\n{emoji_label}"
