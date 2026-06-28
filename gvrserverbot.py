@@ -667,7 +667,7 @@ async def on_member_join(member: discord.Member):
 
     embed = discord.Embed(
         description=(
-            "> ### <:download_20:1520444814703853666>  **__Welcome to Greenville Roleplay Server__**\n"
+            "> ### <a:pink_butterfly_2:1520813024305348799>  **__Welcome to Greenville Roleplay Server__**\n"
             "<:pink_arrow2:1520813009923215581>  Welcome to **__Greenville Roleplay Server__**! In order to become a civilian and gain access to the server, simply verify yourself with **__Bloxlink__** and ensure to read through our **__Regulations & Guidelines__** for necessary information.\n\n"
             "<:pink_notification:1520813330254659594>  **__Require Assistance?__** Simply reach out to a member of our **__High Command__** team and they will be able to support you!"
         ),
@@ -3858,42 +3858,40 @@ SERVER_INFO_IMAGE = "https://media.discordapp.net/attachments/152057119469128912
 ROBLOX_GROUP_LINK = "https://www.roblox.com"
 RESTRICTED_VEHICLES_LINK = "https://www.roblox.com"
 
-SERVER_GUIDELINES_TEXT = """
-**1. <:pink_arrow2:1520813009923215581> Read the Regulations**
+SERVER_GUIDELINES_TEXT = """**__1. <:pink_arrow2:1520813009923215581> Read the Regulations__**
 All Greenville Roleplay Server members must read and acknowledge the regulations listed in our information channels. Failure to comply may result in serious consequences.
 
-**2. <:pink_arrow2:1520813009923215581> Follow All Staff Instructions**
+**__2. <:pink_arrow2:1520813009923215581> Follow All Staff Instructions__**
 Members are required to follow directions given by staff. For example, if instructed to leave a session, you must comply immediately.
 
-
-**3. <:pink_arrow2:1520813009923215581> Exercise Common Sense**
+**__3. <:pink_arrow2:1520813009923215581> Exercise Common Sense__**
 Use sound judgment when determining whether actions violate the rules. If it would be unacceptable in another community, it is not acceptable here.
 
-**4. <:pink_arrow2:1520813009923215581> Age Requirement (13+)**
+**__4. <:pink_arrow2:1520813009923215581> Age Requirement (13+)__**
 In accordance with Discord's Terms of Service, all members must be at least 13 years old. Anyone found under this age will be removed until they meet the requirement.
 
-**5. <:pink_arrow2:1520813009923215581> No Harassment or Personal Attacks**
+**__5. <:pink_arrow2:1520813009923215581> No Harassment or Personal Attacks__**
 Any form of harassment or targeting of other members is prohibited. Violations may result in timeouts, strikes, or removal from the community.
 
-**6. <:pink_arrow2:1520813009923215581> No Slurs or Offensive Remarks**
+**__6. <:pink_arrow2:1520813009923215581> No Slurs or Offensive Remarks__**
 Use of discriminatory language or offensive comments based on race, gender identity, weight, ethnicity, or similar factors is strictly forbidden.
 
-**7. <:pink_arrow2:1520813009923215581> No Advertising**
+**__7. <:pink_arrow2:1520813009923215581> No Advertising__**
 Advertising of any kind is prohibited, including direct messages and public channels. Any server found recruiting Greenville Roleplay Server members or staff will be blacklisted, and involved members will be removed.
 
-**8. <:pink_arrow2:1520813009923215581> No Resource Theft**
+**__8. <:pink_arrow2:1520813009923215581> No Resource Theft__**
 Stealing any Greenville Roleplay Server resources, such as announcements, documentation or any other assets will lead to an immediate ban from Greenville Roleplay Server and all affiliated servers.
 
-**9. <:pink_arrow2:1520813009923215581> No Sharing of Personal Information**
+**__9. <:pink_arrow2:1520813009923215581> No Sharing of Personal Information__**
 Leaking, doxxing, or otherwise sharing personal information about any member will result in an immediate and permanent ban.
 
-**10. <:pink_arrow2:1520813009923215581> No NSFW Content**
+**__10. <:pink_arrow2:1520813009923215581> No NSFW Content__**
 Posting or distributing not safe for work material, including pornography, gore, or violent imagery, is strictly prohibited. First offense results in a warning, although the second offense results in an immediate ban.
 
-**11. <:pink_arrow2:1520813009923215581> Maintain Respect**
+**__11. <:pink_arrow2:1520813009923215581> Maintain Respect__**
 Greenville Roleplay Server will not tolerate any disrespect, defamatory comments or complaints about Greenville Roleplay Server or affiliated communities. Any user found being disrespectful will be moderated.
 
-**12. <:pink_arrow2:1520813009923215581> Voice Channel Conduct**
+**__12. <:pink_arrow2:1520813009923215581> Voice Channel Conduct__**
 All rules apply in voice channels. Excessive noise, disruptive sounds, or "ear-rape" audio is prohibited and will result in disciplinary action.
 """
 
