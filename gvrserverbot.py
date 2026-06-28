@@ -969,7 +969,7 @@ async def startup_one(interaction: discord.Interaction):
     embed = discord.Embed(
         description=(
             "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Roleplay 1__**\n"
-            "Welcome to the **Greenville Roleplay Server's** roleplay startup 1, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information."
+            "<:gvrs_arrow1:1520813007892906074> Welcome to the **Greenville Roleplay Server's** roleplay startup 1, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -1023,7 +1023,7 @@ async def startup_two(interaction: discord.Interaction):
     embed = discord.Embed(
         description=(
             "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Roleplay 2__**\n"
-            "Welcome to the **Greenville Roleplay Server's** roleplay startup 2, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information."
+            "<:gvrs_arrow1:1520813007892906074> Welcome to the **Greenville Roleplay Server's** roleplay startup 2, within this channel, members within our Staff Department will host roleplay sessions for our civilians to attend! Prior to joining our Roblox sessions, ensure you are in the Roblox Group & have familiarized yourself with all guidelines and in-game information."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -1083,13 +1083,15 @@ async def checkpoint(interaction: discord.Interaction):
     embed = discord.Embed(
         description=(
             "> ### <:gvrs_book:1520813015849767012>  **__| Roleplay Checkpoint__**\n"
-            "Civilians must strictly follow the designated format when passing through checkpoints to ensure smooth interactions and avoid delays or complications.\n\n"
-            "**__Checkpoint Format__**\n"
-            "If the host requests that you ping them for approval in the session, it is essential to follow all instructions swiftly to avoid complications.\n\n"
-            "**Username:**\n"
-            "**Session Host:**\n"
-            "**Vehicle:**\n"
-            "**Vehicle Colour:**"
+            "<:gvrs_dot:1520813056546963667> Civilians must strictly follow the designated format when passing through checkpoints to ensure smooth interactions and avoid delays or complications.\n\n"
+            "**__Checkpoint Format:__**\n"
+            "<:gvrs_right_arrow_1:1520878718745317577> If the host requests that you ping them for approval in the session, it is essential to follow all instructions swiftly to avoid complications.\n\n"
+            "```text\n"
+            "Username:\n"
+            "Session Host:\n"
+            "Vehicle:\n"
+            "Vehicle Colour:\n"
+            "```"
         ),
         color=discord.Color.from_str("#93ffa5")
     )
@@ -1193,22 +1195,29 @@ async def server_chat_one(interaction: discord.Interaction):
 
     embed = discord.Embed(
         description=(
-            "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Server Chat 1__** <:pink_arrow2:1520813009923215581>\n"
-            "<a:arrowburst:1513228669479292928> In order to actively enforce our roleplay guidelines regardless of Roblox's chat restrictions, staff members will utilize this channel to communicate with players who are in a different age group or who do not have access to the in-game chat. If you fall under either of these categories, please ensure that you regularly monitor this channel, as staff members or law enforcement officers may use it to contact you.\n\n"
-            "<:gvrs_book:1520813015849767012>  **__Public Services__**\n"
-            "<:download_23:1520536462712377344>   Public Services members will also be required to use this to get in contact with civilians during traffic stops if they do not have access to the chat within the game. You are still expected to follow all guidelines when chatting within this channel.\n\n"
+            "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Server Chat 1__**\n"
+            "<:gvrs_dot:1520813056546963667> In order to actively enforce our roleplay guidelines regardless of Roblox's chat restrictions, staff members will utilize this channel to communicate with players who are in a different age group or who do not have access to the in-game chat. If you fall under either of these categories, please ensure that you regularly monitor this channel, as staff members or law enforcement officers may use it to contact you."
+        ),
+        color=discord.Color.from_str("#93ffa5")
+    )
+
+    public_services_embed = discord.Embed(
+        description=(
+            "> ### <:gvrs_car1:1520813028214571090>  **__Public Services__**\n"
+            "<:gvrs_arrow2:1520813009923215581> Public Services members will also be required to use this to get in contact with civilians during traffic stops if they do not have access to the chat within the game. You are still expected to follow all guidelines when chatting within this channel.\n\n"
             "<:gvrs_right_arrow_1:1520878718745317577>  Side chatting in this channel will result in a mute, this is only permitted for use when Roleplay Sessions are being hosted."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
 
-    embed.set_footer(
+    public_services_embed.set_footer(
         text="Greenville Roleplay Server™",
         icon_url=bot.user.display_avatar.url
     )
 
     await send_image_embed(interaction.channel, SERVER_CHAT_PANEL_IMAGE)
     await interaction.channel.send(embed=embed)
+    await interaction.channel.send(embed=public_services_embed)
     await interaction.response.send_message("Server chat 1 message sent!", ephemeral=True)
 
     await send_log(
@@ -1223,30 +1232,45 @@ async def server_chat_one(interaction: discord.Interaction):
     description="Sends the server chat 2 message"
 )
 async def server_chat_two(interaction: discord.Interaction):
-    if not any(
-        role.name in ["Staff Team", "High Command"]
-        for role in interaction.user.roles
-    ):
-        await interaction.response.defer(ephemeral=True)
+    if interaction.channel.name not in MESSAGE_COMMAND_CHANNELS:
+        await interaction.response.send_message(
+            "You can only use this command in an approved session channel.",
+            ephemeral=True
+        )
+        return
+
+    if not has_bot_developer_role(interaction.user):
+        await interaction.response.send_message(
+            "You do not have permission to use this command.",
+            ephemeral=True
+        )
         return
 
     embed = discord.Embed(
         description=(
-            "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Server Chat 2__** <:pink_arrow2:1520813009923215581>\n"
-            "<a:arrowburst:1513228669479292928> In order to actively enforce our roleplay guidelines regardless of Roblox's chat restrictions, staff members will utilize this channel to communicate with players who are in a different age group or who do not have access to the in-game chat. If you fall under either of these categories, please ensure that you regularly monitor this channel, as staff members or law enforcement officers may use it to contact you.\n\n"
-            "<:gvrs_book:1520813015849767012>  **__Public Services__**\n"
-            "<:download_23:1520536462712377344>   Public Services members will also be required to use this to get in contact with civilians during traffic stops if they do not have access to the chat within the game. You are still expected to follow all guidelines when chatting within this channel.\n\n"
+            "> ### <a:pink_butterfly_1:1520813020811366601>  **__Greenville Roleplay Server, Server Chat 2__**\n"
+            "<:gvrs_dot:1520813056546963667> In order to actively enforce our roleplay guidelines regardless of Roblox's chat restrictions, staff members will utilize this channel to communicate with players who are in a different age group or who do not have access to the in-game chat. If you fall under either of these categories, please ensure that you regularly monitor this channel, as staff members or law enforcement officers may use it to contact you."
+        ),
+        color=discord.Color.from_str("#93ffa5")
+    )
+
+    public_services_embed = discord.Embed(
+        description=(
+            "> ### <:gvrs_car1:1520813028214571090>  **__Public Services__**\n"
+            "<:gvrs_arrow2:1520813009923215581> Public Services members will also be required to use this to get in contact with civilians during traffic stops if they do not have access to the chat within the game. You are still expected to follow all guidelines when chatting within this channel.\n\n"
             "<:gvrs_right_arrow_1:1520878718745317577>  Side chatting in this channel will result in a mute, this is only permitted for use when Roleplay Sessions are being hosted."
         ),
         color=discord.Color.from_str("#93ffa5")
     )
 
-    embed.set_footer(
+    public_services_embed.set_footer(
         text="Greenville Roleplay Server™",
         icon_url=bot.user.display_avatar.url
     )
 
+    await send_image_embed(interaction.channel, SERVER_CHAT_PANEL_IMAGE)
     await interaction.channel.send(embed=embed)
+    await interaction.channel.send(embed=public_services_embed)
     await interaction.response.send_message("Server chat 2 message sent!", ephemeral=True)
 
     await send_log(
