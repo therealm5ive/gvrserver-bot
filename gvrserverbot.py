@@ -38,6 +38,7 @@ SERVER_BOOSTER_ROLE_ID = 1520149560750506208
 STAFF_TEAM_ROLE_ID = 1520147470909313045
 CIVILIANS_ROLE_ID = 1520147861747007528
 VERIFIED_ROLE_ID = 1520188428535205959
+UNVERIFIED_ROLE_NAME = "Unverified"
 TICKET_CATEGORY_ID = 1520192391301042287
 ROLEPLAY_RESTRICTED_ROLE_ID = 1520556110581338122
 WELCOME_CHANNEL_ID = 1519463214264352768
@@ -88,9 +89,33 @@ def has_bot_developer_role(member):
 async def ensure_civilian_role_for_verified(member):
     verified_role = member.guild.get_role(VERIFIED_ROLE_ID)
     civilians_role = member.guild.get_role(CIVILIANS_ROLE_ID)
+    unverified_role = discord.utils.get(member.guild.roles, name=UNVERIFIED_ROLE_NAME)
 
     if verified_role is None or civilians_role is None:
         return False
+
+    if unverified_role in member.roles and verified_role in member.roles:
+        try:
+            await member.remove_roles(
+                verified_role,
+                reason="Member has both Verified and Unverified roles."
+            )
+
+            await send_log(
+                member.guild,
+                bot.user or member,
+                "Auto Verified Role Removed",
+                (
+                    f"Member: {member.mention}\n"
+                    f"Member ID: `{member.id}`\n"
+                    f"Removed role: <@&{VERIFIED_ROLE_ID}>\n"
+                    f"Reason: Member had both Verified and Unverified roles."
+                )
+            )
+            return True
+        except discord.DiscordException as error:
+            print(f"Failed to remove Verified role from {member}: {error}")
+            return False
 
     if verified_role not in member.roles or civilians_role in member.roles:
         return False
@@ -759,6 +784,17 @@ async def on_member_join(member: discord.Member):
         embed=embed,
         allowed_mentions=discord.AllowedMentions(users=True)
     )
+
+
+@bot.event
+async def on_member_update(before: discord.Member, after: discord.Member):
+    before_role_ids = {role.id for role in before.roles}
+    after_role_ids = {role.id for role in after.roles}
+
+    if before_role_ids == after_role_ids:
+        return
+
+    await ensure_civilian_role_for_verified(after)
 
 # =====================================
 # /say
