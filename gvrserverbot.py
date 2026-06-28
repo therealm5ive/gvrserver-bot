@@ -1879,7 +1879,7 @@ async def force_end(interaction: discord.Interaction):
         description=(
             f"> ### <a:gvrs_drippingheart:1520813287451656527>  **__Greenville Roleplay Server, Roleplay Concluded!__**\n"
             f"{PRIMARY_ARROW_EMOJI} {interaction.user.mention} has force-ended {host}'s roleplay session.\n\n"
-            f"<:GVRSarrow2:1515852723713474611> Thank you to all civilians who attended. A new session will be hosted shortly by our staff team. "
+            f"<:gvrs_arrow1:1520813007892906074> Thank you to all civilians who attended. A new session will be hosted shortly by our staff team. "
             f"Please do not harass staff for sessions, or you may face moderation action.\n\n"
             f"<:gvrs_link:1520813318716002476> **Roleplay Notes:**\n"
             f"{YELLOW_ARROW_EMOJI} Session Host: {host}\n"
